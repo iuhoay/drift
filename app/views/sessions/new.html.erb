@@ -1,0 +1,28 @@
+<% content_for :title, "Sign in" %>
+
+<div class="bg-white rounded-lg shadow-sm border border-stone-200 px-8 py-10 font-sans">
+  <h1 class="text-2xl font-semibold tracking-tight mb-1">Drift</h1>
+  <p class="text-sm text-stone-500 mb-6">Sign in to your reader.</p>
+
+  <%= form_with url: session_url, class: "space-y-4" do |form| %>
+    <div>
+      <%= form.label :email_address, "Email", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username",
+            value: params[:email_address],
+            class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none" %>
+    </div>
+
+    <div>
+      <%= form.label :password, class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72,
+            class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none" %>
+    </div>
+
+    <%= form.submit "Sign in", class: "w-full py-2 rounded bg-stone-900 text-white hover:bg-stone-700 cursor-pointer" %>
+  <% end %>
+
+  <div class="mt-6 text-sm text-stone-500 text-center space-y-1">
+    <p>No account? <%= link_to "Create one", new_registration_path, class: "underline text-stone-900" %></p>
+    <p><%= link_to "Forgot password?", new_password_path, class: "underline" %></p>
+  </div>
+</div>

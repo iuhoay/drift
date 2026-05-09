@@ -1,0 +1,41 @@
+<% content_for :title, "Drift" %>
+
+<div class="max-w-3xl mx-auto px-6 py-8">
+  <header class="flex items-baseline justify-between mb-6 font-sans">
+    <h1 class="text-xl font-medium tracking-tight">
+      <% if @feed %>
+        <%= @feed.display_title %>
+      <% else %>
+        <%= @scope.capitalize %>
+      <% end %>
+    </h1>
+
+    <%= form_with url: entries_path, method: :get, data: { turbo_frame: "_top" }, class: "flex gap-2 items-center" do |f| %>
+      <%= hidden_field_tag :scope, @scope %>
+      <%= hidden_field_tag :feed_id, @feed&.id %>
+      <%= text_field_tag :q, @query, placeholder: "Search…",
+            class: "px-3 py-1.5 text-sm rounded border border-stone-300 focus:border-stone-500 focus:outline-none w-56 bg-white" %>
+    <% end %>
+  </header>
+
+  <% if @entries.empty? %>
+    <div class="text-center py-20 text-stone-500 font-sans">
+      <p class="text-lg">Nothing here yet.</p>
+      <p class="text-sm mt-2">
+        <% if @query.present? %>
+          No entries match "<%= @query %>".
+        <% elsif @scope == "unread" %>
+          You're all caught up.
+        <% else %>
+          <%= link_to "Add a feed", new_subscription_path, class: "underline" %> to get started.
+        <% end %>
+      </p>
+    </div>
+  <% else %>
+    <ul class="divide-y divide-stone-200">
+      <% @entries.each do |entry| %>
+        <%= render "entries/entry_row", entry: entry, user_entry: @user_entries_by_id[entry.id] %>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

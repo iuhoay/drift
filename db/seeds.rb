@@ -1,9 +1,20 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+user = User.find_or_create_by!(email_address: "demo@drift.local") do |u|
+  u.password = "drift1234"
+  u.password_confirmation = "drift1234"
+end
+
+starter_feeds = [
+  "https://daringfireball.net/feeds/main",
+  "https://world.hey.com/dhh/feed.atom",
+  "https://blog.cleancoder.com/atom.xml"
+]
+
+starter_feeds.each do |url|
+  feed = Feed.find_or_initialize_by(feed_url: url)
+  feed.title ||= url
+  feed.save!
+  Subscription.find_or_create_by!(user: user, feed: feed)
+  FeedRefreshJob.perform_later(feed.id)
+end
+
+puts "Seeded user demo@drift.local / drift1234 with #{user.subscriptions.count} feeds."

@@ -1,0 +1,36 @@
+<% content_for :title, "Feeds" %>
+
+<div class="max-w-3xl mx-auto px-6 py-8">
+  <header class="flex items-baseline justify-between mb-6 font-sans">
+    <h1 class="text-xl font-medium tracking-tight">Feeds</h1>
+    <%= link_to "Add feed", new_subscription_path,
+          class: "px-3 py-1.5 text-sm rounded bg-stone-900 text-white hover:bg-stone-700" %>
+  </header>
+
+  <% if @subscriptions.empty? %>
+    <p class="text-stone-500 font-sans">You haven't subscribed to anything yet.</p>
+  <% else %>
+    <ul class="divide-y divide-stone-200 font-sans">
+      <% @subscriptions.each do |subscription| %>
+        <li class="py-3 flex items-center justify-between gap-4">
+          <div class="min-w-0 flex-1">
+            <div class="font-medium truncate"><%= subscription.display_title %></div>
+            <div class="text-xs text-stone-500 truncate">
+              <%= subscription.feed.feed_url %>
+              <% if subscription.feed.last_error.present? %>
+                <span class="ml-2 text-red-600">⚠ <%= subscription.feed.last_error %></span>
+              <% elsif subscription.feed.last_success_at %>
+                <span class="ml-2">last fetched <%= relative_time(subscription.feed.last_success_at) %></span>
+              <% end %>
+            </div>
+          </div>
+
+          <%= button_to "Unsubscribe", subscription_path(subscription),
+                method: :delete,
+                form: { data: { turbo_confirm: "Unsubscribe from #{subscription.display_title}?" } },
+                class: "text-xs text-stone-500 hover:text-red-600 underline" %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

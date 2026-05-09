@@ -1,0 +1,12 @@
+one_example:
+  user: one
+  feed: example
+
+one_stale:
+  user: one
+  feed: stale
+  custom_title: My Stale Feed
+
+two_example:
+  user: two
+  feed: example

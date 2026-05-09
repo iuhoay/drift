@@ -1,0 +1,33 @@
+example_first:
+  feed: example
+  guid: example-1
+  title: First Example Post
+  url: https://example.com/posts/1
+  summary: A short summary of the first post.
+  content: <p>The full body of the <strong>first</strong> post.</p>
+  author: Alice
+  published_at: <%= 2.days.ago.iso8601 %>
+
+example_second:
+  feed: example
+  guid: example-2
+  title: Second Example Post
+  url: https://example.com/posts/2
+  summary: A short summary of the second post.
+  content: <p>The full body of the second post.</p>
+  author: Bob
+  published_at: <%= 1.day.ago.iso8601 %>
+
+stale_first:
+  feed: stale
+  guid: stale-1
+  title: Stale Post
+  url: https://stale.example.com/posts/1
+  published_at: <%= 3.days.ago.iso8601 %>
+
+unsubscribed_first:
+  feed: unsubscribed
+  guid: unsub-1
+  title: Hidden Post
+  url: https://unsub.example.com/posts/1
+  published_at: <%= 1.day.ago.iso8601 %>

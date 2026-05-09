@@ -1,0 +1,83 @@
+class EntriesController < ApplicationController
+  before_action :set_entry, only: [ :show, :read, :unread, :star, :unstar ]
+
+  PER_PAGE = 50
+
+  def index
+    @scope = params[:scope].presence_in(%w[all unread starred]) || "unread"
+    @feed = Current.user.feeds.find_by(id: params[:feed_id]) if params[:feed_id]
+    @query = params[:q].to_s.strip
+
+    entries = Current.user.subscribed_entries.includes(:feed)
+    entries = entries.where(feed_id: @feed.id) if @feed
+    entries = entries.search(@query) if @query.present?
+
+    case @scope
+    when "unread"
+      entries = entries.where.not(id: read_entry_ids)
+    when "starred"
+      entries = entries.where(id: starred_entry_ids)
+    end
+
+    entries = entries.recent if @query.blank?
+
+    @entries = entries.limit(PER_PAGE)
+    @user_entries_by_id = Current.user.user_entries
+                                      .where(entry_id: @entries.map(&:id))
+                                      .index_by(&:entry_id)
+  end
+
+  def show
+    @user_entry = Current.user.user_entries.find_or_create_by!(entry: @entry)
+    @user_entry.mark_read!
+  end
+
+  def read
+    user_entry_for(@entry).mark_read!
+    respond_with_turbo
+  end
+
+  def unread
+    user_entry_for(@entry).mark_unread!
+    respond_with_turbo
+  end
+
+  def star
+    ue = user_entry_for(@entry)
+    ue.update!(starred_at: Time.current) unless ue.starred?
+    respond_with_turbo
+  end
+
+  def unstar
+    ue = user_entry_for(@entry)
+    ue.update!(starred_at: nil) if ue.starred?
+    respond_with_turbo
+  end
+
+  private
+
+  def set_entry
+    @entry = Current.user.subscribed_entries.find(params[:id])
+  end
+
+  def user_entry_for(entry)
+    Current.user.user_entries.find_or_create_by!(entry: entry)
+  end
+
+  def read_entry_ids
+    Current.user.user_entries.read.select(:entry_id)
+  end
+
+  def starred_entry_ids
+    Current.user.user_entries.starred.select(:entry_id)
+  end
+
+  def respond_with_turbo
+    @user_entry = Current.user.user_entries.find_by(entry_id: @entry.id)
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back fallback_location: root_path }
+    end
+  end
+end

@@ -1,40 +1,43 @@
-# SQLite. Versions 3.8.0 and up are supported.
-#   gem install sqlite3
-#
-#   Ensure the SQLite 3 gem is defined in your Gemfile
-#   gem "sqlite3"
-#
+<%
+  # Rails 8.2 reads .env via Rails.application.dotenvs and combines it with
+  # ENV + credentials in Rails.app.creds. .env is NOT auto-loaded into ENV,
+  # so config files must look up values explicitly.
+  creds = Rails.application.creds
+%>
 default: &default
-  adapter: sqlite3
-  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  timeout: 5000
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= creds.option(:rails_max_threads, default: 5) %>
+  host: <%= creds.option(:database_host, default: "localhost") %>
+  port: <%= creds.option(:database_port, default: 5432) %>
+  username: <%= creds.option(:database_username, default: ENV["USER"]) %>
+  password: <%= creds.option(:database_password) %>
 
 development:
   <<: *default
-  database: storage/development.sqlite3
+  database: <%= creds.option(:database_name, default: "drift_development") %>
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: storage/test.sqlite3
+  database: <%= creds.option(:test_database_name, default: "drift_test") %>
 
-# Store production database in the storage/ directory, which by default
-# is mounted as a persistent Docker volume in config/deploy.yml.
 production:
   primary:
     <<: *default
-    database: storage/production.sqlite3
+    database: <%= creds.option(:database_name, default: "drift_production") %>
+    username: <%= creds.option(:database_username, default: "drift") %>
   cache:
     <<: *default
-    database: storage/production_cache.sqlite3
+    database: <%= creds.option(:database_name, default: "drift_production") %>_cache
+    username: <%= creds.option(:database_username, default: "drift") %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *default
-    database: storage/production_queue.sqlite3
+    database: <%= creds.option(:database_name, default: "drift_production") %>_queue
+    username: <%= creds.option(:database_username, default: "drift") %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *default
-    database: storage/production_cable.sqlite3
+    database: <%= creds.option(:database_name, default: "drift_production") %>_cable
+    username: <%= creds.option(:database_username, default: "drift") %>
     migrations_paths: db/cable_migrate

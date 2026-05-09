@@ -1,0 +1,9 @@
+one_example_first_read:
+  user: one
+  entry: example_first
+  read_at: <%= 1.hour.ago.iso8601 %>
+
+one_example_second_starred:
+  user: one
+  entry: example_second
+  starred_at: <%= 30.minutes.ago.iso8601 %>

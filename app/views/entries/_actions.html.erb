@@ -1,0 +1,28 @@
+<%
+  read = user_entry&.read_at.present?
+  starred = user_entry&.starred_at.present?
+%>
+
+<% if starred %>
+  <%= button_to unstar_entry_path(entry), method: :post, form: { class: "inline" },
+        class: "px-3 py-1 rounded border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100" do %>
+    ★ Starred
+  <% end %>
+<% else %>
+  <%= button_to star_entry_path(entry), method: :post, form: { class: "inline" },
+        class: "px-3 py-1 rounded border border-stone-300 hover:bg-stone-100" do %>
+    ☆ Star
+  <% end %>
+<% end %>
+
+<% if read %>
+  <%= button_to unread_entry_path(entry), method: :post, form: { class: "inline" },
+        class: "px-3 py-1 rounded border border-stone-300 hover:bg-stone-100" do %>
+    Mark unread
+  <% end %>
+<% else %>
+  <%= button_to read_entry_path(entry), method: :post, form: { class: "inline" },
+        class: "px-3 py-1 rounded border border-stone-300 hover:bg-stone-100" do %>
+    Mark read
+  <% end %>
+<% end %>

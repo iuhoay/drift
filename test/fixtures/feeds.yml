@@ -1,0 +1,26 @@
+example:
+  title: Example Feed
+  feed_url: https://example.com/feed.xml
+  site_url: https://example.com
+  description: An example feed for tests
+  fetch_failure_count: 0
+  last_fetched_at: <%= 1.hour.ago.iso8601 %>
+
+stale:
+  title: Stale Feed
+  feed_url: https://stale.example.com/feed.xml
+  fetch_failure_count: 0
+  last_fetched_at: <%= 2.hours.ago.iso8601 %>
+
+unsubscribed:
+  title: Unsubscribed Feed
+  feed_url: https://unsub.example.com/feed.xml
+  fetch_failure_count: 0
+  last_fetched_at: <%= 1.minute.ago.iso8601 %>
+
+failing:
+  title: Failing Feed
+  feed_url: https://broken.example.com/feed.xml
+  fetch_failure_count: 3
+  last_error: HTTP 500
+  last_fetched_at: <%= 5.minutes.ago.iso8601 %>

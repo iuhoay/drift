@@ -1,0 +1,75 @@
+<%
+  counts = unread_counts_for(Current.user)
+  total_unread = counts.values.sum
+  starred_count = starred_count_for(Current.user)
+  subs = Current.user.subscriptions.joins(:feed).includes(:feed).order(Arel.sql("LOWER(COALESCE(NULLIF(subscriptions.custom_title, ''), feeds.title, feeds.feed_url))"))
+%>
+<aside class="w-72 shrink-0 border-r border-stone-200 bg-white/60 backdrop-blur flex flex-col h-screen">
+  <div class="px-5 pt-6 pb-4 border-b border-stone-200">
+    <%= link_to root_path, class: "flex items-baseline gap-2" do %>
+      <span class="text-2xl font-semibold tracking-tight">Drift</span>
+      <span class="text-xs uppercase tracking-widest text-stone-400">RSS</span>
+    <% end %>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto px-3 py-4 text-sm">
+    <ul class="space-y-0.5 font-sans">
+      <li>
+        <%= link_to entries_path(scope: "unread"),
+              class: "flex justify-between items-center px-3 py-1.5 rounded #{params[:scope] == 'unread' || params[:scope].blank? && controller_name == 'entries' && params[:feed_id].blank? ? 'bg-stone-200/70 font-medium' : 'hover:bg-stone-100'}" do %>
+          <span>Unread</span>
+          <% if total_unread.positive? %>
+            <span class="text-xs text-stone-500"><%= total_unread %></span>
+          <% end %>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to "All entries", entries_path(scope: "all"),
+              class: "block px-3 py-1.5 rounded #{params[:scope] == 'all' ? 'bg-stone-200/70 font-medium' : 'hover:bg-stone-100'}" %>
+      </li>
+      <li>
+        <%= link_to entries_path(scope: "starred"),
+              class: "flex justify-between items-center px-3 py-1.5 rounded #{params[:scope] == 'starred' ? 'bg-stone-200/70 font-medium' : 'hover:bg-stone-100'}" do %>
+          <span>Starred</span>
+          <% if starred_count.positive? %>
+            <span class="text-xs text-stone-500"><%= starred_count %></span>
+          <% end %>
+        <% end %>
+      </li>
+    </ul>
+
+    <div class="mt-6 mb-2 px-3 flex items-center justify-between">
+      <h3 class="text-[11px] uppercase tracking-widest text-stone-500 font-sans">Subscriptions</h3>
+      <%= link_to "+", new_subscription_path, class: "text-stone-500 hover:text-stone-900 text-base leading-none", title: "Add feed" %>
+    </div>
+
+    <ul class="space-y-0.5 font-sans">
+      <% subs.each do |sub| %>
+        <% unread = counts[sub.feed_id].to_i %>
+        <li>
+          <%= link_to entries_path(feed_id: sub.feed_id, scope: "unread"),
+                class: "flex justify-between items-center gap-2 px-3 py-1.5 rounded #{params[:feed_id].to_s == sub.feed_id.to_s ? 'bg-stone-200/70 font-medium' : 'hover:bg-stone-100'}" do %>
+            <span class="truncate"><%= sub.display_title %></span>
+            <% if unread.positive? %>
+              <span class="text-xs text-stone-500 shrink-0"><%= unread %></span>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+      <% if subs.empty? %>
+        <li class="px-3 py-2 text-stone-500 italic text-xs">
+          No feeds yet. <%= link_to "Add one →", new_subscription_path, class: "underline" %>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+
+  <div class="px-5 py-3 border-t border-stone-200 text-xs text-stone-500 font-sans flex items-center justify-between">
+    <span class="truncate"><%= Current.user.email_address %></span>
+    <%= button_to "Sign out", session_path, method: :delete, form: { class: "inline" }, class: "underline hover:text-stone-900" %>
+  </div>
+
+  <div class="px-5 pb-3 font-sans">
+    <%= link_to "Manage feeds", subscriptions_path, class: "block text-xs text-stone-500 hover:text-stone-900" %>
+  </div>
+</aside>
