@@ -69,7 +69,12 @@
     <%= button_to "Sign out", session_path, method: :delete, form: { class: "inline" }, class: "underline hover:text-stone-900" %>
   </div>
 
-  <div class="px-5 pb-3 font-sans">
-    <%= link_to "Manage feeds", subscriptions_path, class: "block text-xs text-stone-500 hover:text-stone-900" %>
+  <div class="px-5 pb-3 font-sans flex items-center justify-between gap-3">
+    <%= link_to "Manage feeds", subscriptions_path, class: "text-xs text-stone-500 hover:text-stone-900" %>
+    <%= button_to theme_path, method: :patch, form: { class: "inline", data: { turbo: false } },
+          class: "text-xs text-stone-500 hover:text-stone-900",
+          title: "Cycle theme (Auto / Light / Dark)" do %>
+      Theme: <%= (cookies[:theme] || "auto").capitalize %>
+    <% end %>
   </div>
 </aside>

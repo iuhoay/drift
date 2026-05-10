@@ -1,5 +1,46 @@
 @import "tailwindcss";
 
+@layer base {
+  /* `color-scheme` drives `light-dark()` below. Default = follow OS;
+     <html data-theme="light|dark"> overrides. */
+  :root                    { color-scheme: light dark; }
+  :root[data-theme="light"] { color-scheme: light; }
+  :root[data-theme="dark"]  { color-scheme: dark; }
+
+  :root {
+    /* Stone scale: light value = original Tailwind, dark value = mirrored around 500.
+       Every `bg-stone-*`, `text-stone-*`, `border-stone-*` (and `bg-white`) flips
+       automatically — no `dark:` utilities needed. */
+    --color-white:     light-dark(#fff,                      oklch(21.6% .006 56.043));
+    --color-stone-50:  light-dark(oklch(98.5% .001 106.423), oklch(14.7% .004 49.25));
+    --color-stone-100: light-dark(oklch(97%   .001 106.424), oklch(21.6% .006 56.043));
+    --color-stone-200: light-dark(oklch(92.3% .003 48.717),  oklch(26.8% .007 34.298));
+    --color-stone-300: light-dark(oklch(86.9% .005 56.366),  oklch(37.4% .01  67.558));
+    --color-stone-400: light-dark(oklch(70.9% .01  56.259),  oklch(44.4% .011 73.639));
+    /* stone-500 unchanged — it is the pivot */
+    --color-stone-600: light-dark(oklch(44.4% .011 73.639),  oklch(70.9% .01  56.259));
+    --color-stone-700: light-dark(oklch(37.4% .01  67.558),  oklch(86.9% .005 56.366));
+    --color-stone-800: light-dark(oklch(26.8% .007 34.298),  oklch(92.3% .003 48.717));
+    --color-stone-900: light-dark(oklch(21.6% .006 56.043),  oklch(97%   .001 106.424));
+
+    /* Flash + form errors */
+    --color-red-50:  light-dark(oklch(97.1% .013 17.38),  oklch(25.8% .092 26.04));
+    --color-red-200: light-dark(oklch(88.5% .062 18.334), oklch(44.4% .177 26.9));
+    --color-red-900: light-dark(oklch(39.6% .141 25.723), oklch(93.7% .032 17.72));
+
+    /* Success flash */
+    --color-emerald-50:  light-dark(oklch(97.9% .021 166.113), oklch(26.2% .051 172.55));
+    --color-emerald-200: light-dark(oklch(90.5% .093 164.15),  oklch(50.8% .118 165.61));
+    --color-emerald-900: light-dark(oklch(37.8% .077 168.94),  oklch(95%   .052 163.05));
+
+    /* Starred chip */
+    --color-amber-50:  light-dark(oklch(98.7% .022 95.277), oklch(27.9% .077 45.64));
+    --color-amber-100: light-dark(oklch(96.2% .059 95.617), oklch(41.4% .112 45.9));
+    --color-amber-300: light-dark(oklch(87.9% .169 91.605), oklch(47.3% .137 46.2));
+    --color-amber-700: light-dark(oklch(55.5% .163 48.998), oklch(92.4% .12  95.75));
+  }
+}
+
 @layer components {
   .entry-content {
     color: var(--color-stone-800);

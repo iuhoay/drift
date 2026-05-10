@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   resources :passwords, param: :token, only: [ :new, :create, :edit, :update ]
   get "up" => "rails/health#show", as: :rails_health_check
 
+  resource :theme, only: :update
+
   resources :subscriptions, only: [ :index, :new, :create, :update, :destroy ]
 
   resources :entries, only: [ :index, :show ] do
