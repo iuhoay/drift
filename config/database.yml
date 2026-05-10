@@ -1,11 +1,12 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  pool: <%= Rails.app.creds.option(:rails_max_threads, default: 5) %>
-  host: <%= Rails.app.creds.option(:database_host, default: "localhost") %>
-  port: <%= Rails.app.creds.option(:database_port, default: 5432) %>
-  username: <%= Rails.app.creds.option(:database_username, default: "root") %>
-  password: <%= Rails.app.creds.option(:database_password, default: "password") %>
+  pool: <%= Rails.app.dotenvs.option(:rails_max_threads, default: 5) %>
+  host: <%= Rails.app.dotenvs.option(:database_host, default: "localhost") %>
+  port: <%= Rails.app.dotenvs.option(:database_port, default: 5432) %>
+  username: <%= Rails.app.dotenvs.option(:database_username, default: "root") %>
+  password: <%= Rails.app.dotenvs.option(:database_password, default: "password") %>
+
 
 development:
   <<: *default
@@ -16,22 +17,26 @@ test:
   database: <%= Rails.app.creds.option(:test_database_name, default: "drift_test") %>
 
 production:
-  primary:
+  primary: &production
     <<: *default
+    pool: <%= Rails.app.creds.option(:rails_max_threads, default: 5) %>
+    host: <%= Rails.app.creds.option(:database_host, default: "localhost") %>
+    port: <%= Rails.app.creds.option(:database_port, default: 5432) %>
+    username: <%= Rails.app.creds.option(:database_username, default: "root") %>
+    password: <%= Rails.app.creds.option(:database_password, default: "password") %>
     database: <%= Rails.app.creds.option(:database_name, default: "drift_production") %>
-    username: <%= Rails.app.creds.option(:database_username, default: "drift") %>
   cache:
-    <<: *default
+    <<: *production
     database: <%= Rails.app.creds.option(:database_name, default: "drift_production") %>_cache
     username: <%= Rails.app.creds.option(:database_username, default: "drift") %>
     migrations_paths: db/cache_migrate
   queue:
-    <<: *default
+    <<: *production
     database: <%= Rails.app.creds.option(:database_name, default: "drift_production") %>_queue
     username: <%= Rails.app.creds.option(:database_username, default: "drift") %>
     migrations_paths: db/queue_migrate
   cable:
-    <<: *default
+    <<: *production
     database: <%= Rails.app.creds.option(:database_name, default: "drift_production") %>_cable
     username: <%= Rails.app.creds.option(:database_username, default: "drift") %>
     migrations_paths: db/cable_migrate

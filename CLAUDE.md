@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bin/dev` — Foreman: web, Tailwind watcher, Solid Queue worker
 - `bin/jobs` — Solid Queue CLI standalone
 - `bin/setup` — bootstrap dev (idempotent); requires Postgres reachable and `.env` configured
-- `bin/rails test` — Minitest. Test env doesn't read `.env` (Rails 8.2 dotenv is dev-only), so `config/database.yml` carries explicit `default:` values (`root` / `password`) on each `creds.option(...)` call. Override locally via real ENV if your Postgres differs. See atom `invariant_dotenv_test_env`.
+- `bin/rails test` — Minitest. Rails 8.2's `creds` only merges `.env` in dev, so test sees nil from `creds.option(...)`; `config/database.yml` carries `root` / `password` defaults on each call as the local-dev fallback. Real `ENV` overrides if your Postgres differs. See atom `invariant_dotenv_test_env`.
 - `bin/rubocop` — omakase style; CI also runs Brakeman, bundler-audit, importmap audit
 - Recurring: `RefreshDueFeedsJob` every 10 min (dev) via `config/recurring.yml`
 
