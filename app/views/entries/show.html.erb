@@ -1,34 +1,56 @@
 <% content_for :title, @entry.title %>
 
-<article class="max-w-3xl mx-auto px-6 py-10">
-  <div class="mb-6 flex items-center justify-between font-sans text-sm text-stone-500">
-    <%= link_to "← Back", :back, class: "hover:text-stone-900" %>
+<article class="max-w-3xl mx-auto px-5 sm:px-8 py-8">
+  <div class="flex items-center justify-between border-b border-stone-300 pb-3 text-sm">
+    <%= link_to :back, class: "text-stone-500 hover:text-amber-700" do %>
+      <span class="select-none">&larr;</span> back
+    <% end %>
 
     <div id="<%= dom_id(@entry, :actions) %>" class="flex items-center gap-2">
       <%= render "entries/actions", entry: @entry, user_entry: @user_entry %>
     </div>
   </div>
 
-  <header class="mb-8">
-    <div class="text-xs uppercase tracking-widest text-stone-500 font-sans mb-2">
-      <%= @entry.feed.display_title %>
+  <header class="py-6">
+    <div class="mb-3 space-y-0.5 text-xs leading-relaxed">
+      <div class="flex gap-3">
+        <span class="w-16 shrink-0 select-none text-stone-400">FEED</span>
+        <span class="truncate text-stone-600"><%= @entry.feed.display_title %></span>
+      </div>
       <% if @entry.published_at %>
-        · <%= @entry.published_at.strftime("%B %-d, %Y") %>
+        <div class="flex gap-3">
+          <span class="w-16 shrink-0 select-none text-stone-400">DATE</span>
+          <span class="text-stone-600"><%= @entry.published_at.strftime("%Y-%m-%d &middot; %H:%M").html_safe %></span>
+        </div>
       <% end %>
       <% if @entry.author.present? %>
-        · <%= @entry.author %>
+        <div class="flex gap-3">
+          <span class="w-16 shrink-0 select-none text-stone-400">AUTHOR</span>
+          <span class="truncate text-stone-600"><%= @entry.author %></span>
+        </div>
+      <% end %>
+      <% if @entry.url.present? %>
+        <div class="flex gap-3">
+          <span class="w-16 shrink-0 select-none text-stone-400">SOURCE</span>
+          <%= link_to @entry.url, @entry.url, target: "_blank", rel: "noopener",
+                class: "truncate text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" %>
+        </div>
       <% end %>
     </div>
-    <h1 class="text-3xl font-semibold tracking-tight leading-tight"><%= @entry.title %></h1>
+    <h1 class="text-2xl sm:text-3xl font-semibold leading-tight tracking-tight text-stone-900"><%= @entry.title.presence || "(untitled)" %></h1>
   </header>
 
-  <div class="entry-content">
+  <div class="entry-content border-t border-stone-300 pt-7">
     <%= sanitize(@entry.content.presence || @entry.summary.to_s) %>
   </div>
 
-  <% if @entry.url.present? %>
-    <div class="mt-12 pt-6 border-t border-stone-200 font-sans text-sm">
-      <%= link_to "Open original →", @entry.url, target: "_blank", rel: "noopener", class: "text-stone-700 underline hover:text-stone-900" %>
-    </div>
-  <% end %>
+  <div class="mt-12 flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
+    <span class="select-none text-stone-400">&mdash; end of entry &mdash;</span>
+    <% if @entry.url.present? %>
+      <%= link_to @entry.url, target: "_blank", rel: "noopener",
+            class: "text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>
+        open original <span class="select-none">&#8599;</span>
+      <% end %>
+    <% end %>
+  </div>
 </article>

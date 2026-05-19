@@ -1,28 +1,25 @@
 <%
   read = user_entry&.read_at.present?
   starred = user_entry&.starred_at.present?
+  marker = starred ? "★" : (read ? "·" : "●")
+  marker_color = (starred || !read) ? "text-amber-700" : "text-stone-300"
 %>
-<li id="<%= dom_id(entry) %>" class="py-3 group">
-  <%= link_to entry_path(entry), class: "block hover:bg-stone-100/70 -mx-3 px-3 py-2 rounded transition-colors" do %>
-    <div class="flex items-start gap-3">
-      <span class="mt-2 inline-block w-1.5 h-1.5 rounded-full shrink-0 <%= read ? 'bg-transparent' : 'bg-stone-700' %>"></span>
+<li id="<%= dom_id(entry) %>" class="term-row group">
+  <%= link_to entry_path(entry), class: "flex gap-3 border-l-2 border-transparent px-4 py-2.5 transition-colors group-hover:border-amber-700 group-hover:bg-amber-700/[0.07]" do %>
+    <span class="w-10 shrink-0 select-none pt-px text-xs tabular-nums text-stone-400"><%= relative_time(entry.published_at || entry.created_at) %></span>
 
-      <div class="flex-1 min-w-0">
-        <div class="flex items-baseline justify-between gap-3 font-sans">
-          <span class="text-xs uppercase tracking-wider text-stone-500 truncate"><%= entry.feed.display_title %></span>
-          <span class="text-xs text-stone-400 shrink-0"><%= relative_time(entry.published_at || entry.created_at) %></span>
-        </div>
+    <div class="min-w-0 flex-1">
+      <div class="truncate text-[0.7rem] uppercase tracking-[0.18em] text-stone-500">[<%= entry.feed.display_title %>]</div>
 
-        <h2 class="mt-0.5 text-base leading-snug <%= read ? 'text-stone-500 font-normal' : 'text-stone-900 font-medium' %>">
-          <% if starred %><span class="text-amber-500 mr-1">★</span><% end %>
-          <%= entry.title.presence || "(untitled)" %>
-        </h2>
+      <h2 class="mt-1 flex items-baseline gap-2 text-sm leading-snug <%= read ? 'text-stone-500' : 'text-stone-900 font-medium' %>">
+        <span class="w-2 shrink-0 select-none text-center <%= marker_color %>"><%= marker %></span>
+        <span class="truncate"><%= entry.title.presence || "(untitled)" %></span>
+      </h2>
 
-        <% excerpt = entry.excerpt(limit: 200) %>
-        <% if excerpt.present? %>
-          <p class="mt-1 text-sm text-stone-600 line-clamp-2"><%= excerpt %></p>
-        <% end %>
-      </div>
+      <% excerpt = entry.excerpt(limit: 180) %>
+      <% if excerpt.present? %>
+        <p class="mt-1 pl-4 text-xs leading-relaxed text-stone-500 line-clamp-2"><%= excerpt %></p>
+      <% end %>
     </div>
   <% end %>
 </li>

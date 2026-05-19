@@ -1,5 +1,6 @@
 <% flash.each do |type, message| %>
-  <div class="px-6 py-3 text-sm <%= type == "alert" ? "bg-red-50 text-red-900 border-b border-red-200" : "bg-emerald-50 text-emerald-900 border-b border-emerald-200" %>">
-    <%= message %>
+  <div class="term flex items-baseline gap-2 border-b px-6 py-2.5 text-sm <%= type == "alert" ? "border-red-200 bg-red-50 text-red-900" : "border-emerald-200 bg-emerald-50 text-emerald-900" %>">
+    <span class="select-none opacity-60"><%= type == "alert" ? "[!]" : "[ok]" %></span>
+    <span><%= message %></span>
   </div>
 <% end %>

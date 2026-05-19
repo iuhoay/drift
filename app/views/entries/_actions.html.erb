@@ -4,25 +4,13 @@
 %>
 
 <% if starred %>
-  <%= button_to unstar_entry_path(entry), method: :post, form: { class: "inline" },
-        class: "px-3 py-1 rounded border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100" do %>
-    ★ Starred
-  <% end %>
+  <%= button_to unstar_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn term-btn-on" do %>[★ starred]<% end %>
 <% else %>
-  <%= button_to star_entry_path(entry), method: :post, form: { class: "inline" },
-        class: "px-3 py-1 rounded border border-stone-300 hover:bg-stone-100" do %>
-    ☆ Star
-  <% end %>
+  <%= button_to star_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn" do %>[☆ star]<% end %>
 <% end %>
 
 <% if read %>
-  <%= button_to unread_entry_path(entry), method: :post, form: { class: "inline" },
-        class: "px-3 py-1 rounded border border-stone-300 hover:bg-stone-100" do %>
-    Mark unread
-  <% end %>
+  <%= button_to unread_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn" do %>[unread]<% end %>
 <% else %>
-  <%= button_to read_entry_path(entry), method: :post, form: { class: "inline" },
-        class: "px-3 py-1 rounded border border-stone-300 hover:bg-stone-100" do %>
-    Mark read
-  <% end %>
+  <%= button_to read_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn" do %>[read]<% end %>
 <% end %>

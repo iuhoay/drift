@@ -8,20 +8,22 @@
   :root[data-theme="dark"]  { color-scheme: dark; }
 
   :root {
-    /* Stone scale: light value = original Tailwind, dark value = mirrored around 500.
-       Every `bg-stone-*`, `text-stone-*`, `border-stone-*` (and `bg-white`) flips
+    /* Stone scale: light value = original Tailwind (keep — it works).
+       Dark value = hand-tuned warm-charcoal ramp: low chroma so it reads as
+       a clean terminal screen, not muddy olive, with deliberate step spacing
+       for hierarchy. Every `bg-stone-*`/`text-stone-*`/`border-stone-*` flips
        automatically — no `dark:` utilities needed. */
-    --color-white:     light-dark(#fff,                      oklch(21.6% .006 56.043));
-    --color-stone-50:  light-dark(oklch(98.5% .001 106.423), oklch(14.7% .004 49.25));
-    --color-stone-100: light-dark(oklch(97%   .001 106.424), oklch(21.6% .006 56.043));
-    --color-stone-200: light-dark(oklch(92.3% .003 48.717),  oklch(26.8% .007 34.298));
-    --color-stone-300: light-dark(oklch(86.9% .005 56.366),  oklch(37.4% .01  67.558));
-    --color-stone-400: light-dark(oklch(70.9% .01  56.259),  oklch(44.4% .011 73.639));
+    --color-white:     light-dark(#fff,                      oklch(19%   .004 65));
+    --color-stone-50:  light-dark(oklch(98.5% .001 106.423), oklch(15%   .004 65));
+    --color-stone-100: light-dark(oklch(97%   .001 106.424), oklch(20%   .005 65));
+    --color-stone-200: light-dark(oklch(92.3% .003 48.717),  oklch(26%   .005 65));
+    --color-stone-300: light-dark(oklch(86.9% .005 56.366),  oklch(32%   .006 65));
+    --color-stone-400: light-dark(oklch(70.9% .01  56.259),  oklch(52%   .008 65));
     /* stone-500 unchanged — it is the pivot */
-    --color-stone-600: light-dark(oklch(44.4% .011 73.639),  oklch(70.9% .01  56.259));
-    --color-stone-700: light-dark(oklch(37.4% .01  67.558),  oklch(86.9% .005 56.366));
-    --color-stone-800: light-dark(oklch(26.8% .007 34.298),  oklch(92.3% .003 48.717));
-    --color-stone-900: light-dark(oklch(21.6% .006 56.043),  oklch(97%   .001 106.424));
+    --color-stone-600: light-dark(oklch(44.4% .011 73.639),  oklch(66%   .008 65));
+    --color-stone-700: light-dark(oklch(37.4% .01  67.558),  oklch(76%   .007 65));
+    --color-stone-800: light-dark(oklch(26.8% .007 34.298),  oklch(86%   .005 65));
+    --color-stone-900: light-dark(oklch(21.6% .006 56.043),  oklch(95%   .003 70));
 
     /* Flash + form errors */
     --color-red-50:  light-dark(oklch(97.1% .013 17.38),  oklch(25.8% .092 26.04));
@@ -33,11 +35,17 @@
     --color-emerald-200: light-dark(oklch(90.5% .093 164.15),  oklch(50.8% .118 165.61));
     --color-emerald-900: light-dark(oklch(37.8% .077 168.94),  oklch(95%   .052 163.05));
 
-    /* Starred chip */
-    --color-amber-50:  light-dark(oklch(98.7% .022 95.277), oklch(27.9% .077 45.64));
-    --color-amber-100: light-dark(oklch(96.2% .059 95.617), oklch(41.4% .112 45.9));
-    --color-amber-300: light-dark(oklch(87.9% .169 91.605), oklch(47.3% .137 46.2));
-    --color-amber-700: light-dark(oklch(55.5% .163 48.998), oklch(92.4% .12  95.75));
+    /* Amber phosphor accent. Light = original Tailwind. Dark = a vivid,
+       saturated amber that actually glows on the charcoal screen (the
+       mirrored value collapsed into a washed-out pale yellow). */
+    --color-amber-50:  light-dark(oklch(98.7% .022 95.277), oklch(30%   .055 60));
+    --color-amber-100: light-dark(oklch(96.2% .059 95.617), oklch(40%   .09  62));
+    --color-amber-300: light-dark(oklch(87.9% .169 91.605), oklch(70%   .15  68));
+    --color-amber-700: light-dark(oklch(55.5% .163 48.998), oklch(80%   .155 72));
+
+    /* Terminal reading UI */
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+                 Consolas, "Liberation Mono", monospace;
   }
 }
 
@@ -102,4 +110,150 @@
     border-top: 1px solid var(--color-stone-200);
     margin: 2em 0;
   }
+}
+
+/* ── Terminal reading UI ─────────────────────────────────────────────────
+   Scoped under `.term`. Reuses the stone/amber light-dark() variables, so
+   the whole thing flips with the existing theme cookie — no `dark:` needed.
+   Amber is treated as monochrome phosphor; stone is the screen substrate. */
+@layer components {
+  .term {
+    font-family: var(--font-mono);
+    font-feature-settings: "zero" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* The "screen": faint horizontal scanlines + a soft CRT vignette. Both are
+     decorative, kept low-contrast so body text stays comfortable to read. */
+  .term-screen {
+    position: relative;
+    background-color: var(--color-stone-50);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--color-stone-900) 3.5%, transparent) 0 1px,
+      transparent 1px 4px
+    );
+  }
+  .term-screen::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    background: radial-gradient(
+      125% 105% at 50% 0%,
+      transparent 66%,
+      rgb(0 0 0 / 0.14) 100%
+    );
+  }
+
+  /* The window's title/status bar. Sits flush on the screen, faint fill so
+     the scanlines still read through it. */
+  .term-topbar {
+    background: color-mix(in oklab, var(--color-stone-100) 70%, transparent);
+    backdrop-filter: blur(2px);
+  }
+
+  /* Blinking block caret after the prompt path. */
+  .term-caret::after {
+    content: "▋";
+    margin-left: 0.1em;
+    color: var(--color-amber-700);
+    animation: term-blink 1.15s steps(1, end) infinite;
+  }
+  @keyframes term-blink {
+    50% { opacity: 0; }
+  }
+
+  /* Listing rows behave like a TUI cursor: hovering/focusing inverts the
+     left rail to phosphor and reveals the `>` run marker. */
+  .term-row > a {
+    outline: none;
+  }
+  .term-row > a:focus-visible {
+    background: color-mix(in oklab, var(--color-amber-700) 14%, transparent);
+    border-left-color: var(--color-amber-700);
+  }
+
+  /* Command-style buttons: bracketed, square, invert to phosphor on hover. */
+  .term-btn {
+    font: inherit;
+    font-size: 0.8125rem;
+    line-height: 1;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--color-stone-300);
+    color: var(--color-stone-600);
+    background: transparent;
+    cursor: pointer;
+    transition: color 80ms, background-color 80ms, border-color 80ms;
+  }
+  .term-btn:hover {
+    color: var(--color-stone-50);
+    background: var(--color-stone-900);
+    border-color: var(--color-stone-900);
+  }
+  .term-btn-on {
+    color: var(--color-amber-700);
+    border-color: var(--color-amber-700);
+    background: color-mix(in oklab, var(--color-amber-700) 12%, transparent);
+  }
+  .term-btn-on:hover {
+    color: var(--color-stone-900);
+    background: var(--color-amber-700);
+    border-color: var(--color-amber-700);
+  }
+
+  /* Article body: monospace, but loosened up so long-form stays legible.
+     Links + structural accents pick up the amber phosphor. */
+  .term .entry-content {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    line-height: 1.85;
+    color: var(--color-stone-700);
+  }
+  .term .entry-content a {
+    color: var(--color-amber-700);
+    text-decoration-thickness: 1px;
+  }
+  .term .entry-content a:hover {
+    color: var(--color-amber-700);
+    background: color-mix(in oklab, var(--color-amber-700) 14%, transparent);
+  }
+  .term .entry-content h1,
+  .term .entry-content h2,
+  .term .entry-content h3,
+  .term .entry-content h4 {
+    color: var(--color-stone-900);
+    letter-spacing: -0.01em;
+  }
+  .term .entry-content h2::before,
+  .term .entry-content h3::before {
+    content: "## ";
+    color: var(--color-amber-700);
+  }
+  .term .entry-content blockquote {
+    border-left-width: 2px;
+    border-left-color: var(--color-amber-700);
+    font-style: normal;
+    background: color-mix(in oklab, var(--color-amber-700) 7%, transparent);
+    padding: 0.6em 1em;
+  }
+  .term .entry-content pre,
+  .term .entry-content code {
+    border-radius: 0;
+    border: 1px solid var(--color-stone-300);
+  }
+  .term .entry-content pre code {
+    border: 0;
+  }
+  .term .entry-content img,
+  .term .entry-content video,
+  .term .entry-content iframe {
+    border-radius: 0;
+    border: 1px solid var(--color-stone-300);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-caret::after { animation: none; }
 }

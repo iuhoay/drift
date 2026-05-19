@@ -1,33 +1,30 @@
 <% content_for :title, "Drift" %>
 
-<div class="max-w-3xl mx-auto px-6 py-8">
-  <header class="flex items-baseline justify-between mb-6 font-sans">
-    <h1 class="text-xl font-medium tracking-tight">
-      <% if @feed %>
-        <%= @feed.display_title %>
-      <% else %>
-        <%= @scope.capitalize %>
-      <% end %>
-    </h1>
+<div class="max-w-3xl mx-auto px-5 sm:px-8 py-8">
+  <header class="flex flex-col gap-3 border-b border-stone-300 pb-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-baseline gap-0.5 overflow-hidden">
+      <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="font-medium text-stone-900 truncate"><%= @feed ? @feed.display_title : @scope %></span><span class="term-caret select-none"></span>
+    </div>
 
-    <%= form_with url: entries_path, method: :get, data: { turbo_frame: "_top" }, class: "flex gap-2 items-center" do |f| %>
+    <%= form_with url: entries_path, method: :get, data: { turbo_frame: "_top" }, class: "flex shrink-0 items-center gap-2" do |f| %>
       <%= hidden_field_tag :scope, @scope %>
       <%= hidden_field_tag :feed_id, @feed&.id %>
-      <%= text_field_tag :q, @query, placeholder: "Search…",
-            class: "px-3 py-1.5 text-sm rounded border border-stone-300 focus:border-stone-500 focus:outline-none w-56 bg-white" %>
+      <span class="select-none text-amber-700">/</span>
+      <%= text_field_tag :q, @query, placeholder: "search", autocomplete: "off",
+            class: "w-44 bg-transparent border-0 border-b border-stone-300 px-1 py-0.5 text-stone-900 placeholder:text-stone-400 focus:border-amber-700 focus:outline-none" %>
     <% end %>
   </header>
 
   <% if @entries.empty? %>
-    <div class="text-center py-20 text-stone-500 font-sans">
-      <p class="text-lg">Nothing here yet.</p>
-      <p class="text-sm mt-2">
+    <div class="py-24 text-center text-sm">
+      <p class="text-stone-700">— no entries —</p>
+      <p class="mt-3 text-xs text-stone-500">
         <% if @query.present? %>
-          No entries match "<%= @query %>".
+          no match for "<span class="text-amber-700"><%= @query %></span>"
         <% elsif @scope == "unread" %>
-          You're all caught up.
+          inbox zero &mdash; you are all caught up
         <% else %>
-          <%= link_to "Add a feed", new_subscription_path, class: "underline" %> to get started.
+          <%= link_to "$ add a feed", new_subscription_path, class: "text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" %>
         <% end %>
       </p>
     </div>
@@ -37,5 +34,10 @@
         <%= render "entries/entry_row", entry: entry, user_entry: @user_entries_by_id[entry.id] %>
       <% end %>
     </ul>
+
+    <div class="mt-px flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
+      <span><%= @entries.size %> <%= "entry".pluralize(@entries.size) %><%= " · max #{EntriesController::PER_PAGE}" if @entries.size == EntriesController::PER_PAGE %></span>
+      <span class="truncate pl-3 text-stone-400">scope=<%= @scope %><%= " feed=#{@feed.id}" if @feed %><%= " q=#{@query}" if @query.present? %></span>
+    </div>
   <% end %>
 </div>
