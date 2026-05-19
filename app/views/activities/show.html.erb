@@ -1,0 +1,62 @@
+<% content_for :title, "Activity — Drift" %>
+<%
+  weeks  = activity_weeks(@start_date, @end_date, @counts)
+  labels = activity_month_labels(weeks)
+%>
+
+<div class="mx-auto max-w-5xl px-5 sm:px-8 py-8">
+  <header class="flex items-baseline gap-0.5 overflow-hidden border-b border-stone-300 pb-3">
+    <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="font-medium text-stone-900">activity</span><span class="term-caret select-none"></span>
+  </header>
+
+  <p class="mt-5 text-sm text-stone-700">
+    <span class="tabular-nums text-amber-700"><%= number_with_delimiter(@total) %></span>
+    <%= "action".pluralize(@total) %> in the last year
+    <span class="text-stone-500">— reads, stars, feeds added</span>
+  </p>
+
+  <div class="mt-4 overflow-x-auto pb-1">
+    <div class="inline-block min-w-max">
+      <div class="flex pl-9 text-[0.65rem] text-stone-500">
+        <% labels.each do |month| %>
+          <div class="w-[14px] shrink-0 overflow-visible whitespace-nowrap"><%= month %></div>
+        <% end %>
+      </div>
+
+      <div class="mt-1 flex">
+        <div class="mr-1 flex w-8 shrink-0 flex-col gap-[3px] text-[0.6rem] leading-[11px] text-stone-500">
+          <% %w[Sun Mon Tue Wed Thu Fri Sat].each_with_index do |day, i| %>
+            <div class="h-[11px]"><%= day if i.odd? %></div>
+          <% end %>
+        </div>
+
+        <div class="flex gap-[3px]">
+          <% weeks.each do |week| %>
+            <div class="flex flex-col gap-[3px]">
+              <% week.each do |cell| %>
+                <% if cell.nil? %>
+                  <div class="h-[11px] w-[11px]"></div>
+                <% elsif cell[:count].zero? %>
+                  <div class="heat heat-0 h-[11px] w-[11px]"
+                       title="No activity · <%= cell[:date].strftime("%b %-d, %Y") %>"></div>
+                <% else %>
+                  <%= link_to "", entries_path(on: cell[:date].iso8601),
+                        class: "heat heat-#{cell[:level]} block h-[11px] w-[11px] hover:outline hover:outline-1 hover:outline-amber-700",
+                        title: "#{pluralize(cell[:count], "action")} · #{cell[:date].strftime("%b %-d, %Y")}" %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="mt-3 flex items-center justify-end gap-1 text-[0.65rem] text-stone-500">
+        <span class="mr-1">less</span>
+        <% (0..4).each do |level| %>
+          <span class="heat heat-<%= level %> inline-block h-[11px] w-[11px]"></span>
+        <% end %>
+        <span class="ml-1">more</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -254,6 +254,20 @@
   }
 }
 
+/* Activity heatmap (GitHub-style), in amber phosphor over the stone screen. */
+@layer components {
+  .heat {
+    border-radius: 2px;
+    outline: 1px solid color-mix(in oklab, var(--color-stone-900) 7%, transparent);
+    outline-offset: -1px;
+  }
+  .heat-0 { background: color-mix(in oklab, var(--color-stone-400) 22%, transparent); }
+  .heat-1 { background: color-mix(in oklab, var(--color-amber-700) 28%, transparent); }
+  .heat-2 { background: color-mix(in oklab, var(--color-amber-700) 52%, transparent); }
+  .heat-3 { background: color-mix(in oklab, var(--color-amber-700) 76%, transparent); }
+  .heat-4 { background: var(--color-amber-700); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .term-caret::after { animation: none; }
 }

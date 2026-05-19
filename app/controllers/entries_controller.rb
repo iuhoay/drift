@@ -7,9 +7,15 @@ class EntriesController < ApplicationController
     @scope = params[:scope].presence_in(%w[all unread starred]) || "unread"
     @feed = Current.user.feeds.find_by(id: params[:feed_id]) if params[:feed_id]
     @query = params[:q].to_s.strip
+    @on = parse_on(params[:on])
+    @scope = "all" if @on
 
     entries = Current.user.subscribed_entries.includes(:feed)
     entries = entries.where(feed_id: @feed.id) if @feed
+    if @on
+      read_ids = Current.user.user_entries.where("read_at::date = ?", @on).select(:entry_id)
+      entries = entries.where(id: read_ids)
+    end
     entries = entries.search(@query) if @query.present?
 
     case @scope
@@ -62,6 +68,12 @@ class EntriesController < ApplicationController
 
   def user_entry_for(entry)
     Current.user.user_entries.find_or_create_by!(entry: entry)
+  end
+
+  def parse_on(value)
+    Date.iso8601(value.to_s) if value.present?
+  rescue ArgumentError
+    nil
   end
 
   def read_entry_ids

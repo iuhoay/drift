@@ -1,11 +1,8 @@
 <%
   counts = unread_counts_for(Current.user)
   total_unread = counts.values.sum
-  starred_count = starred_count_for(Current.user)
   subs = Current.user.subscriptions.joins(:feed).includes(:feed).order(Arel.sql("LOWER(COALESCE(NULLIF(subscriptions.custom_title, ''), feeds.title, feeds.feed_url))"))
-  on_unread  = params[:scope] == "unread" || (params[:scope].blank? && controller_name == "entries" && params[:feed_id].blank?)
-  on_all     = params[:scope] == "all"
-  on_starred = params[:scope] == "starred"
+  on_inbox = controller_name == "entries" && action_name == "index" && params[:feed_id].blank?
   nav_base = "group flex items-center gap-2 border-l-2 px-3 py-1.5 transition-colors"
   nav_on   = "border-amber-700 bg-amber-700/10 text-amber-700"
   nav_off  = "border-transparent text-stone-600 hover:bg-stone-200/60 hover:text-stone-900"
@@ -15,23 +12,21 @@
     <div class="select-none px-3 pb-1 text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// inbox</div>
     <ul>
       <li>
-        <%= link_to entries_path(scope: "unread"), class: "#{nav_base} #{on_unread ? nav_on : nav_off}" do %>
-          <span class="select-none <%= on_unread ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>">&gt;</span>
-          <span class="flex-1">unread</span>
-          <% if total_unread.positive? %><span class="tabular-nums text-xs <%= on_unread ? 'text-amber-700' : 'text-stone-400' %>"><%= total_unread %></span><% end %>
+        <%= link_to entries_path, class: "#{nav_base} #{on_inbox ? nav_on : nav_off}" do %>
+          <span class="select-none <%= on_inbox ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>">&gt;</span>
+          <span class="flex-1">inbox</span>
+          <% if total_unread.positive? %><span class="tabular-nums text-xs <%= on_inbox ? 'text-amber-700' : 'text-stone-400' %>"><%= total_unread %></span><% end %>
         <% end %>
       </li>
+    </ul>
+
+    <div class="mt-5 select-none px-3 pb-1 text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// stats</div>
+    <ul>
+      <% on_activity = controller_name == "activities" %>
       <li>
-        <%= link_to entries_path(scope: "all"), class: "#{nav_base} #{on_all ? nav_on : nav_off}" do %>
-          <span class="select-none <%= on_all ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>">&gt;</span>
-          <span class="flex-1">all</span>
-        <% end %>
-      </li>
-      <li>
-        <%= link_to entries_path(scope: "starred"), class: "#{nav_base} #{on_starred ? nav_on : nav_off}" do %>
-          <span class="select-none <%= on_starred ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>">&gt;</span>
-          <span class="flex-1">starred</span>
-          <% if starred_count.positive? %><span class="tabular-nums text-xs <%= on_starred ? 'text-amber-700' : 'text-stone-400' %>">★ <%= starred_count %></span><% end %>
+        <%= link_to activity_path, class: "#{nav_base} #{on_activity ? nav_on : nav_off}" do %>
+          <span class="select-none <%= on_activity ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>">&gt;</span>
+          <span class="flex-1">activity</span>
         <% end %>
       </li>
     </ul>

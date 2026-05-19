@@ -3,17 +3,29 @@
 <div class="max-w-3xl mx-auto px-5 sm:px-8 py-8">
   <header class="flex flex-col gap-3 border-b border-stone-300 pb-3 sm:flex-row sm:items-center sm:justify-between">
     <div class="flex items-baseline gap-0.5 overflow-hidden">
-      <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="font-medium text-stone-900 truncate"><%= @feed ? @feed.display_title : @scope %></span><span class="term-caret select-none"></span>
+      <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="font-medium text-stone-900 truncate"><%= @on ? @on.iso8601 : (@feed ? @feed.display_title : @scope) %></span><span class="term-caret select-none"></span>
     </div>
 
     <%= form_with url: entries_path, method: :get, data: { turbo_frame: "_top" }, class: "flex shrink-0 items-center gap-2" do |f| %>
       <%= hidden_field_tag :scope, @scope %>
       <%= hidden_field_tag :feed_id, @feed&.id %>
+      <%= hidden_field_tag :on, @on&.iso8601 %>
       <span class="select-none text-amber-700">/</span>
       <%= text_field_tag :q, @query, placeholder: "search", autocomplete: "off",
             class: "w-44 bg-transparent border-0 border-b border-stone-300 px-1 py-0.5 text-stone-900 placeholder:text-stone-400 focus:border-amber-700 focus:outline-none" %>
     <% end %>
   </header>
+
+  <nav class="mt-4 flex items-center gap-2 text-xs">
+    <% %w[unread all starred].each do |s| %>
+      <%= link_to s, entries_path(scope: s, feed_id: @feed&.id, q: @query.presence),
+            class: "term-btn #{'term-btn-on' if @on.nil? && @scope == s}" %>
+    <% end %>
+    <% if @on %>
+      <span class="text-stone-500">filtered to <span class="text-amber-700"><%= @on.iso8601 %></span></span>
+      <%= link_to "[× clear]", entries_path, class: "term-btn" %>
+    <% end %>
+  </nav>
 
   <% if @entries.empty? %>
     <div class="py-24 text-center text-sm">
@@ -21,6 +33,8 @@
       <p class="mt-3 text-xs text-stone-500">
         <% if @query.present? %>
           no match for "<span class="text-amber-700"><%= @query %></span>"
+        <% elsif @on %>
+          nothing read on <span class="text-amber-700"><%= @on.iso8601 %></span>
         <% elsif @scope == "unread" %>
           inbox zero &mdash; you are all caught up
         <% else %>
@@ -37,7 +51,7 @@
 
     <div class="mt-px flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
       <span><%= @entries.size %> <%= "entry".pluralize(@entries.size) %><%= " · max #{EntriesController::PER_PAGE}" if @entries.size == EntriesController::PER_PAGE %></span>
-      <span class="truncate pl-3 text-stone-400">scope=<%= @scope %><%= " feed=#{@feed.id}" if @feed %><%= " q=#{@query}" if @query.present? %></span>
+      <span class="truncate pl-3 text-stone-400">scope=<%= @scope %><%= " on=#{@on.iso8601}" if @on %><%= " feed=#{@feed.id}" if @feed %><%= " q=#{@query}" if @query.present? %></span>
     </div>
   <% end %>
 </div>

@@ -16,4 +16,21 @@ class User < ApplicationRecord
   def subscribed_entries
     Entry.joins(feed: :subscriptions).where(subscriptions: { user_id: id })
   end
+
+  # Activity events per calendar day on/after `date`, as { Date => count }.
+  # Counts entries read, entries starred, and feeds added.
+  def activity_by_day_since(date)
+    since = date.beginning_of_day
+    sources = [
+      user_entries.where("read_at >= ?", since).group(Arel.sql("read_at::date")).count,
+      user_entries.where("starred_at >= ?", since).group(Arel.sql("starred_at::date")).count,
+      subscriptions.where("subscriptions.created_at >= ?", since).group(Arel.sql("subscriptions.created_at::date")).count
+    ]
+
+    sources.each_with_object(Hash.new(0)) do |counts, totals|
+      counts.each do |day, n|
+        totals[day.is_a?(Date) ? day : Date.parse(day.to_s)] += n
+      end
+    end
+  end
 end
