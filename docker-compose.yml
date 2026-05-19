@@ -2,12 +2,38 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_USER: ${USER}
+      POSTGRES_USER: root
       POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - "5432:5432"
     volumes:
       - drift_pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/10-drift-roles.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  drift:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:80"   # Thruster
+    environment:
+      # Reach Postgres by Compose service name on the shared default network.
+      # config/database.yml's production host is an ENV override over creds.
+      DATABASE_HOST: postgres
+      # Boots production without a master key (assets were precompiled at
+      # build time with SECRET_KEY_BASE_DUMMY). Local-only; rotate for real use.
+      SECRET_KEY_BASE: "drift-local-compose-secret-not-for-production"
+      RAILS_LOG_TO_STDOUT: "1"
+      # Run the Solid Queue worker inside Puma (config/puma.rb) so
+      # RefreshDueFeedsJob runs without a separate jobs container.
+      SOLID_QUEUE_IN_PUMA: "1"
+    # ENTRYPOINT bin/docker-entrypoint runs `db:prepare` before the server
+    # because CMD's last two args are "./bin/rails" "server".
+    restart: unless-stopped
 
 volumes:
   drift_pgdata:

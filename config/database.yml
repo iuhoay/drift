@@ -20,7 +20,7 @@ production:
   primary: &production
     <<: *default
     pool: <%= Rails.app.creds.option(:rails_max_threads, default: 5) %>
-    host: <%= Rails.app.creds.option(:database_host, default: "localhost") %>
+    host: <%= ENV.fetch("DATABASE_HOST") { Rails.app.creds.option(:database_host, default: "localhost") } %>
     port: <%= Rails.app.creds.option(:database_port, default: 5432) %>
     username: <%= Rails.app.creds.option(:database_username, default: "root") %>
     password: <%= Rails.app.creds.option(:database_password, default: "password") %>
