@@ -18,8 +18,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    ports:
-      - "8080:80"   # Thruster
+    # No host port mapping. OrbStack auto-routes to the container's
+    # listening port. The label below pins a custom domain so the app
+    # is reachable at https://drift.local instead of the default
+    # <service>.<compose-project>.orb.local.
+    #
+    # NOTE: do NOT use a *.localhost domain here. The OS hardcodes
+    # *.localhost to 127.0.0.1 (RFC 6761), where puma-dev already owns
+    # :80/:443 — OrbStack never sees the connection. OrbStack domains
+    # resolve to the container's bridge IP, avoiding that collision.
+    labels:
+      dev.orbstack.domains: "drift.local"
     environment:
       # Reach Postgres by Compose service name on the shared default network.
       # config/database.yml's production host is an ENV override over creds.
