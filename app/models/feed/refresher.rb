@@ -36,7 +36,7 @@ class Feed::Refresher
   rescue Faraday::Error => e
     record_failure("HTTP error: #{e.message}")
     @feed
-  rescue Feedjira::NoParserAvailable, Feedjira::FeedRequestFailure => e
+  rescue Feedjira::NoParserAvailable => e
     record_failure("Parse error: #{e.message}")
     @feed
   end
@@ -54,7 +54,7 @@ class Feed::Refresher
   def apply!(parsed, response)
     @feed.title = parsed.title.presence || @feed.title
     @feed.site_url = parsed.url.presence || @feed.site_url
-    @feed.description = parsed.description.presence || @feed.description
+    @feed.description = parsed.description.presence || @feed.description if parsed.respond_to?(:description)
     @feed.etag = response.headers["etag"].presence
     @feed.last_modified = response.headers["last-modified"].presence
 
