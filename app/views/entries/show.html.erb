@@ -40,6 +40,21 @@
     <h1 class="text-2xl sm:text-3xl font-semibold leading-tight tracking-tight text-stone-900"><%= @entry.title.presence || "(untitled)" %></h1>
   </header>
 
+  <% if (video_id = @entry.youtube_video_id) %>
+    <div class="border-t border-stone-300 pt-7">
+      <div class="relative aspect-video overflow-hidden bg-stone-900">
+        <iframe
+          src="https://www.youtube.com/embed/<%= video_id %>"
+          title="<%= @entry.title %>"
+          loading="lazy"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+          class="absolute inset-0 h-full w-full border-0"></iframe>
+      </div>
+    </div>
+  <% end %>
+
   <div class="entry-content border-t border-stone-300 pt-7">
     <%= sanitize(@entry.content.presence || @entry.summary.to_s) %>
   </div>

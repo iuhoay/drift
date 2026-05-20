@@ -14,6 +14,8 @@ class Entry < ApplicationRecord
       .reorder(Arel.sql("ts_rank(search_vector, websearch_to_tsquery('english', #{connection.quote(query)})) DESC"))
   }
 
+  YOUTUBE_URL = %r{\A(?:https?:)?//(?:www\.|m\.)?(?:youtube(?:-nocookie)?\.com/(?:watch\?(?:.*&)?v=|embed/|shorts/)|youtu\.be/)([\w-]{11})}
+
   def excerpt(limit: 280)
     plain = ActionController::Base.helpers.strip_tags(summary.presence || content.to_s)
     plain.gsub(/\s+/, " ").strip.truncate(limit)
@@ -21,6 +23,10 @@ class Entry < ApplicationRecord
 
   def for_user(user)
     user_entries.find_or_initialize_by(user: user)
+  end
+
+  def youtube_video_id
+    url.to_s.match(YOUTUBE_URL)&.captures&.first
   end
 
   private

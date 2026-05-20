@@ -55,4 +55,23 @@ class EntryTest < ActiveSupport::TestCase
     assert fresh.new_record?
     assert_equal users(:two), fresh.user
   end
+
+  test "youtube_video_id extracts the id from supported URL shapes" do
+    {
+      "https://www.youtube.com/watch?v=sMxskir7Rug"          => "sMxskir7Rug",
+      "https://www.youtube.com/watch?v=abc12345678&t=42s"    => "abc12345678",
+      "https://m.youtube.com/watch?v=abc12345678"            => "abc12345678",
+      "https://youtu.be/sMxskir7Rug"                         => "sMxskir7Rug",
+      "https://www.youtube.com/shorts/abc12345678"           => "abc12345678",
+      "https://www.youtube-nocookie.com/embed/abc12345678"   => "abc12345678"
+    }.each do |url, expected|
+      assert_equal expected, Entry.new(url: url).youtube_video_id, "failed for #{url}"
+    end
+  end
+
+  test "youtube_video_id returns nil for non-YouTube urls" do
+    assert_nil Entry.new(url: "https://daringfireball.net/2026/05/post").youtube_video_id
+    assert_nil Entry.new(url: nil).youtube_video_id
+    assert_nil Entry.new(url: "https://evil.example/?next=https://youtube.com/watch?v=abc12345678").youtube_video_id
+  end
 end
