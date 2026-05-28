@@ -24,7 +24,7 @@ gem "bcrypt", "~> 3.1.7"
 
 # Feed parsing and HTTP
 gem "feedjira", "~> 3.2"
-gem "faraday", "~> 2.9"
+gem "faraday", "~> 2.14"
 gem "faraday-follow_redirects", "~> 0.3"
 
 # HTML sanitization for entry content
