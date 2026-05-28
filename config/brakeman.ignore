@@ -1,0 +1,39 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "85a12dbb4a602a79c472bc3f05d6cba7bd02c684f677fb103448203eb8f3d33f",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/entries/show.html.erb",
+      "line": 69,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Current.user.subscribed_entries.find(params[:id]).safe_url, :target => \"_blank\", :rel => \"noopener\", :class => \"text-amber-700 underline underline-offset-2 hover:bg-amber-700/15\")",
+      "render_path": [{"type": "controller", "class": "EntriesController", "method": "show", "line": 12, "file": "app/controllers/entries_controller.rb", "rendered": {"name": "entries/show", "file": "app/views/entries/show.html.erb"}}],
+      "location": {"type": "template", "template": "entries/show"},
+      "user_input": "Current.user.subscribed_entries.find(params[:id]).safe_url",
+      "confidence": "Weak",
+      "cwe_id": [79],
+      "note": "Entry#safe_url returns the URL only when it matches \\Ahttps?:// — see app/models/entry.rb."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "b4bf8f749bfbac58e0aadc99c3e32086edd9cd005d40296ead8f2b447258d43a",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/entries/show.html.erb",
+      "line": 39,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Current.user.subscribed_entries.find(params[:id]).safe_url, Current.user.subscribed_entries.find(params[:id]).safe_url, :target => \"_blank\", :rel => \"noopener\", :class => \"truncate text-amber-700 underline underline-offset-2 hover:bg-amber-700/15\")",
+      "render_path": [{"type": "controller", "class": "EntriesController", "method": "show", "line": 12, "file": "app/controllers/entries_controller.rb", "rendered": {"name": "entries/show", "file": "app/views/entries/show.html.erb"}}],
+      "location": {"type": "template", "template": "entries/show"},
+      "user_input": "Current.user.subscribed_entries.find(params[:id]).safe_url",
+      "confidence": "Weak",
+      "cwe_id": [79],
+      "note": "Entry#safe_url returns the URL only when it matches \\Ahttps?:// — see app/models/entry.rb."
+    }
+  ],
+  "brakeman_version": "8.0.4"
+}

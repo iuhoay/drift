@@ -6,7 +6,7 @@ class Feed < ApplicationRecord
   normalizes :feed_url, with: ->(url) { url.strip }
 
   validates :feed_url, presence: true, uniqueness: { case_sensitive: false },
-                       format: { with: %r{\Ahttps?://}i }
+                       format: { with: %r{\Ahttps?://\S+\z}i }
 
   scope :due_for_refresh, ->(interval: 30.minutes) {
     where("last_fetched_at IS NULL OR last_fetched_at < ?", interval.ago)
