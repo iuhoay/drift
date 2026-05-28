@@ -25,6 +25,10 @@ class Entry < ApplicationRecord
     user_entries.find_or_initialize_by(user: user)
   end
 
+  def safe_url
+    url if url.to_s.match?(%r{\Ahttps?://\S+\z}i)
+  end
+
   def youtube_video_id
     url.to_s.match(YOUTUBE_URL)&.captures&.first
   end

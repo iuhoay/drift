@@ -20,7 +20,11 @@
       <% if @entry.published_at %>
         <div class="flex gap-3">
           <span class="w-16 shrink-0 select-none text-stone-400">DATE</span>
-          <span class="text-stone-600"><%= @entry.published_at.strftime("%Y-%m-%d &middot; %H:%M").html_safe %></span>
+          <span class="text-stone-600">
+            <%= @entry.published_at.strftime("%Y-%m-%d") %>
+            <span aria-hidden="true">&middot;</span>
+            <%= @entry.published_at.strftime("%H:%M") %>
+          </span>
         </div>
       <% end %>
       <% if @entry.author.present? %>
@@ -29,10 +33,10 @@
           <span class="truncate text-stone-600"><%= @entry.author %></span>
         </div>
       <% end %>
-      <% if @entry.url.present? %>
+      <% if (source_url = @entry.safe_url) %>
         <div class="flex gap-3">
           <span class="w-16 shrink-0 select-none text-stone-400">SOURCE</span>
-          <%= link_to @entry.url, @entry.url, target: "_blank", rel: "noopener",
+          <%= link_to source_url, source_url, target: "_blank", rel: "noopener",
                 class: "truncate text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" %>
         </div>
       <% end %>
@@ -61,8 +65,8 @@
 
   <div class="mt-12 flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
     <span class="select-none text-stone-400">&mdash; end of entry &mdash;</span>
-    <% if @entry.url.present? %>
-      <%= link_to @entry.url, target: "_blank", rel: "noopener",
+    <% if (footer_url = @entry.safe_url) %>
+      <%= link_to footer_url, target: "_blank", rel: "noopener",
             class: "text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>
         open original <span class="select-none">&#8599;</span>
       <% end %>
