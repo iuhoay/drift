@@ -11,8 +11,8 @@
 
     <%= yield :head %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,10 +27,10 @@
     <% if authenticated? %>
       <div class="flex h-screen flex-col overflow-hidden">
         <header class="term-topbar flex h-9 shrink-0 items-center justify-between border-b border-stone-300 px-4 text-xs">
-          <%= link_to root_path, class: "flex items-baseline gap-1.5 text-stone-900" do %>
-            <span class="select-none text-amber-700">▌</span>
-            <span class="font-semibold tracking-tight">drift</span>
-            <span class="select-none text-stone-400">— rss reader</span>
+          <%= link_to root_path, class: "brand-logo text-stone-900", aria: { label: "Drift RSS reader" } do %>
+            <span class="brand-logo__rail" aria-hidden="true"></span>
+            <span class="brand-logo__name">drift</span>
+            <span class="brand-logo__tagline" aria-hidden="true">&#8212; rss reader</span>
           <% end %>
           <span class="hidden select-none text-stone-400 sm:block">tty/01</span>
         </header>

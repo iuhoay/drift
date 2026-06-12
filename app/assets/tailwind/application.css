@@ -154,6 +154,30 @@
     backdrop-filter: blur(2px);
   }
 
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+  }
+  .brand-logo__rail {
+    width: 0.45rem;
+    height: 1.2rem;
+    align-self: center;
+    background: var(--color-amber-700);
+  }
+  .brand-logo__name {
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+  .brand-logo__tagline {
+    color: var(--color-stone-400);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+
   /* Blinking block caret after the prompt path. */
   .term-caret::after {
     content: "▋";
