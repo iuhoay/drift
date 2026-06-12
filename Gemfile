@@ -30,6 +30,9 @@ gem "faraday-follow_redirects", "~> 0.3"
 # HTML sanitization for entry content
 gem "sanitize", "~> 7.0"
 
+# Self-hosted performance monitoring (requests, SQL/N+1, jobs) [https://github.com/railspulse/rails_pulse]
+gem "rails_pulse", "~> 0.3.2"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

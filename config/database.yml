@@ -40,3 +40,8 @@ production:
     database: <%= Rails.app.creds.option(:database_name, default: "drift_production") %>_cable
     username: <%= Rails.app.creds.option(:database_username, default: "drift") %>
     migrations_paths: db/cable_migrate
+  rails_pulse:
+    <<: *production
+    database: <%= Rails.app.creds.option(:database_name, default: "drift_production") %>_rails_pulse
+    username: <%= Rails.app.creds.option(:database_username, default: "drift") %>
+    migrations_paths: db/rails_pulse_migrate
