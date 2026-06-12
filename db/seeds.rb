@@ -2,6 +2,9 @@ user = User.find_or_create_by!(email_address: "demo@drift.local") do |u|
   u.password = "drift1234"
   u.password_confirmation = "drift1234"
 end
+# Promote the demo user so it can reach the Rails Pulse dashboard at /rails_pulse.
+# Done outside the create block so re-seeding an already-seeded DB also applies it.
+user.update!(admin: true) unless user.admin?
 
 starter_feeds = [
   "https://daringfireball.net/feeds/main",
@@ -17,4 +20,4 @@ starter_feeds.each do |url|
   FeedRefreshJob.perform_later(feed.id)
 end
 
-puts "Seeded user demo@drift.local / drift1234 with #{user.subscriptions.count} feeds."
+puts "Seeded admin user demo@drift.local / drift1234 with #{user.subscriptions.count} feeds (Rails Pulse dashboard at /rails_pulse)."

@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "offline" => "pwa#offline", as: :pwa_offline
 
+  # Self-hosted performance monitoring dashboard (admin-only; see config/initializers/rails_pulse.rb)
+  mount RailsPulse::Engine => "/rails_pulse"
+
   resource :theme, only: :update
   resource :activity, only: :show
 
