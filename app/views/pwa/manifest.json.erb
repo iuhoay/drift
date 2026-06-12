@@ -1,5 +1,12 @@
+<%-
+  app_name   = Rails.env.production? ? "Drift" : "Drift (#{Rails.env})"
+  short_name = Rails.env.production? ? "Drift" : "Drift #{Rails.env.first(3)}"
+  theme      = Rails.env.production? ? "#171412" : "#3f2a14"
+-%>
 {
-  "name": "Drift",
+  "id": "drift-<%= Rails.env %>",
+  "name": "<%= app_name %>",
+  "short_name": "<%= short_name %>",
   "icons": [
     {
       "src": "/icon.png",
@@ -17,6 +24,6 @@
   "display": "standalone",
   "scope": "/",
   "description": "A calm RSS reader.",
-  "theme_color": "#171412",
-  "background_color": "#171412"
+  "theme_color": "<%= theme %>",
+  "background_color": "<%= theme %>"
 }

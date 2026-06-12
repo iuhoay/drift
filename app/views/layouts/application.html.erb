@@ -6,6 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Drift">
     <meta name="mobile-web-app-capable" content="yes">
+    <%= tag.meta name: "rails-env", content: Rails.env %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -14,6 +15,7 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="manifest" href="<%= pwa_manifest_path %>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
