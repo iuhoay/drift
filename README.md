@@ -67,6 +67,23 @@ username: <%%= Rails.application.creds.option(:database_username) %>
 In production, set the same keys as real environment variables (they take
 precedence over `.env`).
 
+### Production domain
+
+Set `APP_HOST` to the canonical public domain before booting production. Rails
+uses it for absolute URLs, including password reset emails, and Kamal uses it
+for the proxy host.
+
+```bash
+APP_HOST=rdrift.app
+APP_HOSTS=rdrift.app,www.rdrift.app # optional aliases
+APP_PROTOCOL=https
+```
+
+If Kamal terminates TLS through its proxy, keep the default `FORCE_SSL=true` and
+point DNS at the server before deploying so Let's Encrypt can issue the
+certificate. For local production-style Docker compose, `FORCE_SSL=false` is set
+with `APP_HOST=drift.local`.
+
 ## Background jobs
 
 Solid Queue runs in-process via `bin/jobs` (started by `bin/dev`).

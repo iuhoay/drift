@@ -33,6 +33,9 @@ services:
       # Reach Postgres by Compose service name on the shared default network.
       # config/database.yml's production host is an ENV override over creds.
       DATABASE_HOST: postgres
+      APP_HOST: drift.local
+      APP_PROTOCOL: http
+      FORCE_SSL: "false"
       # Boots production without a master key (assets were precompiled at
       # build time with SECRET_KEY_BASE_DUMMY). Local-only; rotate for real use.
       SECRET_KEY_BASE: "drift-local-compose-secret-not-for-production"
