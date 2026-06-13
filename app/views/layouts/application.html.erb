@@ -34,7 +34,14 @@
             <span class="brand-logo__name">drift</span>
             <span class="brand-logo__tagline" aria-hidden="true">&#8212; rss reader</span>
           <% end %>
-          <span class="hidden select-none text-stone-400 sm:block">tty/01</span>
+          <div class="flex items-center gap-3 text-stone-400">
+            <% if Current.user.admin? %>
+              <%= link_to "admin", admin_root_path,
+                    class: "hover:text-amber-700 #{'text-amber-700' if controller_path == 'admin/dashboard'}" %>
+              <span class="hidden select-none sm:inline" aria-hidden="true">·</span>
+            <% end %>
+            <span class="hidden select-none sm:block">tty/01</span>
+          </div>
         </header>
 
         <div class="flex flex-1 overflow-hidden">
