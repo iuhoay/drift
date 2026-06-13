@@ -23,7 +23,7 @@ gem "jbuilder"
 gem "bcrypt", "~> 3.1.7"
 
 # Feed parsing and HTTP
-gem "feedjira", "~> 3.2"
+gem "feedjira", "~> 4.0"
 gem "faraday", "~> 2.9"
 gem "faraday-follow_redirects", "~> 0.3"
 
