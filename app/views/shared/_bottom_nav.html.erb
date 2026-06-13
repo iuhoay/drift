@@ -13,7 +13,7 @@
     { label: "feeds",   path: subscriptions_path,             on: controller_name == "subscriptions" }
   ]
 %>
-<nav class="term-topbar flex shrink-0 border-t border-stone-300 text-xs md:hidden" aria-label="Primary">
+<nav class="term-topbar flex shrink-0 border-t border-stone-300 pb-[env(safe-area-inset-bottom)] text-xs md:hidden" aria-label="Primary">
   <% tabs.each do |tab| %>
     <%= link_to tab[:path],
           class: "flex flex-1 items-center justify-center gap-1.5 py-3 #{tab[:on] ? 'bg-amber-700/10 text-amber-700' : 'text-stone-500'}",
