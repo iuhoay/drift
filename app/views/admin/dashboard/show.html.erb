@@ -1,0 +1,50 @@
+<% content_for :title, "Admin — Drift" %>
+
+<div class="mx-auto max-w-5xl px-5 sm:px-8 py-8">
+  <header class="flex items-baseline gap-0.5 overflow-hidden border-b border-stone-300 pb-3">
+    <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="font-medium text-stone-900">admin</span><span class="term-caret select-none"></span>
+  </header>
+
+  <div class="mt-5 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// at a glance</div>
+  <dl class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded border border-stone-300 bg-stone-300 sm:grid-cols-4">
+    <% @stats.each do |label, count| %>
+      <div class="bg-stone-50 px-4 py-3">
+        <dt class="select-none text-[0.65rem] uppercase tracking-[0.15em] text-stone-500"><%= label %></dt>
+        <dd class="mt-1 tabular-nums text-2xl text-stone-900"><%= number_with_delimiter(count) %></dd>
+      </div>
+    <% end %>
+  </dl>
+
+  <p class="mt-3 text-sm text-stone-700">
+    <% if @failing_feeds.positive? %>
+      <span class="tabular-nums text-amber-700"><%= @failing_feeds %></span>
+      <%= "feed".pluralize(@failing_feeds) %> currently failing to fetch
+    <% else %>
+      <span class="text-stone-500">all feeds fetching cleanly</span>
+    <% end %>
+    <span class="text-stone-400">—</span>
+    <% if @last_success_at %>
+      last successful refresh <%= time_ago_in_words(@last_success_at) %> ago
+    <% else %>
+      no successful refresh yet
+    <% end %>
+  </p>
+
+  <div class="mt-7 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// dashboards</div>
+  <ul class="mt-2 divide-y divide-stone-300 border-y border-stone-300">
+    <li>
+      <%= link_to "/jobs", class: "group flex items-baseline gap-2 px-1 py-2.5 text-stone-700 hover:text-amber-700" do %>
+        <span class="select-none text-stone-300 group-hover:text-amber-700">&gt;</span>
+        <span class="font-medium">background jobs</span>
+        <span class="text-sm text-stone-500">— Mission Control: queues, retries, failures</span>
+      <% end %>
+    </li>
+    <li>
+      <%= link_to "/rails_pulse", class: "group flex items-baseline gap-2 px-1 py-2.5 text-stone-700 hover:text-amber-700" do %>
+        <span class="select-none text-stone-300 group-hover:text-amber-700">&gt;</span>
+        <span class="font-medium">performance</span>
+        <span class="text-sm text-stone-500">— Rails Pulse: request timings, slow queries</span>
+      <% end %>
+    </li>
+  </ul>
+</div>
