@@ -6,7 +6,10 @@
       <span class="select-none">&larr;</span> back
     <% end %>
 
-    <div id="<%= dom_id(@entry, :actions) %>" class="flex items-center gap-2">
+    <%# mark-read posts on render, keeping #show a safe GET (Turbo prefetch won't mark read). %>
+    <div id="<%= dom_id(@entry, :actions) %>" class="flex items-center gap-2"
+         data-controller="mark-read"
+         data-mark-read-url-value="<%= entry_read_path(@entry) %>">
       <%= render "entries/actions", entry: @entry, user_entry: @user_entry %>
     </div>
   </div>

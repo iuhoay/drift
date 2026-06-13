@@ -26,12 +26,8 @@ Rails.application.routes.draw do
   resources :subscriptions, only: [ :index, :new, :create, :update, :destroy ]
 
   resources :entries, only: [ :index, :show ] do
-    member do
-      post :read
-      post :unread
-      post :star
-      post :unstar
-    end
+    resource :read, only: [ :create, :destroy ], module: :entries
+    resource :star, only: [ :create, :destroy ], module: :entries
   end
 
   root "entries#index"

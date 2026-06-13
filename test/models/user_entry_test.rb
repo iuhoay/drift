@@ -42,14 +42,29 @@ class UserEntryTest < ActiveSupport::TestCase
     end
   end
 
-  test "toggle_star! toggles starred_at" do
+  test "mark_starred! sets starred_at when previously unstarred" do
     user_entry = user_entries(:one_example_first_read)
 
-    assert_nil user_entry.starred_at
-    user_entry.toggle_star!
-    assert_not_nil user_entry.starred_at
+    freeze_time do
+      assert_changes -> { user_entry.starred_at }, from: nil, to: Time.current do
+        user_entry.mark_starred!
+      end
+    end
+  end
 
-    user_entry.toggle_star!
-    assert_nil user_entry.starred_at
+  test "mark_starred! is a no-op when already starred" do
+    user_entry = user_entries(:one_example_second_starred)
+
+    assert_no_changes -> { user_entry.reload.starred_at } do
+      user_entry.mark_starred!
+    end
+  end
+
+  test "mark_unstarred! clears starred_at" do
+    user_entry = user_entries(:one_example_second_starred)
+
+    assert_changes -> { user_entry.starred_at }, to: nil do
+      user_entry.mark_unstarred!
+    end
   end
 end
