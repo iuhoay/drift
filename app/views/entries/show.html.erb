@@ -18,7 +18,7 @@
     <div class="mb-3 space-y-0.5 text-xs leading-relaxed">
       <div class="flex gap-3">
         <span class="w-16 shrink-0 select-none text-stone-400">FEED</span>
-        <span class="truncate text-stone-600"><%= @entry.feed.display_title %></span>
+        <span class="min-w-0 truncate text-stone-600"><%= @entry.feed.display_title %></span>
       </div>
       <% if @entry.published_at %>
         <div class="flex gap-3">
@@ -33,14 +33,14 @@
       <% if @entry.author.present? %>
         <div class="flex gap-3">
           <span class="w-16 shrink-0 select-none text-stone-400">AUTHOR</span>
-          <span class="truncate text-stone-600"><%= @entry.author %></span>
+          <span class="min-w-0 truncate text-stone-600"><%= @entry.author %></span>
         </div>
       <% end %>
       <% if (source_url = @entry.safe_url) %>
         <div class="flex gap-3">
           <span class="w-16 shrink-0 select-none text-stone-400">SOURCE</span>
           <%= link_to source_url, source_url, target: "_blank", rel: "noopener",
-                class: "truncate text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" %>
+                class: "min-w-0 truncate text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" %>
         </div>
       <% end %>
     </div>
