@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   # Self-hosted performance monitoring dashboard (admin-only; see config/initializers/rails_pulse.rb)
   mount RailsPulse::Engine => "/rails_pulse"
 
+  # Background job dashboard (admin-only; see config/initializers/mission_control.rb)
+  mount MissionControl::Jobs::Engine, at: "/jobs"
+
   resource :theme, only: :update
   resource :activity, only: :show
 
