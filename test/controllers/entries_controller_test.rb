@@ -47,60 +47,22 @@ class EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(entries(:example_first))}", count: 0
   end
 
-  test "show marks the entry as read" do
+  test "show does not mark the entry as read on GET" do
     target = entries(:stale_first)
 
-    assert_difference -> { @user.user_entries.read.count } => 1 do
+    # GET must stay side-effect free so Turbo's hover prefetch can't mark
+    # entries read. The view POSTs to #read once it actually renders.
+    assert_no_difference -> { @user.user_entries.read.count } do
       get entry_path(target)
     end
 
     assert_response :success
+    assert_select "##{dom_id(target, :actions)}[data-controller=mark-read][data-mark-read-url-value=?]",
+      entry_read_path(target)
   end
 
   test "show is scoped to subscribed entries" do
     get entry_path(entries(:unsubscribed_first))
     assert_response :not_found
-  end
-
-  test "read marks the entry as read" do
-    target = entries(:stale_first)
-
-    post read_entry_path(target), as: :turbo_stream
-
-    assert_response :success
-    assert @user.user_entries.find_by(entry: target).read?
-  end
-
-  test "unread clears read_at" do
-    post unread_entry_path(@entry), as: :turbo_stream
-
-    assert_response :success
-    assert_not @user.user_entries.find_by(entry: @entry).read?
-  end
-
-  test "star sets starred_at" do
-    target = entries(:stale_first)
-
-    post star_entry_path(target), as: :turbo_stream
-
-    assert_response :success
-    assert @user.user_entries.find_by(entry: target).starred?
-  end
-
-  test "unstar clears starred_at" do
-    target = entries(:example_second)
-
-    post unstar_entry_path(target), as: :turbo_stream
-
-    assert_response :success
-    assert_not @user.user_entries.find_by(entry: target).starred?
-  end
-
-  test "html star action redirects back" do
-    target = entries(:stale_first)
-
-    post star_entry_path(target), headers: { "HTTP_REFERER" => entries_url }
-
-    assert_redirected_to entries_url
   end
 end

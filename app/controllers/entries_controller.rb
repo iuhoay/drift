@@ -1,5 +1,5 @@
 class EntriesController < ApplicationController
-  before_action :set_entry, only: [ :show, :read, :unread, :star, :unstar ]
+  before_action :set_entry, only: :show
 
   PER_PAGE = 50
 
@@ -34,40 +34,16 @@ class EntriesController < ApplicationController
   end
 
   def show
-    @user_entry = Current.user.user_entries.find_or_create_by!(entry: @entry)
-    @user_entry.mark_read!
-  end
-
-  def read
-    user_entry_for(@entry).mark_read!
-    respond_with_turbo
-  end
-
-  def unread
-    user_entry_for(@entry).mark_unread!
-    respond_with_turbo
-  end
-
-  def star
-    ue = user_entry_for(@entry)
-    ue.update!(starred_at: Time.current) unless ue.starred?
-    respond_with_turbo
-  end
-
-  def unstar
-    ue = user_entry_for(@entry)
-    ue.update!(starred_at: nil) if ue.starred?
-    respond_with_turbo
+    # Read-only: marking read happens via a POST to Entries::ReadsController from
+    # the view once the page is actually rendered. Keeps GET safe so Turbo's
+    # hover prefetch can't mark entries read without the user opening them.
+    @user_entry = Current.user.user_entries.find_by(entry: @entry)
   end
 
   private
 
   def set_entry
     @entry = Current.user.subscribed_entries.find(params[:id])
-  end
-
-  def user_entry_for(entry)
-    Current.user.user_entries.find_or_create_by!(entry: entry)
   end
 
   def parse_on(value)
@@ -82,14 +58,5 @@ class EntriesController < ApplicationController
 
   def starred_entry_ids
     Current.user.user_entries.starred.select(:entry_id)
-  end
-
-  def respond_with_turbo
-    @user_entry = Current.user.user_entries.find_by(entry_id: @entry.id)
-
-    respond_to do |format|
-      format.turbo_stream
-      format.html { redirect_back fallback_location: root_path }
-    end
   end
 end

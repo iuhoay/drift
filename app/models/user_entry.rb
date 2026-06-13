@@ -22,7 +22,11 @@ class UserEntry < ApplicationRecord
     update!(read_at: nil) if read?
   end
 
-  def toggle_star!
-    update!(starred_at: starred? ? nil : Time.current)
+  def mark_starred!
+    update!(starred_at: Time.current) unless starred?
+  end
+
+  def mark_unstarred!
+    update!(starred_at: nil) if starred?
   end
 end

@@ -4,13 +4,13 @@
 %>
 
 <% if starred %>
-  <%= button_to unstar_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn term-btn-on" do %>[★ starred]<% end %>
+  <%= button_to entry_star_path(entry), method: :delete, form: { class: "inline" }, class: "term-btn term-btn-on" do %>[★ starred]<% end %>
 <% else %>
-  <%= button_to star_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn" do %>[☆ star]<% end %>
+  <%= button_to entry_star_path(entry), form: { class: "inline" }, class: "term-btn" do %>[☆ star]<% end %>
 <% end %>
 
 <% if read %>
-  <%= button_to unread_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn" do %>[unread]<% end %>
+  <%= button_to entry_read_path(entry), method: :delete, form: { class: "inline" }, class: "term-btn" do %>[unread]<% end %>
 <% else %>
-  <%= button_to read_entry_path(entry), method: :post, form: { class: "inline" }, class: "term-btn" do %>[read]<% end %>
+  <%= button_to entry_read_path(entry), form: { class: "inline" }, class: "term-btn" do %>[read]<% end %>
 <% end %>
