@@ -1,0 +1,25 @@
+<%#
+  Mobile-only primary navigation. The desktop sidebar is hidden below `md`,
+  so this bar carries the top-level destinations. It's a flex child of the
+  screen column (not fixed), so the scrolling <main> never hides behind it.
+%>
+<%
+  on_entries = controller_name == "entries" && action_name == "index"
+  scope      = params[:scope].presence_in(%w[all unread starred]) || "unread"
+  tabs = [
+    { label: "inbox",   path: entries_path,                   on: on_entries && scope != "starred" },
+    { label: "starred", path: entries_path(scope: "starred"), on: on_entries && scope == "starred" },
+    { label: "stats",   path: activity_path,                  on: controller_name == "activities" },
+    { label: "feeds",   path: subscriptions_path,             on: controller_name == "subscriptions" }
+  ]
+%>
+<nav class="term-topbar flex shrink-0 border-t border-stone-300 text-xs md:hidden" aria-label="Primary">
+  <% tabs.each do |tab| %>
+    <%= link_to tab[:path],
+          class: "flex flex-1 items-center justify-center gap-1.5 py-3 #{tab[:on] ? 'bg-amber-700/10 text-amber-700' : 'text-stone-500'}",
+          aria: { current: ("page" if tab[:on]) } do %>
+      <span class="select-none <%= tab[:on] ? 'text-amber-700' : 'text-stone-300' %>"><%= tab[:on] ? ">" : "·" %></span>
+      <span class="tracking-wide"><%= tab[:label] %></span>
+    <% end %>
+  <% end %>
+</nav>

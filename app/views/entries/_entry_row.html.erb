@@ -6,10 +6,11 @@
 %>
 <li id="<%= dom_id(entry) %>" class="term-row group">
   <%= link_to entry_path(entry), class: "flex gap-3 border-l-2 border-transparent px-4 py-2.5 transition-colors group-hover:border-amber-700 group-hover:bg-amber-700/[0.07]" do %>
-    <span class="w-10 shrink-0 select-none pt-px text-xs tabular-nums text-stone-400"><%= relative_time(entry.published_at || entry.created_at) %></span>
-
     <div class="min-w-0 flex-1">
-      <div class="truncate text-[0.7rem] uppercase tracking-[0.18em] text-stone-500">[<%= entry.feed.display_title %>]</div>
+      <div class="flex items-baseline gap-3 text-[0.7rem] uppercase tracking-[0.18em] text-stone-500">
+        <span class="min-w-0 flex-1 truncate">[<%= entry.feed.display_title %>]</span>
+        <time datetime="<%= (entry.published_at || entry.created_at).iso8601 %>" class="shrink-0 normal-case tracking-normal tabular-nums text-stone-300"><%= relative_time(entry.published_at || entry.created_at) %></time>
+      </div>
 
       <h2 class="mt-1 flex items-baseline gap-2 text-sm leading-snug <%= read ? 'text-stone-500' : 'text-stone-900 font-medium' %>">
         <span class="w-2 shrink-0 select-none text-center <%= marker_color %>"><%= marker %></span>
