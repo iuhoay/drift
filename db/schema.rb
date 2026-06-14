@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_06_12_224221) do
+ActiveRecord::Schema[8.2].define(version: 2026_06_14_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,6 +38,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_12_224221) do
     t.string "etag"
     t.string "feed_url", null: false
     t.integer "fetch_failure_count", default: 0, null: false
+    t.string "kind", default: "rss", null: false
     t.text "last_error"
     t.datetime "last_fetched_at"
     t.string "last_modified"

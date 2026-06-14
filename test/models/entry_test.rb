@@ -74,4 +74,15 @@ class EntryTest < ActiveSupport::TestCase
     assert_nil Entry.new(url: nil).youtube_video_id
     assert_nil Entry.new(url: "https://evil.example/?next=https://youtube.com/watch?v=abc12345678").youtube_video_id
   end
+
+  test "bilibili_bvid extracts the BV id from a video URL" do
+    assert_equal "BV1wPJH6UEVL", Entry.new(url: "https://www.bilibili.com/video/BV1wPJH6UEVL").bilibili_bvid
+    assert_equal "BV1wPJH6UEVL", Entry.new(url: "https://www.bilibili.com/video/BV1wPJH6UEVL/?spm_id_from=x").bilibili_bvid
+  end
+
+  test "bilibili_bvid returns nil for non-Bilibili urls" do
+    assert_nil Entry.new(url: "https://space.bilibili.com/26846937").bilibili_bvid
+    assert_nil Entry.new(url: nil).bilibili_bvid
+    assert_nil Entry.new(url: "https://evil.example/?next=https://www.bilibili.com/video/BV1wPJH6UEVL").bilibili_bvid
+  end
 end

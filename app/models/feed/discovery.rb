@@ -35,13 +35,22 @@ class Feed::Discovery
     new(url).call
   end
 
-  def initialize(url, http: nil)
+  def initialize(url, http: nil, bilibili_enabled: Feed::Bilibili.enabled?)
     @url = url.to_s.strip
     @http = http
+    @bilibili_enabled = bilibili_enabled
   end
 
   def call
     return [] if @url.blank?
+
+    # A Bilibili space serves no discoverable feed link; when the integration is
+    # enabled, recognize it by URL and hand back a canonical space URL that
+    # Feed::Bilibili knows how to refresh. When disabled it falls through and no
+    # feed is found, so the public instance never subscribes Bilibili spaces.
+    if @bilibili_enabled && (uid = Feed::Bilibili.uid_from(@url))
+      return [ Feed::Bilibili.canonical_url(uid) ]
+    end
 
     response = get(@url)
     return [] unless response&.success?

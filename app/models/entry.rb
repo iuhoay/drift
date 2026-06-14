@@ -15,6 +15,7 @@ class Entry < ApplicationRecord
   }
 
   YOUTUBE_URL = %r{\A(?:https?:)?//(?:www\.|m\.)?(?:youtube(?:-nocookie)?\.com/(?:watch\?(?:.*&)?v=|embed/|shorts/)|youtu\.be/)([\w-]{11})}
+  BILIBILI_URL = %r{\A(?:https?:)?//(?:www\.|m\.)?bilibili\.com/video/(BV[0-9A-Za-z]{10})}
 
   def excerpt(limit: 280)
     plain = ActionController::Base.helpers.strip_tags(summary.presence || content.to_s)
@@ -31,6 +32,10 @@ class Entry < ApplicationRecord
 
   def youtube_video_id
     url.to_s.match(YOUTUBE_URL)&.captures&.first
+  end
+
+  def bilibili_bvid
+    url.to_s.match(BILIBILI_URL)&.captures&.first
   end
 
   private

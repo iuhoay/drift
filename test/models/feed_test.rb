@@ -41,4 +41,9 @@ class FeedTest < ActiveSupport::TestCase
     assert feeds(:example).healthy?
     assert_not feeds(:failing).healthy?
   end
+
+  test "USER_AGENT tags the environment outside production" do
+    assert_not_equal "Drift RSS Reader/0.1 (+https://rdrift.app)", Feed::USER_AGENT
+    assert_includes Feed::USER_AGENT, Rails.env
+  end
 end

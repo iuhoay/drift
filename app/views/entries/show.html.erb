@@ -62,6 +62,21 @@
     </div>
   <% end %>
 
+  <% if (bvid = @entry.bilibili_bvid) %>
+    <div class="border-t border-stone-300 pt-7">
+      <div class="relative aspect-video overflow-hidden bg-stone-900">
+        <iframe
+          src="https://player.bilibili.com/player.html?bvid=<%= bvid %>&autoplay=0&danmaku=0"
+          title="<%= @entry.title %>"
+          loading="lazy"
+          scrolling="no"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+          class="absolute inset-0 h-full w-full border-0"></iframe>
+      </div>
+    </div>
+  <% end %>
+
   <div class="entry-content border-t border-stone-300 pt-7">
     <%= sanitize(@entry.content.presence || @entry.summary.to_s) %>
   </div>

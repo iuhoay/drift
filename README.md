@@ -96,6 +96,12 @@ To refresh a single feed manually:
 FeedRefreshJob.perform_now(Feed.first.id)
 ```
 
+## Bilibili feeds
+
+Pasting a `space.bilibili.com/<uid>` address subscribes to that user's video
+uploads. Intended for personal use and **off by default in production** — see
+[docs/bilibili-feeds.md](docs/bilibili-feeds.md).
+
 ## Search
 
 Full-text search uses Postgres `tsvector` with `websearch_to_tsquery`,
