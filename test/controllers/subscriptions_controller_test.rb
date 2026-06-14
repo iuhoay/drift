@@ -120,11 +120,10 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   # Replaces Feed::Discovery.call with a canned result for the block so the
   # controller never reaches out to the network during the test.
   def stub_discovery(result)
-    Feed::Discovery.singleton_class.alias_method(:__real_call, :call)
+    original = Feed::Discovery.method(:call)
     Feed::Discovery.define_singleton_method(:call) { |_url| result }
     yield
   ensure
-    Feed::Discovery.define_singleton_method(:call) { |url| __real_call(url) }
-    Feed::Discovery.singleton_class.remove_method(:__real_call)
+    Feed::Discovery.define_singleton_method(:call, original)
   end
 end
