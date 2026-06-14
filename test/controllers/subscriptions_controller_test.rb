@@ -35,11 +35,39 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create creates a new feed when needed" do
-    assert_difference -> { Feed.count } => 1, -> { @user.subscriptions.count } => 1 do
-      post subscriptions_path, params: { subscription: { feed_url: "https://brand-new.example.com/feed.xml" } }
+    feed_url = "https://brand-new.example.com/feed.xml"
+
+    stub_discovery([ feed_url ]) do
+      assert_difference -> { Feed.count } => 1, -> { @user.subscriptions.count } => 1 do
+        post subscriptions_path, params: { subscription: { feed_url: feed_url } }
+      end
     end
 
     assert_redirected_to subscriptions_path
+  end
+
+  test "create auto-detects the feed url from a site address" do
+    site_url = "https://www.ruanyifeng.com/blog/"
+    feed_url = "https://www.ruanyifeng.com/blog/atom.xml"
+
+    stub_discovery([ feed_url ]) do
+      assert_difference -> { Feed.count } => 1 do
+        post subscriptions_path, params: { subscription: { feed_url: site_url } }
+      end
+    end
+
+    assert_redirected_to subscriptions_path
+    assert_equal feed_url, Feed.last.feed_url
+  end
+
+  test "create re-renders when no feed can be detected" do
+    stub_discovery([]) do
+      assert_no_difference -> { Subscription.count } do
+        post subscriptions_path, params: { subscription: { feed_url: "https://no-feed.example.com" } }
+      end
+    end
+
+    assert_response :unprocessable_entity
   end
 
   test "create with blank feed_url re-renders" do
@@ -85,5 +113,18 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :not_found
+  end
+
+  private
+
+  # Replaces Feed::Discovery.call with a canned result for the block so the
+  # controller never reaches out to the network during the test. (Minitest 6
+  # dropped the bundled mock, so there's no Object#stub to lean on here.)
+  def stub_discovery(result)
+    original = Feed::Discovery.method(:call)
+    Feed::Discovery.define_singleton_method(:call) { |_url| result }
+    yield
+  ensure
+    Feed::Discovery.define_singleton_method(:call, original)
   end
 end
