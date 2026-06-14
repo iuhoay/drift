@@ -1,0 +1,44 @@
+<% content_for :title, "Devices & sessions" %>
+
+<div class="max-w-3xl mx-auto px-6 py-8 font-sans">
+  <header class="flex items-baseline justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-xl font-medium tracking-tight">Devices &amp; sessions</h1>
+      <p class="text-sm text-stone-500">Each device you sign in on appears here.</p>
+    </div>
+    <%= link_to "Back to account", account_path, class: "shrink-0 text-sm underline text-stone-500 hover:text-stone-900" %>
+  </header>
+
+  <ul class="divide-y divide-stone-200 border-y border-stone-200">
+    <% @sessions.each do |session| %>
+      <% current = session.id == Current.session&.id %>
+      <li class="py-3 flex items-center justify-between gap-4" id="<%= dom_id(session) %>">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="font-medium truncate"><%= device_label(session.user_agent) %></span>
+            <% if current %>
+              <span class="shrink-0 rounded bg-emerald-700/10 px-1.5 py-0.5 text-[0.65rem] uppercase tracking-widest text-emerald-700">This device</span>
+            <% end %>
+          </div>
+          <div class="text-xs text-stone-500">
+            <%= session.ip_address.presence || "unknown IP" %>
+            &middot; signed in <%= relative_time(session.created_at) %>
+            <% if session.last_active_at %>&middot; active <%= relative_time(session.last_active_at) %><% end %>
+          </div>
+        </div>
+
+        <%= button_to(current ? "Sign out" : "Revoke", account_session_path(session), method: :delete,
+              form: { data: current ? {} : { turbo_confirm: "Sign out this device?" } },
+              class: "shrink-0 text-xs text-stone-500 hover:text-red-600 underline") %>
+      </li>
+    <% end %>
+  </ul>
+
+  <% if @sessions.size > 1 %>
+    <div class="mt-6">
+      <%= button_to "Sign out of all other devices", account_other_sessions_path, method: :delete,
+            form: { data: { turbo_confirm: "Sign out everywhere except this device?" } },
+            class: "text-sm px-3 py-1.5 rounded bg-stone-900 text-white hover:bg-stone-700" %>
+    </div>
+  <% end %>
+</div>
