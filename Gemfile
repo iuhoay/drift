@@ -22,6 +22,14 @@ gem "jbuilder"
 # Use Active Model has_secure_password
 gem "bcrypt", "~> 3.1.7"
 
+# Third-party sign-in (GitHub, Google). omniauth-rails_csrf_protection forces
+# the request phase through a POST with a CSRF token (so OAuth buttons must be
+# button_to, not link_to).
+gem "omniauth", "~> 2.1"
+gem "omniauth-github", "~> 2.0"
+gem "omniauth-google-oauth2", "~> 1.1"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+
 # Feed parsing and HTTP
 gem "feedjira", "~> 3.2"
 gem "faraday", "~> 2.9"

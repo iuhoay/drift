@@ -1,0 +1,18 @@
+<% providers = Identity.configured_providers %>
+<% if providers.any? %>
+  <div class="mt-6">
+    <div class="mb-3 flex items-center gap-3 text-xs uppercase tracking-widest text-stone-400">
+      <span class="h-px flex-1 bg-stone-200"></span>
+      <span>or</span>
+      <span class="h-px flex-1 bg-stone-200"></span>
+    </div>
+    <div class="space-y-2">
+      <% providers.each do |name, cfg| %>
+        <%= button_to "/auth/#{name}", form: { data: { turbo: false }, class: "block" },
+              class: "w-full py-2 rounded border border-stone-300 text-stone-700 hover:bg-stone-50 cursor-pointer" do %>
+          Continue with <%= cfg[:label] %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
