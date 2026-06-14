@@ -1,0 +1,12 @@
+# User-Agent sent on every outbound feed request (discovery + refresh).
+# Only production identifies as the bare live service; other environments tag
+# the env so their traffic is distinguishable to feed operators and in our logs.
+# production has no section of its own, so it inherits the shared value.
+shared:
+  user_agent: "Drift RSS Reader/0.1 (+https://rdrift.app)"
+
+development:
+  user_agent: "Drift RSS Reader/0.1 (+https://rdrift.app; development)"
+
+test:
+  user_agent: "Drift RSS Reader/0.1 (+https://rdrift.app; test)"
