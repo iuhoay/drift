@@ -1,0 +1,29 @@
+<% content_for :title, "Change email" %>
+
+<div class="max-w-md mx-auto px-6 py-8 font-sans">
+  <header class="mb-6">
+    <h1 class="text-xl font-medium tracking-tight">Change email</h1>
+    <p class="text-sm text-stone-500">We'll send a verification link to the new address.</p>
+  </header>
+
+  <%= form_with model: @user, url: account_email_path, method: :patch, class: "space-y-4" do |f| %>
+    <% if @user.errors.any? %>
+      <div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <% @user.errors.full_messages.each do |msg| %>
+          <div><%= msg %></div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :email_address, "Email", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
+      <%= f.email_field :email_address, autofocus: true, autocomplete: "email",
+            class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none" %>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= f.submit "Save", class: "px-3 py-1.5 text-sm rounded bg-stone-900 text-white hover:bg-stone-700 cursor-pointer" %>
+      <%= link_to "Cancel", account_path, class: "text-sm text-stone-500 underline hover:text-stone-900" %>
+    </div>
+  <% end %>
+</div>

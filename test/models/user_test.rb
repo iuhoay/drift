@@ -48,4 +48,38 @@ class UserTest < ActiveSupport::TestCase
       user.destroy
     end
   end
+
+  test "destroys dependent identities" do
+    user = users(:two)
+    assert user.identities.any?
+
+    assert_difference -> { Identity.count } => -user.identities.count do
+      user.destroy
+    end
+  end
+
+  test "verified? reflects verified_at" do
+    assert users(:one).verified?
+    assert_not users(:unverified).verified?
+  end
+
+  test "verify! sets verified_at once and is idempotent" do
+    user = users(:unverified)
+
+    user.verify!
+    assert user.reload.verified?
+
+    first = user.verified_at
+    user.verify!
+    assert_equal first, user.reload.verified_at
+  end
+
+  test "email_verification token round-trips and is invalidated by an email change" do
+    user = users(:one)
+    token = user.generate_token_for(:email_verification)
+    assert_equal user, User.find_by_token_for(:email_verification, token)
+
+    user.update!(email_address: "changed@example.com")
+    assert_nil User.find_by_token_for(:email_verification, token)
+  end
 end

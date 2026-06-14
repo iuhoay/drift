@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
+  has_many :identities, dependent: :destroy
 
   has_many :subscriptions, dependent: :destroy
   has_many :feeds, through: :subscriptions
@@ -12,6 +13,20 @@ class User < ApplicationRecord
   validates :email_address, presence: true, uniqueness: true,
                             format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, allow_nil: true
+
+  # Email-verification link token. Tied to the current email address, so it
+  # stops working the moment the address changes (re-verification on change).
+  generates_token_for :email_verification, expires_in: 1.day do
+    email_address
+  end
+
+  def verified?
+    verified_at.present?
+  end
+
+  def verify!
+    update_column(:verified_at, Time.current) unless verified?
+  end
 
   def subscribed_entries
     Entry.joins(feed: :subscriptions).where(subscriptions: { user_id: id })

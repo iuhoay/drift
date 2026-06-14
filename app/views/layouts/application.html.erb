@@ -52,6 +52,9 @@
                     class: "hover:text-amber-700 #{'text-amber-700' if controller_path == 'admin/dashboard'}" %>
               <span class="hidden select-none sm:inline" aria-hidden="true">·</span>
             <% end %>
+            <%# Mobile-only: the sidebar (which carries account on desktop) is hidden below md. %>
+            <%= link_to "account", account_path,
+                  class: "md:hidden hover:text-amber-700 #{'text-amber-700' if controller_path.start_with?('account')}" %>
             <span class="hidden select-none sm:block">tty/01</span>
           </div>
         </header>
@@ -60,6 +63,7 @@
           <%= render "shared/sidebar" %>
 
           <main class="flex-1 min-w-0 overflow-y-auto">
+            <%= render "shared/email_verification_banner" %>
             <%= render "shared/flash" %>
             <%= yield %>
           </main>

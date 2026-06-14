@@ -21,6 +21,8 @@
     <%= form.submit "Sign in", class: "w-full py-2 rounded bg-stone-900 text-white hover:bg-stone-700 cursor-pointer" %>
   <% end %>
 
+  <%= render "shared/oauth_buttons" %>
+
   <div class="mt-6 text-sm text-stone-500 text-center space-y-1">
     <p>No account? <%= link_to "Create one", new_registration_path, class: "underline text-stone-900" %></p>
     <p><%= link_to "Forgot password?", new_password_path, class: "underline" %></p>

@@ -1,0 +1,4 @@
+two_github:
+  user: two
+  provider: github
+  uid: "github-uid-two"

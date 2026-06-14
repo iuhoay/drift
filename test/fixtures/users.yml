@@ -3,12 +3,19 @@
 one:
   email_address: one@example.com
   password_digest: <%= password_digest %>
+  verified_at: <%= 1.week.ago.to_fs(:db) %>
 
 two:
   email_address: two@example.com
   password_digest: <%= password_digest %>
+  verified_at: <%= 1.week.ago.to_fs(:db) %>
 
 admin:
   email_address: admin@example.com
   password_digest: <%= password_digest %>
   admin: true
+  verified_at: <%= 1.week.ago.to_fs(:db) %>
+
+unverified:
+  email_address: unverified@example.com
+  password_digest: <%= password_digest %>

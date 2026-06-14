@@ -1,0 +1,87 @@
+<% content_for :title, "Account" %>
+
+<div class="max-w-3xl mx-auto px-6 py-8 font-sans">
+  <header class="mb-6 flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-medium tracking-tight">Account</h1>
+      <p class="text-sm text-stone-500">Manage your sign-in details and connected devices.</p>
+    </div>
+    <%= button_to "Sign out", session_path, method: :delete,
+          form: { class: "shrink-0" },
+          class: "text-sm underline text-stone-700 hover:text-amber-700" %>
+  </header>
+
+  <div class="divide-y divide-stone-200 border-y border-stone-200">
+    <%# Email %>
+    <section class="py-4 flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <div class="text-xs uppercase tracking-widest text-stone-500">Email</div>
+        <div class="mt-1 truncate"><%= @user.email_address %></div>
+        <div class="mt-1 text-xs">
+          <% if @user.verified? %>
+            <span class="text-emerald-700">[ok] verified</span>
+          <% else %>
+            <span class="text-amber-700">[!] unverified</span>
+          <% end %>
+        </div>
+      </div>
+      <%= link_to "Change", edit_account_email_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
+    </section>
+
+    <%# Password %>
+    <section class="py-4 flex items-start justify-between gap-4">
+      <div>
+        <div class="text-xs uppercase tracking-widest text-stone-500">Password</div>
+        <div class="mt-1 text-stone-500 text-sm">Change the password you use to sign in.</div>
+      </div>
+      <%= link_to "Change", edit_account_password_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
+    </section>
+
+    <%# Connected accounts (only when at least one provider is configured) %>
+    <% configured = Identity.configured_providers %>
+    <% if configured.any? || @identities.any? %>
+      <section class="py-4">
+        <div class="text-xs uppercase tracking-widest text-stone-500">Connected accounts</div>
+        <ul class="mt-2 space-y-2">
+          <% @identities.each do |identity| %>
+            <li class="flex items-center justify-between gap-4">
+              <span class="text-sm"><%= identity.label %></span>
+              <%= button_to "Disconnect", account_identity_path(identity), method: :delete,
+                    form: { data: { turbo_confirm: "Disconnect #{identity.label}?" } },
+                    class: "text-xs text-stone-500 hover:text-red-600 underline" %>
+            </li>
+          <% end %>
+          <% linked = @identities.map(&:provider) %>
+          <% configured.each_key do |provider| %>
+            <% next if linked.include?(provider) %>
+            <li class="flex items-center justify-between gap-4">
+              <span class="text-sm text-stone-500"><%= Identity.label_for(provider) %></span>
+              <%= button_to "Connect", "/auth/#{provider}", form: { data: { turbo: false } },
+                    class: "text-xs underline text-stone-700 hover:text-amber-700" %>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+
+    <%# Sessions %>
+    <section class="py-4 flex items-start justify-between gap-4">
+      <div>
+        <div class="text-xs uppercase tracking-widest text-stone-500">Devices &amp; sessions</div>
+        <div class="mt-1 text-stone-500 text-sm">See where you're signed in and sign out other devices.</div>
+      </div>
+      <%= link_to "Manage", account_sessions_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
+    </section>
+  </div>
+
+  <%# Danger zone %>
+  <section class="mt-8 rounded border border-red-200 bg-red-50/40 px-4 py-4">
+    <div class="text-xs uppercase tracking-widest text-red-700">Danger zone</div>
+    <div class="mt-2 flex items-start justify-between gap-4">
+      <p class="text-sm text-stone-600">Permanently delete your account, subscriptions, and read history. This cannot be undone.</p>
+      <%= button_to "Delete account", account_path, method: :delete,
+            form: { data: { turbo_confirm: "Delete your account permanently? This cannot be undone." } },
+            class: "shrink-0 text-sm px-3 py-1.5 rounded bg-red-700 text-white hover:bg-red-800" %>
+    </div>
+  </section>
+</div>

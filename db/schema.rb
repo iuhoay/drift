@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_06_14_120000) do
+ActiveRecord::Schema[8.2].define(version: 2026_06_14_130200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,9 +49,20 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_14_120000) do
     t.index ["feed_url"], name: "index_feeds_on_feed_url", unique: true
   end
 
+  create_table "identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
+    t.index ["user_id"], name: "index_identities_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
+    t.datetime "last_active_at"
     t.datetime "updated_at", null: false
     t.string "user_agent"
     t.bigint "user_id", null: false
@@ -89,10 +100,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_14_120000) do
     t.string "email_address", null: false
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false
+    t.datetime "verified_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   add_foreign_key "entries", "feeds"
+  add_foreign_key "identities", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "subscriptions", "feeds"
   add_foreign_key "subscriptions", "users"

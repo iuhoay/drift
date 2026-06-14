@@ -2,6 +2,26 @@ Rails.application.routes.draw do
   resource :session, only: [ :new, :create, :destroy ]
   resource :registration, only: [ :new, :create ]
   resources :passwords, param: :token, only: [ :new, :create, :edit, :update ]
+
+  # Email confirmation: :show verifies a signed link (works signed-out),
+  # :create resends to the signed-in user.
+  resources :email_verifications, only: [ :show, :create ], param: :token
+
+  # Third-party sign-in. OmniAuth's middleware handles the POST /auth/:provider
+  # request phase; the app only owns the callback and failure endpoints.
+  get "auth/:provider/callback", to: "sessions/omniauth#create", as: :omniauth_callback
+  get "auth/failure", to: "sessions/omniauth#failure"
+
+  # Account self-service.
+  resource :account, only: [ :show, :destroy ]
+  namespace :account do
+    resource :email, only: [ :edit, :update ]
+    resource :password, only: [ :edit, :update ]
+    delete "sessions/others", to: "sessions#destroy_others", as: :other_sessions
+    resources :sessions, only: [ :index, :destroy ]
+    resources :identities, only: [ :destroy ]
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/*
