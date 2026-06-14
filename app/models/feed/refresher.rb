@@ -4,7 +4,6 @@ require "faraday/follow_redirects"
 require "sanitize"
 
 class Feed::Refresher
-  USER_AGENT = "Drift RSS Reader/0.1 (+https://drift.local)"
   TIMEOUT = 15
 
   def self.call(feed)
@@ -17,7 +16,7 @@ class Feed::Refresher
 
   def call
     response = http.get(@feed.feed_url) do |req|
-      req.headers["User-Agent"] = USER_AGENT
+      req.headers["User-Agent"] = Feed::USER_AGENT
       req.headers["If-None-Match"] = @feed.etag if @feed.etag.present?
       req.headers["If-Modified-Since"] = @feed.last_modified if @feed.last_modified.present?
     end

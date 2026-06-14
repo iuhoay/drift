@@ -1,4 +1,8 @@
 class Feed < ApplicationRecord
+  # Sent on every outbound HTTP request we make on a feed's behalf
+  # (discovery and refresh). Defined here so the two share one source of truth.
+  USER_AGENT = "Drift RSS Reader/0.1 (+https://drift.local)"
+
   has_many :entries, dependent: :destroy
   has_many :subscriptions, dependent: :destroy
   has_many :users, through: :subscriptions

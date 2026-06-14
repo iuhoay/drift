@@ -15,7 +15,6 @@ require "nokogiri"
 # Returns an array of absolute feed URLs (most likely first), or [] when
 # nothing parses as a feed.
 class Feed::Discovery
-  USER_AGENT = "Drift RSS Reader/0.1 (+https://drift.local)"
   TIMEOUT = 15
 
   # <link type="..."> values that advertise a feed in an HTML <head>.
@@ -67,7 +66,7 @@ class Feed::Discovery
   end
 
   def get(url)
-    http.get(url) { |req| req.headers["User-Agent"] = USER_AGENT }
+    http.get(url) { |req| req.headers["User-Agent"] = Feed::USER_AGENT }
   rescue StandardError
     nil
   end
