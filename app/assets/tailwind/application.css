@@ -54,6 +54,7 @@
     color: var(--color-stone-800);
     line-height: 1.7;
     font-size: 1.0625rem;
+    overflow-wrap: break-word;
   }
   .entry-content p { margin: 0 0 1.1em; }
   .entry-content h1,
