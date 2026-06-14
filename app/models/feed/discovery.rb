@@ -1,6 +1,4 @@
 require "feedjira"
-require "faraday"
-require "faraday/follow_redirects"
 require "nokogiri"
 
 # Resolves a human-pasted address (e.g. "https://www.ruanyifeng.com/blog/")
@@ -15,7 +13,10 @@ require "nokogiri"
 # Returns an array of absolute feed URLs (most likely first), or [] when
 # nothing parses as a feed.
 class Feed::Discovery
-  TIMEOUT = 15
+  # Wall-clock cap for speculative path probing (COMMON_PATHS), which makes one
+  # request per path. Without it a slow host could stack a full read timeout per
+  # path and pin a request thread; a fast host runs all probes well within it.
+  PROBE_BUDGET = 10 # seconds
 
   # <link type="..."> values that advertise a feed in an HTML <head>.
   FEED_LINK_TYPES = [
@@ -58,15 +59,11 @@ class Feed::Discovery
   private
 
   def http
-    @http ||= Faraday.new do |f|
-      f.response :follow_redirects, limit: 5
-      f.options.timeout = TIMEOUT
-      f.options.open_timeout = TIMEOUT
-    end
+    @http ||= Feed.http_connection
   end
 
   def get(url)
-    http.get(url) { |req| req.headers["User-Agent"] = Feed::USER_AGENT }
+    http.get(url)
   rescue StandardError
     nil
   end
@@ -77,6 +74,7 @@ class Feed::Discovery
     # Feedjira's heuristic parsers happily "parse" an HTML page that merely
     # mentions <rss>/<channel> (common in blog markup), returning a feed with
     # no entries. Require real entries so a homepage isn't mistaken for a feed.
+    # Trade-off: a valid but currently-empty feed won't be auto-detected.
     Feedjira.parse(body).entries.any?
   rescue StandardError
     false
@@ -102,7 +100,11 @@ class Feed::Discovery
   end
 
   def probe_common_paths(base_uri)
+    deadline = monotonic_now + PROBE_BUDGET
+
     COMMON_PATHS.each do |path|
+      break if monotonic_now >= deadline
+
       candidate = absolutize(path, base_uri)
       next if candidate.blank?
 
@@ -116,5 +118,9 @@ class Feed::Discovery
     base_uri.merge(href).to_s
   rescue StandardError
     nil
+  end
+
+  def monotonic_now
+    Process.clock_gettime(Process::CLOCK_MONOTONIC)
   end
 end

@@ -21,7 +21,7 @@ class SubscriptionsController < ApplicationController
     feed_url = resolve_feed_url(input_url)
 
     if feed_url.blank?
-      @subscription.errors.add(:feed_url, "no RSS or Atom feed found at that address")
+      @subscription.errors.add(:feed_url, "no feed found at that address")
       return render :new, status: :unprocessable_entity
     end
 

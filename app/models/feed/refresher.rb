@@ -1,11 +1,8 @@
 require "feedjira"
 require "faraday"
-require "faraday/follow_redirects"
 require "sanitize"
 
 class Feed::Refresher
-  TIMEOUT = 15
-
   def self.call(feed)
     new(feed).call
   end
@@ -16,7 +13,6 @@ class Feed::Refresher
 
   def call
     response = http.get(@feed.feed_url) do |req|
-      req.headers["User-Agent"] = Feed::USER_AGENT
       req.headers["If-None-Match"] = @feed.etag if @feed.etag.present?
       req.headers["If-Modified-Since"] = @feed.last_modified if @feed.last_modified.present?
     end
@@ -43,11 +39,7 @@ class Feed::Refresher
   private
 
   def http
-    @http ||= Faraday.new do |f|
-      f.response :follow_redirects, limit: 5
-      f.options.timeout = TIMEOUT
-      f.options.open_timeout = TIMEOUT
-    end
+    @http ||= Feed.http_connection
   end
 
   def apply!(parsed, response)
