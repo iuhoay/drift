@@ -132,3 +132,10 @@ maintained in the `Entry` model's `before_save`.
 ```bash
 bin/rails test
 ```
+
+## License
+
+Drift is free software, licensed under the **GNU Affero General Public License
+v3.0** (AGPL-3.0). See [LICENSE](LICENSE). In short: you may use, modify, and
+self-host it, but if you run a modified version as a network service, you must
+make your source available to its users under the same license.
