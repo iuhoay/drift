@@ -1,0 +1,137 @@
+<% content_for :title, "Terms of Service" %>
+<%
+  # Operator-specific blanks. Replace these before going to production — they
+  # render as highlighted placeholders so an unfilled value is obvious.
+  operator     = "Drift"
+  contact      = mail_to "hello@rdrift.app"
+  jurisdiction = "the jurisdiction in which the operator of Drift is established"
+%>
+
+<h1 class="text-2xl font-semibold tracking-tight">Terms of Service</h1>
+<p class="mt-1 text-sm text-stone-500">Last updated: June 14, 2026</p>
+
+<div class="entry-content mt-8">
+  <p>
+    Welcome to <strong>Drift</strong> (the &ldquo;Service&rdquo;), a web-based RSS
+    reader operated by <%= operator %> (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or
+    &ldquo;our&rdquo;). These Terms of Service (the &ldquo;Terms&rdquo;) govern
+    your access to and use of the Service. By creating an account or otherwise
+    using Drift, you agree to be bound by these Terms. If you do not agree, do
+    not use the Service.
+  </p>
+
+  <h2>1. The Service</h2>
+  <p>
+    Drift lets you subscribe to RSS and Atom feeds, organize subscriptions, and
+    read, search, and star their entries. Drift periodically fetches content
+    from the third-party feeds you add and displays it to you. Drift is a reading
+    tool only: it does not host, author, or endorse the content delivered through
+    those feeds, and it adds no AI summaries or social features.
+  </p>
+
+  <h2>2. Accounts</h2>
+  <p>
+    To use Drift you must create an account with a valid email address and a
+    password of at least eight characters. You are responsible for the accuracy
+    of the information you provide, for keeping your credentials confidential, and
+    for all activity that occurs under your account. Notify us promptly at
+    <%= contact %> if you suspect unauthorized use. You must be old enough to form
+    a binding contract in your jurisdiction (and at least 13 years old) to use the
+    Service. One person or entity may not maintain more than one free account
+    except as we expressly permit.
+  </p>
+
+  <h2>3. Acceptable Use</h2>
+  <p>You agree not to:</p>
+  <ul>
+    <li>use the Service in violation of any applicable law or the rights of others;</li>
+    <li>add feeds, titles, or other content that is unlawful, infringing, or that you have no right to access;</li>
+    <li>attempt to disrupt, overload, probe, or gain unauthorized access to the Service, its infrastructure, or other users&rsquo; accounts;</li>
+    <li>use automated means to scrape, replicate, or resell the Service or its functionality; or</li>
+    <li>circumvent any access controls, rate limits, or usage restrictions we put in place.</li>
+  </ul>
+
+  <h2>4. Third-Party Content and Feeds</h2>
+  <p>
+    Feeds and their entries are published by third parties and remain the property
+    and responsibility of their respective owners. We do not control and are not
+    responsible for the availability, accuracy, legality, or content of any feed.
+    Your use of third-party content may be subject to the terms and copyright of
+    the publisher, and you are responsible for complying with them. References to
+    a feed within Drift are not an endorsement.
+  </p>
+
+  <h2>5. Your Content</h2>
+  <p>
+    You retain all rights to the information you supply &mdash; such as your list
+    of subscriptions and custom feed titles. You grant us a limited license to
+    store and process that information solely to operate and provide the Service
+    to you.
+  </p>
+
+  <h2>6. Intellectual Property</h2>
+  <p>
+    The Service itself &mdash; including its software, design, and trademarks
+    &mdash; is owned by us or our licensors and is protected by applicable law.
+    These Terms grant you no right to our intellectual property other than the
+    limited right to use the Service in accordance with these Terms.
+  </p>
+
+  <h2>7. Availability and Changes</h2>
+  <p>
+    We may modify, suspend, or discontinue all or part of the Service at any time,
+    with or without notice. We do not guarantee that the Service will be
+    uninterrupted, timely, secure, or error-free, or that feeds will be fetched on
+    any particular schedule.
+  </p>
+
+  <h2>8. Termination</h2>
+  <p>
+    You may stop using the Service at any time and may request deletion of your
+    account by contacting us at <%= contact %>. We may suspend or terminate your
+    access if you violate these Terms or if we reasonably believe it is necessary
+    to protect the Service or other users. Provisions that by their nature should
+    survive termination &mdash; including ownership, disclaimers, and limitations
+    of liability &mdash; will survive.
+  </p>
+
+  <h2>9. Disclaimers</h2>
+  <p>
+    The Service is provided &ldquo;as is&rdquo; and &ldquo;as available,&rdquo;
+    without warranties of any kind, whether express or implied, including any
+    implied warranties of merchantability, fitness for a particular purpose, and
+    non-infringement. We do not warrant that the Service or any third-party
+    content will meet your requirements or be free of errors.
+  </p>
+
+  <h2>10. Limitation of Liability</h2>
+  <p>
+    To the maximum extent permitted by law, we will not be liable for any
+    indirect, incidental, special, consequential, or punitive damages, or for any
+    loss of data, profits, or goodwill, arising out of or relating to your use of
+    (or inability to use) the Service. To the extent liability cannot be excluded,
+    it is limited to the greater of the amount you paid us, if any, in the twelve
+    months before the claim, or the minimum amount permitted by law.
+  </p>
+
+  <h2>11. Changes to These Terms</h2>
+  <p>
+    We may update these Terms from time to time. When we do, we will revise the
+    &ldquo;Last updated&rdquo; date above. Material changes will be communicated by
+    a reasonable means. Your continued use of the Service after changes take effect
+    constitutes acceptance of the revised Terms.
+  </p>
+
+  <h2>12. Governing Law</h2>
+  <p>
+    These Terms are governed by the laws of <%= jurisdiction %>, without regard to
+    its conflict-of-laws rules, and you agree to the exclusive jurisdiction of its
+    courts for any dispute arising out of or relating to these Terms or the
+    Service.
+  </p>
+
+  <h2>13. Contact</h2>
+  <p>
+    Questions about these Terms? Reach us at <%= contact %>.
+  </p>
+</div>

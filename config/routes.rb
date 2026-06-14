@@ -20,6 +20,11 @@ Rails.application.routes.draw do
     root "dashboard#show"
   end
 
+  # Static pages — readable without an account (linked from sign-in / sign-up).
+  get "about" => "pages#about", as: :about
+  get "terms" => "pages#terms", as: :terms
+  get "privacy" => "pages#privacy", as: :privacy
+
   resource :theme, only: :update
   resource :activity, only: :show
 
