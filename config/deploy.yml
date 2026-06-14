@@ -37,6 +37,8 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    # Resend API key (re_…) — defined in .kamal/secrets, never committed raw.
+    - SMTP_PASSWORD
   clear:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
@@ -45,6 +47,14 @@ env:
     APP_HOSTS: <%= ENV.fetch("APP_HOSTS", ENV.fetch("APP_HOST", "rdrift.app")) %>
     APP_PROTOCOL: https
     DATABASE_HOST: drift-db
+
+    # Outgoing mail via Resend (see the README "Sending email" section). Only the API key is a
+    # secret; host/port/username and the From address are plain config. Drift
+    # enables delivery automatically once SMTP_ADDRESS is present.
+    SMTP_ADDRESS: smtp.resend.com
+    SMTP_PORT: 587
+    SMTP_USERNAME: resend
+    MAILER_FROM_ADDRESS: <%= ENV.fetch("MAILER_FROM_ADDRESS", "Drift <no-reply@rdrift.app>") %>
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3

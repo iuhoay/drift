@@ -84,6 +84,25 @@ point DNS at the server before deploying so Let's Encrypt can issue the
 certificate. For local production-style Docker compose, `FORCE_SSL=false` is set
 with `APP_HOST=drift.local`.
 
+### Sending email
+
+Drift sends one transactional email — the password-reset link — delivered
+asynchronously through Solid Queue. Production reads SMTP settings entirely from
+the environment (on ONCE these come from the host's mail settings UI):
+
+```bash
+SMTP_ADDRESS=smtp.example.com      # required to enable delivery
+SMTP_PORT=587                      # optional, defaults to 587
+SMTP_USERNAME=...                  # optional
+SMTP_PASSWORD=...                  # optional
+SMTP_AUTHENTICATION=plain          # optional, defaults to plain
+MAILER_FROM_ADDRESS="Drift <no-reply@example.com>"
+```
+
+Until `SMTP_ADDRESS` is set, mail delivery stays **off** — the app boots fine and
+queued reset emails are dropped rather than retried forever. Bring any SMTP
+provider (Postmark, SES, Resend, Fastmail, …); no provider gem is required.
+
 ## Background jobs
 
 Solid Queue runs in-process via `bin/jobs` (started by `bin/dev`).
