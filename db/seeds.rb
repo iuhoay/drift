@@ -5,6 +5,7 @@ end
 # Promote the demo user so it can reach the Rails Pulse dashboard at /rails_pulse.
 # Done outside the create block so re-seeding an already-seeded DB also applies it.
 user.update!(admin: true) unless user.admin?
+user.verify! unless user.verified?
 
 starter_feeds = [
   "https://daringfireball.net/feeds/main",
