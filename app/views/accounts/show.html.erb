@@ -1,9 +1,14 @@
 <% content_for :title, "Account" %>
 
 <div class="max-w-3xl mx-auto px-6 py-8 font-sans">
-  <header class="mb-6">
-    <h1 class="text-xl font-medium tracking-tight">Account</h1>
-    <p class="text-sm text-stone-500">Manage your sign-in details and connected devices.</p>
+  <header class="mb-6 flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-medium tracking-tight">Account</h1>
+      <p class="text-sm text-stone-500">Manage your sign-in details and connected devices.</p>
+    </div>
+    <%= button_to "Sign out", session_path, method: :delete,
+          form: { class: "shrink-0" },
+          class: "text-sm underline text-stone-700 hover:text-amber-700" %>
   </header>
 
   <div class="divide-y divide-stone-200 border-y border-stone-200">
