@@ -33,6 +33,25 @@ class Feed::DiscoveryTest < ActiveSupport::TestCase
     assert_equal [ "https://example.com/blog/atom.xml" ], discover("https://example.com/blog/", stubs)
   end
 
+  test "does not mistake an HTML page for a feed and prefers its feed link" do
+    # An HTML homepage whose markup contains <rss>/<channel> tokens (e.g. an
+    # embedded widget) — Feedjira's heuristics will "parse" it, but it has no
+    # entries, so discovery must return the advertised feed link, not the page.
+    html = <<~HTML
+      <html><head>
+        <title>Blog</title>
+        <link rel="alternate" type="application/atom+xml" href="https://example.com/blog/atom.xml">
+      </head><body>
+        <rss version="2.0"><channel><title>widget</title></channel></rss>
+      </body></html>
+    HTML
+
+    stubs = Faraday::Adapter::Test::Stubs.new
+    stubs.get("https://example.com/blog/") { [ 200, { "Content-Type" => "text/html" }, html ] }
+
+    assert_equal [ "https://example.com/blog/atom.xml" ], discover("https://example.com/blog/", stubs)
+  end
+
   test "resolves relative feed links against the page url" do
     html = <<~HTML
       <html><head>

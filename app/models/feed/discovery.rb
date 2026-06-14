@@ -74,8 +74,10 @@ class Feed::Discovery
   def feed?(body)
     return false if body.blank?
 
-    Feedjira.parse(body)
-    true
+    # Feedjira's heuristic parsers happily "parse" an HTML page that merely
+    # mentions <rss>/<channel> (common in blog markup), returning a feed with
+    # no entries. Require real entries so a homepage isn't mistaken for a feed.
+    Feedjira.parse(body).entries.any?
   rescue StandardError
     false
   end
