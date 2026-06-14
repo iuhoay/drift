@@ -1,0 +1,134 @@
+<% content_for :title, "Privacy Policy" %>
+<%
+  # Operator-specific blanks. Replace these before going to production — they
+  # render as highlighted placeholders so an unfilled value is obvious.
+  operator   = "Drift"
+  contact    = mail_to "hello@rdrift.app"
+  processors = "Resend (email delivery), Cloudflare (DNS), and our server hosting provider"
+%>
+
+<h1 class="text-2xl font-semibold tracking-tight">Privacy Policy</h1>
+<p class="mt-1 text-sm text-stone-500">Last updated: June 14, 2026</p>
+
+<div class="entry-content mt-8">
+  <p>
+    This Privacy Policy explains what information <strong>Drift</strong> (the
+    &ldquo;Service&rdquo;), operated by <%= operator %> (&ldquo;we,&rdquo;
+    &ldquo;us&rdquo;), collects, how we use it, and the choices you have. Drift is
+    a calm RSS reader; we collect only what we need to run it.
+  </p>
+
+  <h2>1. Information We Collect</h2>
+  <p>We collect the following, and nothing more than what the Service needs to function:</p>
+  <ul>
+    <li>
+      <strong>Account information.</strong> Your email address and your password.
+      Your password is never stored in readable form &mdash; we keep only a
+      one-way cryptographic hash of it.
+    </li>
+    <li>
+      <strong>Session and device information.</strong> When you sign in, we record
+      a session for each device, including your IP address, your browser&rsquo;s
+      user-agent string, and the time of access. This keeps you logged in and helps
+      us detect abuse.
+    </li>
+    <li>
+      <strong>Your subscriptions.</strong> The RSS/Atom feeds you add and any
+      custom titles you give them.
+    </li>
+    <li>
+      <strong>Reading activity.</strong> Which entries you have read or starred,
+      and when, so the Service can show your unread counts, stars, and activity.
+    </li>
+  </ul>
+  <p>
+    We do <strong>not</strong> use third-party advertising or analytics trackers,
+    and we do not sell your personal information.
+  </p>
+
+  <h2>2. Cookies</h2>
+  <p>Drift uses only the cookies it needs to work:</p>
+  <ul>
+    <li>
+      <strong>Session cookie</strong> &mdash; a signed, HttpOnly cookie that keeps
+      you signed in. It is strictly necessary for the Service.
+    </li>
+    <li>
+      <strong>Theme cookie</strong> &mdash; remembers whether you prefer the light
+      or dark reading theme.
+    </li>
+  </ul>
+  <p>We do not use cookies for advertising or cross-site tracking.</p>
+
+  <h2>3. How We Use Your Information</h2>
+  <ul>
+    <li>to provide, maintain, and secure the Service;</li>
+    <li>to authenticate you and keep your session active;</li>
+    <li>to fetch the feeds you subscribe to and present their entries to you;</li>
+    <li>to send you essential account emails, such as password-reset messages; and</li>
+    <li>to detect, prevent, and respond to fraud, abuse, or security incidents.</li>
+  </ul>
+
+  <h2>4. Feed Fetching and Third Parties</h2>
+  <p>
+    To deliver your feeds, our servers periodically request content directly from
+    the feed publishers you choose. These requests are made by Drift&rsquo;s
+    servers, not from your browser, so your personal IP address is not shared with
+    those publishers.
+  </p>
+  <p>
+    Some pages load the <strong>IBM Plex Mono</strong> webfont from Google Fonts
+    (<code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code>). When a
+    page loads, your browser contacts Google to retrieve the font, which means your
+    IP address and request headers are shared with Google for that purpose.
+  </p>
+  <p>
+    We also rely on infrastructure providers &mdash; <%= processors %> &mdash; to
+    host the Service and deliver email. These providers process data only on our
+    behalf and under appropriate safeguards.
+  </p>
+
+  <h2>5. Data Retention</h2>
+  <p>
+    We keep your account information and the data above for as long as your account
+    is active. Session records are retained until they expire or you sign out. When
+    your account is deleted, we delete or anonymize the associated personal
+    information, except where we must retain it to comply with legal obligations.
+  </p>
+
+  <h2>6. Your Rights and Choices</h2>
+  <p>
+    Depending on where you live, you may have the right to access, correct, export,
+    or delete your personal information, and to object to or restrict certain
+    processing. Drift does not yet offer self-service account deletion; to exercise
+    any of these rights, contact us at <%= contact %> and we will respond within a
+    reasonable time. You can also sign out at any time to end a session.
+  </p>
+
+  <h2>7. Security</h2>
+  <p>
+    We take reasonable measures to protect your information: passwords are stored
+    only as one-way hashes, the session cookie is signed and HttpOnly, and access
+    to data is limited. No method of transmission or storage is completely secure,
+    so we cannot guarantee absolute security.
+  </p>
+
+  <h2>8. Children&rsquo;s Privacy</h2>
+  <p>
+    Drift is not directed to children under 13, and we do not knowingly collect
+    personal information from them. If you believe a child has provided us
+    information, contact us and we will delete it.
+  </p>
+
+  <h2>9. Changes to This Policy</h2>
+  <p>
+    We may update this Policy from time to time. When we do, we will revise the
+    &ldquo;Last updated&rdquo; date above and, for material changes, provide notice
+    by a reasonable means.
+  </p>
+
+  <h2>10. Contact</h2>
+  <p>
+    Questions about your privacy or this Policy? Reach us at <%= contact %>.
+  </p>
+</div>

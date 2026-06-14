@@ -25,4 +25,10 @@
     <p>No account? <%= link_to "Create one", new_registration_path, class: "underline text-stone-900" %></p>
     <p><%= link_to "Forgot password?", new_password_path, class: "underline" %></p>
   </div>
+
+  <p class="mt-4 text-xs text-stone-500 text-center">
+    <%= link_to "Terms", terms_path, class: "underline" %>
+    &middot;
+    <%= link_to "Privacy", privacy_path, class: "underline" %>
+  </p>
 </div>

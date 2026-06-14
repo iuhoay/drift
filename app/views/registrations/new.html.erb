@@ -33,6 +33,12 @@
     </div>
 
     <%= f.submit "Create account", class: "w-full py-2 rounded bg-stone-900 text-white hover:bg-stone-700" %>
+
+    <p class="text-xs text-stone-500 text-center">
+      By creating an account you agree to our
+      <%= link_to "Terms", terms_path, class: "underline text-stone-900" %>
+      and <%= link_to "Privacy Policy", privacy_path, class: "underline text-stone-900" %>.
+    </p>
   <% end %>
 
   <p class="mt-6 text-sm text-stone-500 text-center">

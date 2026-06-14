@@ -14,6 +14,12 @@ Rails.application.configure do
   app_hosts = ENV.fetch("APP_HOSTS", app_host).split(",").map(&:strip)
   force_ssl = ENV.fetch("FORCE_SSL", "true") != "false"
 
+  # Outgoing mail. SMTP_* and MAILER_FROM_ADDRESS are supplied by the host's
+  # settings UI at runtime (see ONCE deployment docs). Until SMTP_ADDRESS is
+  # set, delivery stays off so a fresh deploy boots without a mail server and
+  # queued reset emails don't pile up as failing jobs.
+  smtp_address = ENV["SMTP_ADDRESS"]
+
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
@@ -75,14 +81,24 @@ Rails.application.configure do
   config.action_controller.default_url_options = app_url_options
   Rails.application.routes.default_url_options = app_url_options
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.app.credentials.dig(:smtp, :user_name),
-  #   password: Rails.app.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Outgoing SMTP, driven entirely by ENV (set via the host's settings UI).
+  if smtp_address.present?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.smtp_settings = {
+      address:              smtp_address,
+      port:                 ENV.fetch("SMTP_PORT", 587).to_i,
+      user_name:            ENV["SMTP_USERNAME"].presence,
+      password:             ENV["SMTP_PASSWORD"].presence,
+      authentication:       ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
+      enable_starttls_auto: true
+    }
+  else
+    # No SMTP configured yet — accept but drop mail rather than erroring.
+    config.action_mailer.perform_deliveries = false
+    config.action_mailer.raise_delivery_errors = false
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

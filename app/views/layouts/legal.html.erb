@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html class="h-full" data-theme="<%= cookies[:theme] %>">
+  <head>
+    <title><%= content_for(:title) || "Drift" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="application-name" content="Drift">
+    <% case cookies[:theme] %>
+    <% when "light" %>
+      <meta name="theme-color" content="#f5f5f4">
+    <% when "dark" %>
+      <meta name="theme-color" content="#181614">
+    <% else %>
+      <meta name="theme-color" content="#f5f5f4">
+      <meta name="theme-color" content="#181614" media="(prefers-color-scheme: dark)">
+    <% end %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="term term-screen min-h-full bg-stone-50 text-stone-900 antialiased">
+    <header class="term-topbar flex min-h-9 items-center border-b border-stone-300 px-4 pt-[env(safe-area-inset-top)] text-xs">
+      <%= link_to root_path, class: "brand-logo text-stone-900", aria: { label: "Drift RSS reader" } do %>
+        <span class="brand-logo__rail" aria-hidden="true"></span>
+        <span class="brand-logo__name">drift</span>
+        <span class="brand-logo__tagline" aria-hidden="true">&#8212; rss reader</span>
+      <% end %>
+    </header>
+
+    <main class="mx-auto w-full max-w-2xl px-5 py-10 sm:py-14">
+      <%= yield %>
+
+      <footer class="mt-14 border-t border-stone-200 pt-6 text-sm text-stone-500">
+        <nav class="flex flex-wrap gap-x-5 gap-y-2">
+          <%= link_to "About", about_path, class: "underline underline-offset-2 hover:text-stone-900" %>
+          <%= link_to "Terms of Service", terms_path, class: "underline underline-offset-2 hover:text-stone-900" %>
+          <%= link_to "Privacy Policy", privacy_path, class: "underline underline-offset-2 hover:text-stone-900" %>
+          <%= link_to "Back to Drift", root_path, class: "underline underline-offset-2 hover:text-stone-900" %>
+        </nav>
+      </footer>
+    </main>
+  </body>
+</html>
