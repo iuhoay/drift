@@ -62,6 +62,7 @@
       <%= button_to "[sign out]", session_path, method: :delete, form: { class: "inline" }, class: "shrink-0 text-stone-500 hover:text-amber-700" %>
     </div>
     <div class="mt-2 flex items-center justify-between gap-2 text-stone-500">
+      <%= link_to "[account]", account_path, class: "hover:text-amber-700" %>
       <%= link_to "[manage feeds]", subscriptions_path, class: "hover:text-amber-700" %>
       <%= button_to theme_path, method: :patch, form: { class: "inline", data: { turbo: false } },
             class: "hover:text-amber-700", title: "Cycle theme (Auto / Light / Dark)" do %>
