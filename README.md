@@ -133,6 +133,14 @@ maintained in the `Entry` model's `before_save`.
 bin/rails test
 ```
 
+## Backups
+
+Production `drift_production` is dumped every few hours and pushed off-server to
+S3-compatible object storage (R2 / B2) by a Kamal **backup accessory** — a
+sidecar built from official `postgres:16` + AWS CLI. Tooling lives in
+[`backup/`](backup); setup, retention, and restore drills are in
+[docs/backups.md](docs/backups.md).
+
 ## License
 
 Drift is free software, licensed under the **GNU Affero General Public License

@@ -122,6 +122,28 @@ accessories:
       - docker/postgres-init.sql:/docker-entrypoint-initdb.d/10-drift-roles.sql:ro
     directories:
       - postgres-data:/var/lib/postgresql/data
+  # Periodic logical backups of drift_production to S3-compatible storage
+  # (R2 / B2). Custom image built from official postgres:16 + AWS CLI; build and
+  # push it with backup/build.sh before booting. See docs/backups.md.
+  db_backup:
+    image: localhost:5555/drift-db-backup:latest
+    host: rdrift-app
+    env:
+      clear:
+        PG_HOST: drift-db
+        PG_USER: root
+        PG_DATABASE: drift_production
+        BACKUP_INTERVAL_SECONDS: 14400          # every 4 hours
+        S3_BUCKET: rdrift-db
+        S3_PREFIX: rdrift
+        S3_ENDPOINT: https://43973ffd7abc750ade2f62193761a823.r2.cloudflarestorage.com
+        AWS_DEFAULT_REGION: auto                # R2: "auto"; B2: e.g. "us-west-004"
+        KEEP_RECENT_DAYS: 3
+        KEEP_DAILY_DAYS: 30
+        KEEP_WEEKLY_DAYS: 180
+      secret:
+        - AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY
 #   redis:
 #     image: valkey/valkey:9
 #     host: 192.168.0.2
