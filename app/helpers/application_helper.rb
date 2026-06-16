@@ -26,4 +26,19 @@ module ApplicationHelper
     else                   time.strftime("%b %-d")
     end
   end
+
+  # Forward-looking counterpart to relative_time: "in 4m", "in 21h", "in 3d".
+  # Used for next_fetch_at, which is always in the future for a backed-off feed.
+  def time_until(time)
+    return nil unless time
+
+    distance = time - Time.current
+    case distance
+    when ..0       then "now"
+    when ...3600   then "in #{(distance / 60).round}m"
+    when ...86400  then "in #{(distance / 3600).round}h"
+    when ...604800 then "in #{(distance / 86400).round}d"
+    else                "on #{time.strftime('%b %-d')}"
+    end
+  end
 end

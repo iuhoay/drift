@@ -20,5 +20,26 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1, header", text: /admin/i
     assert_select "a[href='/jobs']"
     assert_select "a[href='/rails_pulse']"
+    assert_includes @response.body, "// signal"
+    assert_includes @response.body, "// recent"
+  end
+
+  test "the dashboard surfaces failing feeds with their error" do
+    sign_in_as users(:admin)
+    get admin_root_path
+
+    assert_response :success
+    assert_includes @response.body, "// problem feeds"
+    assert_includes @response.body, feeds(:failing).display_title
+    assert_includes @response.body, "HTTP 500"
+  end
+
+  test "the dashboard flags a dead feed" do
+    feeds(:failing).update!(dead_at: 2.days.ago)
+    sign_in_as users(:admin)
+    get admin_root_path
+
+    assert_response :success
+    assert_select "span.bg-red-100", text: /dead/i
   end
 end

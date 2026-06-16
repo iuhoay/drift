@@ -15,6 +15,26 @@
     <% end %>
   </dl>
 
+  <div class="mt-6 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// signal</div>
+  <dl class="mt-2 flex flex-wrap items-baseline gap-x-7 gap-y-2 text-sm text-stone-700">
+    <div>
+      <dt class="inline select-none text-stone-500">active users (7d)</dt>
+      <dd class="ml-1 inline tabular-nums text-stone-900"><%= number_with_delimiter(@active_users) %></dd>
+    </div>
+    <div>
+      <dt class="inline select-none text-stone-500">new entries (24h)</dt>
+      <dd class="ml-1 inline tabular-nums text-stone-900"><%= number_with_delimiter(@entries_last_24h) %></dd>
+    </div>
+    <div>
+      <dt class="inline select-none text-stone-500">feeds</dt>
+      <dd class="ml-1 inline tabular-nums text-stone-900">
+        <%= @feed_kinds[:rss] %> rss
+        <span class="text-stone-400">·</span> <%= @feed_kinds[:youtube] %> youtube
+        <span class="text-stone-400">·</span> <%= @feed_kinds[:bilibili] %> bilibili
+      </dd>
+    </div>
+  </dl>
+
   <p class="mt-3 text-sm text-stone-700">
     <% if @failing_feeds.positive? %>
       <span class="tabular-nums text-amber-700"><%= @failing_feeds %></span>
@@ -33,6 +53,54 @@
       no successful refresh yet
     <% end %>
   </p>
+
+  <% if @problem_feeds.any? %>
+    <div class="mt-7 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// problem feeds</div>
+    <ul class="mt-2 divide-y divide-stone-300 border-y border-stone-300">
+      <% @problem_feeds.each do |feed| %>
+        <li class="px-1 py-2.5">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="min-w-0 truncate font-medium text-stone-900"><%= feed.display_title %></span>
+            <% if feed.dead? %>
+              <span class="select-none rounded bg-red-100 px-1.5 py-0.5 text-[0.6rem] uppercase tracking-[0.1em] text-red-700">dead <%= relative_time(feed.dead_at) %></span>
+            <% else %>
+              <span class="select-none rounded bg-amber-100 px-1.5 py-0.5 text-[0.6rem] uppercase tracking-[0.1em] text-amber-700">failing</span>
+            <% end %>
+          </div>
+          <div class="truncate text-xs text-stone-500"><%= feed.feed_url %></div>
+          <div class="mt-0.5 text-xs text-stone-500">
+            <span class="tabular-nums"><%= pluralize(feed.fetch_failure_count, "consecutive failure") %></span>
+            <% if feed.last_error.present? %>
+              <span class="text-stone-400">·</span> <span class="text-red-600"><%= feed.last_error %></span>
+            <% end %>
+            <% if feed.next_fetch_at %>
+              <span class="text-stone-400">·</span> next try <%= time_until(feed.next_fetch_at) %>
+            <% end %>
+            <span class="text-stone-400">·</span> <%= pluralize(feed.subscribers_count.to_i, "subscriber") %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+    <% if @failing_feeds > @problem_feeds.size %>
+      <p class="mt-2 text-xs text-stone-500">showing the worst <%= @problem_feeds.size %> of <%= @failing_feeds %> failing feeds</p>
+    <% end %>
+  <% end %>
+
+  <div class="mt-7 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// recent</div>
+  <ul class="mt-2 divide-y divide-stone-300 border-y border-stone-300 text-sm">
+    <% @recent.each do |event| %>
+      <li class="flex items-baseline gap-3 px-1 py-2">
+        <% label, body = case event[:type]
+             when :feed_added then [ "new feed", event[:feed].display_title ]
+             when :user_joined then [ "new user", event[:user].email_address ]
+             when :fetched then [ "fetched", event[:feed].display_title ]
+           end %>
+        <span class="w-16 shrink-0 select-none text-[0.65rem] uppercase tracking-[0.1em] text-stone-400"><%= label %></span>
+        <span class="min-w-0 flex-1 truncate text-stone-700"><%= body %></span>
+        <span class="shrink-0 tabular-nums text-xs text-stone-400"><%= relative_time(event[:at]) %></span>
+      </li>
+    <% end %>
+  </ul>
 
   <div class="mt-7 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// dashboards</div>
   <ul class="mt-2 divide-y divide-stone-300 border-y border-stone-300">

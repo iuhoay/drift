@@ -84,6 +84,22 @@ class Feed < ApplicationRecord
 
   scope :dead, -> { where.not(dead_at: nil) }
   scope :alive, -> { where(dead_at: nil) }
+  scope :failing, -> { where("fetch_failure_count > 0") }
+
+  # YouTube channel feeds, identified by URL the same way #youtube? does — a
+  # case-insensitive regex so the admin breakdown matches the runtime cadence.
+  scope :youtube, -> { where("feed_url ~* ?", '^https?://([^/@]+\.)?youtube\.com/') }
+
+  # Failing feeds for the admin dashboard, worst first: dead ones lead, then by
+  # how hard they're failing. Carries a subscribers_count so the view can show
+  # each feed's reach without an N+1.
+  scope :troubled, -> {
+    failing
+      .left_joins(:subscriptions)
+      .select("feeds.*, COUNT(subscriptions.id) AS subscribers_count")
+      .group("feeds.id")
+      .order(Arel.sql("feeds.dead_at IS NULL, feeds.fetch_failure_count DESC"))
+  }
 
   def bilibili?
     kind == "bilibili"

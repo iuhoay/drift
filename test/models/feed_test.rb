@@ -100,6 +100,29 @@ class FeedTest < ActiveSupport::TestCase
     assert_not_includes Feed.alive, feeds(:failing)
   end
 
+  test "failing scope selects feeds with at least one failure" do
+    assert_includes Feed.failing, feeds(:failing)
+    assert_not_includes Feed.failing, feeds(:example)
+  end
+
+  test "youtube scope matches youtube channel feeds by url" do
+    youtube = Feed.create!(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UC123")
+
+    assert_includes Feed.youtube, youtube
+    assert_not_includes Feed.youtube, feeds(:example)
+  end
+
+  test "troubled scope leads with dead feeds and carries subscriber counts" do
+    feeds(:failing).update!(dead_at: 1.day.ago)
+    feeds(:example).update!(fetch_failure_count: 1)
+
+    troubled = Feed.troubled.to_a
+
+    assert_equal feeds(:failing), troubled.first
+    example_row = troubled.find { |feed| feed == feeds(:example) }
+    assert_equal feeds(:example).subscriptions.count, example_row.subscribers_count.to_i
+  end
+
   test "display_title falls back to feed_url when title is blank" do
     feed = Feed.new(feed_url: "https://example.com/feed.xml", title: "")
     assert_equal "https://example.com/feed.xml", feed.display_title
