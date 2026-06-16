@@ -7,8 +7,11 @@ class Feed::Refresher
     new(feed).call
   end
 
-  def initialize(feed)
+  # http is injectable so tests can drive the status-handling paths with a
+  # Faraday test adapter; in production it defaults to Feed.http_connection.
+  def initialize(feed, http: nil)
     @feed = feed
+    @http = http
   end
 
   def call
@@ -37,7 +40,7 @@ class Feed::Refresher
       apply!(Feedjira.parse(response.body), response)
       record_success(response)
     else
-      record_failure("HTTP #{response.status}")
+      record_failure("HTTP #{response.status}", response: response)
     end
   end
 
@@ -93,16 +96,22 @@ class Feed::Refresher
       last_success_at: Time.current,
       last_error: nil,
       fetch_failure_count: 0,
+      next_fetch_at: Time.current + @feed.refresh_interval,
+      dead_at: nil,
       etag: response&.headers&.[]("etag").presence || @feed.etag,
       last_modified: response&.headers&.[]("last-modified").presence || @feed.last_modified
     )
   end
 
-  def record_failure(message)
+  def record_failure(message, response: nil)
+    failures = @feed.fetch_failure_count + 1
+    retry_after = response&.headers&.[]("retry-after")
     @feed.update!(
       last_fetched_at: Time.current,
       last_error: message,
-      fetch_failure_count: @feed.fetch_failure_count + 1
+      fetch_failure_count: failures,
+      next_fetch_at: Time.current + @feed.backoff_interval(failures, retry_after: retry_after),
+      dead_at: @feed.dead_at_after(failures)
     )
   end
 end

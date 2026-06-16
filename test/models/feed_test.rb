@@ -20,16 +20,84 @@ class FeedTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:feed_url], "has already been taken"
   end
 
-  test "due_for_refresh selects feeds older than the interval and never-fetched" do
+  test "due_for_refresh selects feeds past next_fetch_at and never-fetched" do
     fresh = feeds(:unsubscribed)
     stale = feeds(:stale)
     never = Feed.create!(feed_url: "https://never.example.com/feed.xml")
 
-    due = Feed.due_for_refresh(interval: 30.minutes)
+    due = Feed.due_for_refresh
 
     assert_includes due, stale
     assert_includes due, never
     assert_not_includes due, fresh
+  end
+
+  test "youtube? recognizes youtube channel feeds" do
+    assert Feed.new(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UC123").youtube?
+    assert Feed.new(feed_url: "http://youtube.com/feeds/videos.xml?channel_id=UC123").youtube?
+    assert_not Feed.new(feed_url: "https://example.com/youtube.com/feed.xml").youtube?
+    assert_not Feed.new(feed_url: "https://notyoutube.com/feed.xml").youtube?
+  end
+
+  test "refresh_interval is longer for youtube feeds" do
+    youtube = Feed.new(feed_url: "https://www.youtube.com/feeds/videos.xml?channel_id=UC123")
+    assert_equal Feed::YOUTUBE_REFRESH_INTERVAL, youtube.refresh_interval
+    assert_equal Feed::REFRESH_INTERVAL, feeds(:example).refresh_interval
+  end
+
+  test "backoff_interval grows exponentially and is capped" do
+    feed = feeds(:example)
+    base = feed.refresh_interval.to_i
+
+    assert_equal base, feed.backoff_interval(1)
+    assert_equal base * 2, feed.backoff_interval(2)
+    assert_equal base * 4, feed.backoff_interval(3)
+    assert_equal Feed::MAX_BACKOFF.to_i, feed.backoff_interval(99)
+  end
+
+  test "backoff_interval honors a numeric Retry-After over exponential backoff" do
+    assert_equal 120, feeds(:example).backoff_interval(5, retry_after: "120")
+  end
+
+  test "backoff_interval honors an http-date Retry-After" do
+    retry_at = 10.minutes.from_now
+    seconds = feeds(:example).backoff_interval(1, retry_after: retry_at.httpdate)
+
+    assert_in_delta 600, seconds, 2
+  end
+
+  test "backoff_interval ignores a blank or past Retry-After and falls back to backoff" do
+    feed = feeds(:example)
+    base = feed.refresh_interval.to_i
+
+    assert_equal base, feed.backoff_interval(1, retry_after: nil)
+    assert_equal base, feed.backoff_interval(1, retry_after: 1.hour.ago.httpdate)
+  end
+
+  test "dead_at_after marks dead only once the failure threshold is crossed" do
+    feed = feeds(:example)
+    now = Time.current
+
+    assert_nil feed.dead_at_after(Feed::DEAD_AFTER_FAILURES - 1, now: now)
+    assert_equal now, feed.dead_at_after(Feed::DEAD_AFTER_FAILURES, now: now)
+  end
+
+  test "dead_at_after preserves the first dead_at once set" do
+    first = 3.days.ago
+    feed = feeds(:example)
+    feed.dead_at = first
+
+    assert_equal first, feed.dead_at_after(Feed::DEAD_AFTER_FAILURES + 5, now: Time.current)
+  end
+
+  test "dead? and dead/alive scopes reflect dead_at" do
+    feeds(:failing).update!(dead_at: 1.day.ago)
+
+    assert feeds(:failing).reload.dead?
+    assert_not feeds(:example).dead?
+    assert_includes Feed.dead, feeds(:failing)
+    assert_includes Feed.alive, feeds(:example)
+    assert_not_includes Feed.alive, feeds(:failing)
   end
 
   test "display_title falls back to feed_url when title is blank" do

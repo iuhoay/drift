@@ -2,9 +2,9 @@ require "test_helper"
 
 class RefreshDueFeedsJobTest < ActiveJob::TestCase
   test "enqueues a FeedRefreshJob for every due feed" do
-    Feed.update_all(last_fetched_at: 1.minute.ago)
-    feeds(:stale).update!(last_fetched_at: 2.hours.ago)
-    feeds(:failing).update!(last_fetched_at: nil)
+    Feed.update_all(next_fetch_at: 30.minutes.from_now)
+    feeds(:stale).update!(next_fetch_at: 1.minute.ago)
+    feeds(:failing).update!(next_fetch_at: nil)
 
     assert_enqueued_jobs 2, only: FeedRefreshJob do
       RefreshDueFeedsJob.perform_now

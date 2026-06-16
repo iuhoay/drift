@@ -14,6 +14,7 @@ module Admin
         entries: Entry.count
       }
       @failing_feeds = Feed.where("fetch_failure_count > 0").count
+      @dead_feeds = Feed.dead.count
       @last_success_at = Feed.maximum(:last_success_at)
     end
 

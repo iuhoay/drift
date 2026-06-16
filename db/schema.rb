@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_06_14_130200) do
+ActiveRecord::Schema[8.2].define(version: 2026_06_16_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -34,6 +34,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_14_130200) do
 
   create_table "feeds", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.datetime "dead_at"
     t.text "description"
     t.string "etag"
     t.string "feed_url", null: false
@@ -43,10 +44,12 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_14_130200) do
     t.datetime "last_fetched_at"
     t.string "last_modified"
     t.datetime "last_success_at"
+    t.datetime "next_fetch_at"
     t.string "site_url"
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["feed_url"], name: "index_feeds_on_feed_url", unique: true
+    t.index ["next_fetch_at"], name: "index_feeds_on_next_fetch_at"
   end
 
   create_table "identities", force: :cascade do |t|

@@ -17,7 +17,9 @@
             <div class="font-medium truncate group-hover:text-amber-700"><%= subscription.display_title %></div>
             <div class="text-xs text-stone-500 truncate">
               <%= subscription.feed.feed_url %>
-              <% if subscription.feed.last_error.present? %>
+              <% if subscription.feed.dead? %>
+                <span class="ml-2 text-red-600">⚠ unreachable for <%= relative_time(subscription.feed.dead_at) %> — <%= subscription.feed.last_error %></span>
+              <% elsif subscription.feed.last_error.present? %>
                 <span class="ml-2 text-red-600">⚠ <%= subscription.feed.last_error %></span>
               <% elsif subscription.feed.last_success_at %>
                 <span class="ml-2">last fetched <%= relative_time(subscription.feed.last_success_at) %></span>

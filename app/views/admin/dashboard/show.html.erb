@@ -19,6 +19,10 @@
     <% if @failing_feeds.positive? %>
       <span class="tabular-nums text-amber-700"><%= @failing_feeds %></span>
       <%= "feed".pluralize(@failing_feeds) %> currently failing to fetch
+      <% if @dead_feeds.positive? %>
+        <span class="text-stone-400">·</span>
+        <span class="tabular-nums text-red-700"><%= @dead_feeds %></span> dead
+      <% end %>
     <% else %>
       <span class="text-stone-500">all feeds fetching cleanly</span>
     <% end %>

@@ -13,6 +13,27 @@ class Feed < ApplicationRecord
   HTTP_OPEN_TIMEOUT = 3
   HTTP_TIMEOUT = 10
 
+  # Baseline poll cadence. YouTube channel feeds get a longer interval because
+  # polling many channels from one IP at the default rate draws 429s, and a new
+  # video can wait the interval out anyway — there's no realtime guarantee.
+  REFRESH_INTERVAL = 30.minutes
+  YOUTUBE_REFRESH_INTERVAL = 1.hour
+
+  # Failure backoff: each consecutive failure doubles the wait (capped by the
+  # exponent so 2** can't blow up), never exceeding MAX_BACKOFF. A server-sent
+  # Retry-After overrides this — YouTube returns one with its 429s, and ignoring
+  # it is exactly what keeps a rate-limited feed rate-limited.
+  MAX_BACKOFF = 24.hours
+  MAX_BACKOFF_EXPONENT = 6
+
+  # Consecutive failures after which a feed is treated as dead: a deleted URL or
+  # a channel whose feed has gone permanently 404/500. With the backoff above,
+  # reaching this count spans several days of failed attempts, so it means
+  # "we've genuinely tried for a while," not "one bad fetch." A dead feed keeps
+  # polling at the backoff cap (≈daily) so it can revive on its own, but it's
+  # flagged so subscribers and the dashboard see it instead of failing silently.
+  DEAD_AFTER_FAILURES = 10
+
   # The one Faraday connection every feed fetch goes through (discovery and
   # refresh). Follows redirects, sends our User-Agent, blocks non-public
   # addresses (SSRF), and bounds how long any single request may hang.
@@ -24,6 +45,19 @@ class Feed < ApplicationRecord
       f.options.timeout = HTTP_TIMEOUT
       f.options.open_timeout = HTTP_OPEN_TIMEOUT
     end
+  end
+
+  # Retry-After is either a number of seconds ("120") or an HTTP-date
+  # ("Wed, 21 Oct 2025 07:28:00 GMT"). Returns the wait in seconds, or nil when
+  # the value is blank, malformed, or already in the past.
+  def self.retry_after_seconds(value)
+    return nil if value.blank?
+    return value.to_i if value.to_s.match?(/\A\d+\z/)
+
+    seconds = Time.httpdate(value.to_s).to_i - Time.current.to_i
+    seconds.positive? ? seconds : nil
+  rescue ArgumentError
+    nil
   end
 
   has_many :entries, dependent: :destroy
@@ -41,12 +75,49 @@ class Feed < ApplicationRecord
                        format: { with: %r{\Ahttps?://\S+\z}i }
   validates :kind, inclusion: { in: %w[rss bilibili] }
 
-  scope :due_for_refresh, ->(interval: 30.minutes) {
-    where("last_fetched_at IS NULL OR last_fetched_at < ?", interval.ago)
+  # next_fetch_at is the single source of truth for "may we fetch yet": the
+  # refresher stamps it after every attempt (one interval out on success, a
+  # backoff out on failure). NULL means never fetched, so always due.
+  scope :due_for_refresh, -> {
+    where("next_fetch_at IS NULL OR next_fetch_at <= ?", Time.current)
   }
+
+  scope :dead, -> { where.not(dead_at: nil) }
+  scope :alive, -> { where(dead_at: nil) }
 
   def bilibili?
     kind == "bilibili"
+  end
+
+  def dead?
+    dead_at.present?
+  end
+
+  def youtube?
+    feed_url.match?(%r{\Ahttps?://([^/@]+\.)?youtube\.com/}i)
+  end
+
+  def refresh_interval
+    youtube? ? YOUTUBE_REFRESH_INTERVAL : REFRESH_INTERVAL
+  end
+
+  # Seconds to wait before the next fetch after `failures` consecutive failures.
+  # Honors a server Retry-After when present; otherwise backs off exponentially
+  # from refresh_interval. Always clamped to MAX_BACKOFF.
+  def backoff_interval(failures, retry_after: nil)
+    from_header = self.class.retry_after_seconds(retry_after)
+    seconds = from_header || refresh_interval.to_i * (2**[ failures - 1, MAX_BACKOFF_EXPONENT ].min)
+    [ seconds, MAX_BACKOFF.to_i ].min
+  end
+
+  # When does a feed become dead after `failures` consecutive failures? Returns
+  # the existing dead_at once set (so the timestamp marks the *first* time it
+  # crossed the threshold), the current time when it crosses now, or nil while
+  # it's still below the threshold.
+  def dead_at_after(failures, now: Time.current)
+    return dead_at unless failures >= DEAD_AFTER_FAILURES
+
+    dead_at || now
   end
 
   def display_title
