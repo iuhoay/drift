@@ -39,3 +39,6 @@
 !/app/assets/builds/.keep
 
 .claude/worktrees
+
+# Skill-creator eval scaffolding (test runs, benchmarks, logs)
+.claude/skills/*-workspace/
