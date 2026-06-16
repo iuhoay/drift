@@ -24,9 +24,12 @@
 
     <%= yield :head %>
 
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%# The ?v= query busts the 1-year public-file cache (see production.rb) so
+        corrected icon bytes reach already-installed browsers and home screens.
+        Bump it whenever an icon's pixels change. %>
+    <link rel="icon" href="/favicon.png?v=2" type="image/png">
+    <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png?v=2">
     <link rel="manifest" href="<%= pwa_manifest_path %>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
