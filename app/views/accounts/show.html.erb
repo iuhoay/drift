@@ -37,6 +37,18 @@
       <%= link_to "Change", edit_account_password_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
     </section>
 
+    <%# Reading %>
+    <section class="py-4 flex items-start justify-between gap-4">
+      <div>
+        <div class="text-xs uppercase tracking-widest text-stone-500">Reading</div>
+        <div class="mt-1 text-stone-500 text-sm">
+          Article font and size &mdash;
+          <span class="text-stone-700"><%= @user.reading_font %>, <%= @user.reading_font_size.sub("xlarge", "extra large") %></span>.
+        </div>
+      </div>
+      <%= link_to "Change", edit_account_reading_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
+    </section>
+
     <%# Connected accounts (only when at least one provider is configured) %>
     <% configured = Identity.configured_providers %>
     <% if configured.any? || @identities.any? %>

@@ -1,4 +1,10 @@
 class User < ApplicationRecord
+  # Reading preferences applied to the article body (`.entry-content`). The
+  # values double as the `data-reading-*` attribute on <html> and the CSS hook
+  # that swaps the font/size — keep them in sync with app/assets/tailwind.
+  READING_FONTS = %w[mono sans serif].freeze
+  READING_FONT_SIZES = %w[small medium large xlarge].freeze
+
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :identities, dependent: :destroy
@@ -13,6 +19,8 @@ class User < ApplicationRecord
   validates :email_address, presence: true, uniqueness: true,
                             format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, allow_nil: true
+  validates :reading_font, inclusion: { in: READING_FONTS }
+  validates :reading_font_size, inclusion: { in: READING_FONT_SIZES }
 
   # Email-verification link token. Tied to the current email address, so it
   # stops working the moment the address changes (re-verification on change).

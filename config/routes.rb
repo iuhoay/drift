@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   namespace :account do
     resource :email, only: [ :edit, :update ]
     resource :password, only: [ :edit, :update ]
+    resource :reading, only: [ :edit, :update ]
     delete "sessions/others", to: "sessions#destroy_others", as: :other_sessions
     resources :sessions, only: [ :index, :destroy ]
     resources :identities, only: [ :destroy ]

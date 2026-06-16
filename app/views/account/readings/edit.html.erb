@@ -1,0 +1,75 @@
+<% content_for :title, "Reading settings" %>
+
+<div class="max-w-md mx-auto px-6 py-8 font-sans">
+  <header class="mb-6">
+    <h1 class="text-xl font-medium tracking-tight">Reading settings</h1>
+    <p class="text-sm text-stone-500">
+      Choose the font and size used for article text. Changes apply the next
+      time you open an entry.
+    </p>
+  </header>
+
+  <%= form_with model: @user, url: account_reading_path, method: :patch, class: "space-y-8" do |f| %>
+    <% if @user.errors.any? %>
+      <div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <% @user.errors.full_messages.each do |msg| %>
+          <div><%= msg %></div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Reading font %>
+    <fieldset class="space-y-2">
+      <legend class="block text-xs uppercase tracking-widest text-stone-500 mb-2">Reading font</legend>
+
+      <%
+        fonts = [
+          { value: "mono",  name: "Monospace", note: "Terminal default", preview: "font-mono" },
+          { value: "sans",  name: "Sans-serif", note: "Clean and modern", preview: "font-sans" },
+          { value: "serif", name: "Serif", note: "Recommended for long reads", preview: "font-serif", recommended: true }
+        ]
+      %>
+      <% fonts.each do |font| %>
+        <label class="flex cursor-pointer items-center gap-3 rounded border border-stone-300 px-3 py-2.5 hover:border-stone-700 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-100">
+          <%= f.radio_button :reading_font, font[:value], class: "accent-stone-900" %>
+          <span class="min-w-0 flex-1">
+            <span class="flex items-center gap-2">
+              <span class="text-sm font-medium"><%= font[:name] %></span>
+              <% if font[:recommended] %>
+                <span class="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-amber-700">Recommended</span>
+              <% end %>
+            </span>
+            <span class="block text-xs text-stone-500"><%= font[:note] %></span>
+          </span>
+          <span class="<%= font[:preview] %> shrink-0 text-base text-stone-700">Aa</span>
+        </label>
+      <% end %>
+    </fieldset>
+
+    <%# Font size %>
+    <fieldset class="space-y-2">
+      <legend class="block text-xs uppercase tracking-widest text-stone-500 mb-2">Font size</legend>
+
+      <%
+        sizes = [
+          { value: "small",  name: "Small",       sample: "text-sm" },
+          { value: "medium", name: "Medium",      sample: "text-base" },
+          { value: "large",  name: "Large",       sample: "text-lg" },
+          { value: "xlarge", name: "Extra large", sample: "text-xl" }
+        ]
+      %>
+      <% sizes.each do |size| %>
+        <label class="flex cursor-pointer items-center gap-3 rounded border border-stone-300 px-3 py-2.5 hover:border-stone-700 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-100">
+          <%= f.radio_button :reading_font_size, size[:value], class: "accent-stone-900" %>
+          <span class="flex-1 text-sm font-medium"><%= size[:name] %></span>
+          <span class="<%= size[:sample] %> shrink-0 text-stone-700">Aa</span>
+        </label>
+      <% end %>
+    </fieldset>
+
+    <div class="flex items-center gap-3">
+      <%= f.submit "Save", class: "px-3 py-1.5 text-sm rounded bg-stone-900 text-white hover:bg-stone-700 cursor-pointer" %>
+      <%= link_to "Cancel", account_path, class: "text-sm text-stone-500 underline hover:text-stone-900" %>
+    </div>
+  <% end %>
+</div>

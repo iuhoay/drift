@@ -46,7 +46,24 @@
     /* Terminal reading UI */
     --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
                  Consolas, "Liberation Mono", monospace;
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+                 Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    --font-serif: Charter, "Iowan Old Style", "Source Serif Pro", Georgia,
+                  Cambria, "Times New Roman", Times, serif;
   }
+
+  /* Reading preferences for the article body. The <html data-reading-*>
+     attributes are set from the signed-in user's settings (see the layout +
+     Account::ReadingsController); the defaults here mirror the User model
+     column defaults so a missing attribute still reads comfortably. */
+  :root                          { --reading-font: var(--font-mono); --reading-size: 1.0625rem; }
+  :root[data-reading-font="mono"]  { --reading-font: var(--font-mono); }
+  :root[data-reading-font="sans"]  { --reading-font: var(--font-sans); }
+  :root[data-reading-font="serif"] { --reading-font: var(--font-serif); }
+  :root[data-reading-size="small"]  { --reading-size: 0.9375rem; }
+  :root[data-reading-size="medium"] { --reading-size: 1.0625rem; }
+  :root[data-reading-size="large"]  { --reading-size: 1.25rem; }
+  :root[data-reading-size="xlarge"] { --reading-size: 1.4375rem; }
 }
 
 @layer components {
@@ -231,11 +248,15 @@
   /* Article body: monospace, but loosened up so long-form stays legible.
      Links + structural accents pick up the amber phosphor. */
   .term .entry-content {
-    font-family: var(--font-mono);
-    font-size: 0.9375rem;
+    font-family: var(--reading-font);
+    font-size: var(--reading-size);
     line-height: 1.85;
     color: var(--color-stone-700);
   }
+  /* Loosen the line-height a touch for proportional fonts — monospace needs
+     the extra leading more than serif/sans do. */
+  :root[data-reading-font="sans"] .entry-content,
+  :root[data-reading-font="serif"] .entry-content { line-height: 1.7; }
   .term .entry-content a {
     color: var(--color-amber-700);
     text-decoration-thickness: 1px;
@@ -251,8 +272,10 @@
     color: var(--color-stone-900);
     letter-spacing: -0.01em;
   }
-  .term .entry-content h2::before,
-  .term .entry-content h3::before {
+  /* Terminal "## " heading marker only fits the monospace face — drop it for
+     the proportional reading fonts where it reads as stray punctuation. */
+  :root[data-reading-font="mono"] .term .entry-content h2::before,
+  :root[data-reading-font="mono"] .term .entry-content h3::before {
     content: "## ";
     color: var(--color-amber-700);
   }

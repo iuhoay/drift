@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html class="h-full" data-theme="<%= cookies[:theme] %>">
+<html class="h-full" data-theme="<%= cookies[:theme] %>"
+      data-reading-font="<%= Current.user&.reading_font %>"
+      data-reading-size="<%= Current.user&.reading_font_size %>">
   <head>
     <title><%= content_for(:title) || "Drift" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
