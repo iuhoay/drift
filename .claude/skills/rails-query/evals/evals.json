@@ -1,0 +1,43 @@
+{
+  "skill_name": "rails-query",
+  "evals": [
+    {
+      "id": 0,
+      "name": "count-active-and-failing-feeds",
+      "prompt": "How many active feeds do we have in production right now? And how many are currently backed off or marked dead/failing? Give me the read-only commands you'd run against prod and what each returns.",
+      "expected_output": "Reaches for `bin/kamal query` with ActiveRecord count expressions (e.g. Feed.where(active: true).count). Does not use console/dbconsole/runner and proposes no mutating operations. Recognizes the command is read-only and outputs JSON.",
+      "files": [],
+      "assertions": [
+        "Uses `bin/kamal query` to answer the question (not bin/kamal console, dbc/dbconsole, or a rails runner script)",
+        "Uses an ActiveRecord expression by default rather than raw SQL without the --sql flag",
+        "Constructs a count of active feeds (e.g. a where(active: ...).count or an equivalent scope)",
+        "Proposes no write/mutating operation and treats the task as read-only"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "investigate-feed-zero-entries",
+      "prompt": "Something looks wrong in prod: we have a feed for Hacker News but its entry count shows zero. Can you investigate the production database to figure out what's going on with that feed? Walk me through the read-only checks you'd run.",
+      "expected_output": "Uses `bin/kamal query` to find the feed and inspect related entries. Either uses `query schema`/`models` to confirm column/association names or uses correct drift names (Feed -> entries, last_fetched_at, etc.). Stays read-only.",
+      "files": [],
+      "assertions": [
+        "Uses `bin/kamal query` for the investigation (not console/dbc/runner)",
+        "Looks up the Hacker News feed and inspects its entries/associations to diagnose",
+        "Either discovers structure via `query schema`/`query models` or uses correct drift model/column names",
+        "Keeps the investigation read-only; proposes no data changes"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "count-failed-queue-jobs",
+      "prompt": "Check production for me: how many background jobs are currently failed? We're on Solid Queue. What command do I run?",
+      "expected_output": "Uses `bin/kamal query` and recognizes Solid Queue lives in a separate `queue` database, so targets it with `--db queue` (likely via --sql against solid_queue_failed_executions / solid_queue_jobs, or the SolidQueue model).",
+      "files": [],
+      "assertions": [
+        "Uses `bin/kamal query` to answer (not console/dbc/runner)",
+        "Routes to the queue database correctly — either the auto-routing SolidQueue model (no --db needed) or `--db queue` for raw SQL",
+        "Identifies failed jobs as rows in solid_queue_failed_executions and recognizes Solid Queue lives in a separate database"
+      ]
+    }
+  ]
+}
