@@ -1,0 +1,3 @@
+<%= turbo_stream.update "token_manager" do %>
+  <%= render "manager", new_token: @new_token, tokens: @api_tokens %>
+<% end %>

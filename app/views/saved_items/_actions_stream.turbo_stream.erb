@@ -1,0 +1,5 @@
+<%= turbo_stream.replace dom_id(@saved_item, :actions) do %>
+  <div id="<%= dom_id(@saved_item, :actions) %>" class="flex items-center gap-2">
+    <%= render "saved_items/actions", saved_item: @saved_item %>
+  </div>
+<% end %>

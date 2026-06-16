@@ -1,0 +1,57 @@
+<% content_for :title, "Read Later" %>
+
+<div class="max-w-3xl mx-auto px-5 sm:px-8 py-8">
+  <header class="flex flex-col gap-3 border-b border-stone-300 pb-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-baseline gap-0.5 overflow-hidden">
+      <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="font-medium text-stone-900 truncate">read-later</span><span class="term-caret select-none"></span>
+    </div>
+
+    <%= form_with url: saved_items_path, method: :get, data: { turbo_frame: "_top" }, class: "flex shrink-0 items-center gap-2" do |f| %>
+      <%= hidden_field_tag :scope, @scope %>
+      <span class="select-none text-amber-700">/</span>
+      <%= text_field_tag :q, @query, placeholder: "search", autocomplete: "off",
+            class: "w-44 bg-transparent border-0 border-b border-stone-300 px-1 py-0.5 text-stone-900 placeholder:text-stone-400 focus:border-amber-700 focus:outline-none" %>
+    <% end %>
+  </header>
+
+  <nav class="mt-4 flex items-center gap-2 text-xs">
+    <% %w[unread all starred].each do |s| %>
+      <%= link_to s, saved_items_path(scope: s, q: @query.presence),
+            class: "term-btn #{'term-btn-on' if @scope == s}" %>
+    <% end %>
+  </nav>
+
+  <%# Manual capture — the extension is the primary path, but pasting a URL works too. %>
+  <%= form_with url: saved_items_path, scope: :saved_item, class: "mt-4 flex items-center gap-2" do |f| %>
+    <span class="select-none text-amber-700">$</span>
+    <%= f.url_field :url, placeholder: "https://… save a link", autocomplete: "off",
+          class: "min-w-0 flex-1 bg-transparent border-0 border-b border-stone-300 px-1 py-0.5 text-stone-900 placeholder:text-stone-400 focus:border-amber-700 focus:outline-none" %>
+    <%= f.submit "save", class: "term-btn shrink-0" %>
+  <% end %>
+
+  <% if @saved_items.empty? %>
+    <div class="py-24 text-center text-sm">
+      <p class="text-stone-700">— nothing saved —</p>
+      <p class="mt-3 text-xs text-stone-500">
+        <% if @query.present? %>
+          no match for "<span class="text-amber-700"><%= @query %></span>"
+        <% elsif @scope == "unread" %>
+          your reading list is clear
+        <% else %>
+          save pages with the <%= link_to "browser extension", account_api_tokens_path, class: "text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" %>
+        <% end %>
+      </p>
+    </div>
+  <% else %>
+    <ul class="mt-4 divide-y divide-stone-200">
+      <% @saved_items.each do |saved_item| %>
+        <%= render "saved_items/saved_item_row", saved_item: saved_item %>
+      <% end %>
+    </ul>
+
+    <div class="mt-px flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
+      <span><%= @saved_items.size %> <%= "item".pluralize(@saved_items.size) %><%= " · max #{SavedItemsController::PER_PAGE}" if @saved_items.size == SavedItemsController::PER_PAGE %></span>
+      <span class="truncate pl-3 text-stone-400">scope=<%= @scope %><%= " q=#{@query}" if @query.present? %></span>
+    </div>
+  <% end %>
+</div>

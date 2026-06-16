@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_06_16_130000) do
+ActiveRecord::Schema[8.2].define(version: 2026_06_17_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "api_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "last_used_at"
+    t.string "name"
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["token"], name: "index_api_tokens_on_token", unique: true
+    t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
 
   create_table "entries", force: :cascade do |t|
     t.string "author"
@@ -62,6 +73,27 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_16_130000) do
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
+  create_table "saved_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "excerpt"
+    t.string "image_url"
+    t.datetime "read_at"
+    t.datetime "saved_at", null: false
+    t.tsvector "search_vector"
+    t.string "site_name"
+    t.datetime "starred_at"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.bigint "user_id", null: false
+    t.index ["search_vector"], name: "index_saved_items_on_search_vector", using: :gin
+    t.index ["user_id", "read_at"], name: "index_saved_items_on_user_id_and_read_at"
+    t.index ["user_id", "saved_at"], name: "index_saved_items_on_user_id_and_saved_at"
+    t.index ["user_id", "starred_at"], name: "index_saved_items_on_user_id_and_starred_at"
+    t.index ["user_id", "url"], name: "index_saved_items_on_user_id_and_url", unique: true
+    t.index ["user_id"], name: "index_saved_items_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -107,8 +139,10 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_16_130000) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "api_tokens", "users"
   add_foreign_key "entries", "feeds"
   add_foreign_key "identities", "users"
+  add_foreign_key "saved_items", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "subscriptions", "feeds"
   add_foreign_key "subscriptions", "users"

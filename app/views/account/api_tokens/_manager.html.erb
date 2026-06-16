@@ -1,0 +1,40 @@
+<%# Token list + create form, swapped in place by create.turbo_stream.erb so a
+    freshly generated token can be revealed once without a full navigation. %>
+<% if new_token %>
+  <div class="mb-6 rounded border border-emerald-200 bg-emerald-50/60 px-4 py-4">
+    <div class="text-xs uppercase tracking-widest text-emerald-700">New token — copy it now</div>
+    <code class="mt-2 block break-all rounded bg-white/70 px-3 py-2 font-mono text-sm text-stone-900"><%= new_token.token %></code>
+    <p class="mt-2 text-xs text-stone-600">Paste it into the extension's options. For security it won't be shown in full again.</p>
+  </div>
+<% end %>
+
+<%= form_with url: account_api_tokens_path, scope: :api_token, class: "mb-6 flex items-end gap-3" do |f| %>
+  <div class="flex-1">
+    <%= f.label :name, "Token name", class: "block text-xs uppercase tracking-widest text-stone-500" %>
+    <%= f.text_field :name, placeholder: "e.g. Chrome on laptop", autocomplete: "off",
+          class: "mt-1 w-full border-0 border-b border-stone-300 bg-transparent px-1 py-1 text-stone-900 placeholder:text-stone-400 focus:border-amber-700 focus:outline-none" %>
+  </div>
+  <%= f.submit "Generate token", class: "shrink-0 rounded bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700" %>
+<% end %>
+
+<% if tokens.any? %>
+  <ul class="divide-y divide-stone-200 border-y border-stone-200">
+    <% tokens.each do |token| %>
+      <li class="flex items-center justify-between gap-4 py-3" id="<%= dom_id(token) %>">
+        <div class="min-w-0">
+          <div class="font-medium truncate"><%= token.name.presence || "Untitled token" %></div>
+          <div class="text-xs text-stone-500">
+            <span class="font-mono"><%= token.masked %></span>
+            &middot; created <%= relative_time(token.created_at) %>
+            <% if token.last_used_at %>&middot; last used <%= relative_time(token.last_used_at) %><% else %>&middot; never used<% end %>
+          </div>
+        </div>
+        <%= button_to "Revoke", account_api_token_path(token), method: :delete,
+              form: { data: { turbo_confirm: "Revoke this token? The extension using it will stop working." } },
+              class: "shrink-0 text-xs text-stone-500 hover:text-red-600 underline" %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="text-sm text-stone-500">No tokens yet. Generate one above, then paste it into the extension.</p>
+<% end %>

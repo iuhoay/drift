@@ -1,0 +1,30 @@
+<% content_for :title, "Browser extension" %>
+
+<div class="max-w-3xl mx-auto px-6 py-8 font-sans">
+  <header class="flex items-baseline justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-xl font-medium tracking-tight">Browser extension</h1>
+      <p class="text-sm text-stone-500">API tokens let the extension save pages to your reading list.</p>
+    </div>
+    <%= link_to "Back to account", account_path, class: "shrink-0 text-sm underline text-stone-500 hover:text-stone-900" %>
+  </header>
+
+  <%# Connection details the extension's options page needs. %>
+  <section class="mb-6 rounded border border-stone-200 bg-stone-50/60 px-4 py-4 text-sm">
+    <div class="text-xs uppercase tracking-widest text-stone-500">Extension settings</div>
+    <dl class="mt-2 space-y-1">
+      <div class="flex gap-3">
+        <dt class="w-24 shrink-0 text-stone-500">Server URL</dt>
+        <dd class="min-w-0 break-all font-mono text-stone-800"><%= request.base_url %></dd>
+      </div>
+      <div class="flex gap-3">
+        <dt class="w-24 shrink-0 text-stone-500">Endpoint</dt>
+        <dd class="min-w-0 break-all font-mono text-stone-800">POST <%= api_saved_items_path %></dd>
+      </div>
+    </dl>
+  </section>
+
+  <div id="token_manager">
+    <%= render "manager", new_token: @new_token, tokens: @api_tokens %>
+  </div>
+</div>

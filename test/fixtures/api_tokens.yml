@@ -1,0 +1,11 @@
+one_laptop:
+  user: one
+  name: Laptop
+  token: tok_one_aaaaaaaaaaaaaaaa
+  created_at: <%= 2.days.ago.to_fs(:db) %>
+
+two_laptop:
+  user: two
+  name: Other laptop
+  token: tok_two_bbbbbbbbbbbbbbbb
+  created_at: <%= 2.days.ago.to_fs(:db) %>

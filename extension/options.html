@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drift — Read Later settings</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { font: 14px/1.5 system-ui, sans-serif; max-width: 28rem; margin: 2rem auto; padding: 0 1rem; }
+      h1 { font-size: 1.1rem; }
+      label { display: block; margin-top: 1rem; font-weight: 600; }
+      input { width: 100%; box-sizing: border-box; margin-top: 0.25rem; padding: 0.5rem; font: inherit; }
+      button { margin-top: 1.25rem; padding: 0.5rem 1rem; font: inherit; cursor: pointer; }
+      .hint { color: #78716c; font-size: 0.8rem; margin-top: 0.25rem; }
+      #status { margin-top: 1rem; min-height: 1.2em; font-size: 0.85rem; }
+      .ok { color: #15803d; }
+      .err { color: #b91c1c; }
+      code { background: rgba(120,113,108,0.15); padding: 0 0.25rem; border-radius: 3px; }
+    </style>
+  </head>
+  <body>
+    <h1>Drift — Read Later</h1>
+    <p class="hint">Find both values in Drift under <strong>Account → Browser extension</strong>.</p>
+
+    <label for="baseUrl">Server URL</label>
+    <input id="baseUrl" type="url" placeholder="https://drift.example.com" autocomplete="off">
+    <p class="hint">The address of your Drift install, with no trailing path.</p>
+
+    <label for="token">API token</label>
+    <input id="token" type="text" placeholder="paste your token" autocomplete="off">
+
+    <button id="save">Save</button>
+    <p id="status"></p>
+
+    <script src="options.js"></script>
+  </body>
+</html>

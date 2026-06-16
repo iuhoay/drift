@@ -1,0 +1,27 @@
+one_unread:
+  user: one
+  url: https://example.com/article-one
+  title: An Unread Article
+  excerpt: Something worth reading later.
+  site_name: Example
+  saved_at: <%= 2.hours.ago.to_fs(:db) %>
+
+one_read:
+  user: one
+  url: https://example.com/article-read
+  title: A Read Article
+  saved_at: <%= 1.day.ago.to_fs(:db) %>
+  read_at: <%= 1.hour.ago.to_fs(:db) %>
+
+one_starred:
+  user: one
+  url: https://example.com/article-starred
+  title: A Starred Article
+  saved_at: <%= 3.days.ago.to_fs(:db) %>
+  starred_at: <%= 2.days.ago.to_fs(:db) %>
+
+two_unread:
+  user: two
+  url: https://example.com/two-article
+  title: Two's Article
+  saved_at: <%= 1.hour.ago.to_fs(:db) %>

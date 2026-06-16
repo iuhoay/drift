@@ -7,6 +7,8 @@ class User < ApplicationRecord
   has_many :feeds, through: :subscriptions
   has_many :user_entries, dependent: :destroy
   has_many :entries, through: :user_entries
+  has_many :saved_items, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

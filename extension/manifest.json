@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Drift — Read Later",
+  "version": "1.0.0",
+  "description": "Save the current tab to your Drift reading list.",
+  "permissions": ["activeTab", "storage"],
+  "optional_host_permissions": ["*://*/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Save to Drift" },
+  "options_page": "options.html"
+}

@@ -9,6 +9,7 @@
   tabs = [
     { label: "inbox",   path: entries_path,                   on: on_entries && scope != "starred" },
     { label: "starred", path: entries_path(scope: "starred"), on: on_entries && scope == "starred" },
+    { label: "later",   path: saved_items_path,               on: controller_name == "saved_items" },
     { label: "stats",   path: activity_path,                  on: controller_name == "activities" },
     { label: "feeds",   path: subscriptions_path,             on: controller_name == "subscriptions" }
   ]

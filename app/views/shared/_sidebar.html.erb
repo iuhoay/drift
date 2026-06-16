@@ -3,6 +3,8 @@
   total_unread = counts.values.sum
   subs = Current.user.subscriptions.joins(:feed).includes(:feed).order(Arel.sql("LOWER(COALESCE(NULLIF(subscriptions.custom_title, ''), feeds.title, feeds.feed_url))"))
   on_inbox = controller_name == "entries" && action_name == "index" && params[:feed_id].blank?
+  on_saved = controller_name == "saved_items"
+  saved_unread = Current.user.saved_items.unread.count
   nav_base = "group flex items-center gap-2 border-l-2 px-3 py-1.5 transition-colors"
   nav_on   = "border-amber-700 bg-amber-700/10 text-amber-700"
   nav_off  = "border-transparent text-stone-600 hover:bg-stone-200/60 hover:text-stone-900"
@@ -16,6 +18,13 @@
           <span class="select-none <%= on_inbox ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>">&gt;</span>
           <span class="flex-1">inbox</span>
           <% if total_unread.positive? %><span class="tabular-nums text-xs <%= on_inbox ? 'text-amber-700' : 'text-stone-400' %>"><%= total_unread %></span><% end %>
+        <% end %>
+      </li>
+      <li>
+        <%= link_to saved_items_path, class: "#{nav_base} #{on_saved ? nav_on : nav_off}" do %>
+          <span class="select-none <%= on_saved ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>">&gt;</span>
+          <span class="flex-1">read later</span>
+          <% if saved_unread.positive? %><span class="tabular-nums text-xs <%= on_saved ? 'text-amber-700' : 'text-stone-400' %>"><%= saved_unread %></span><% end %>
         <% end %>
       </li>
     </ul>

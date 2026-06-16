@@ -1,0 +1,72 @@
+<% content_for :title, @saved_item.display_title %>
+
+<article class="max-w-3xl mx-auto px-5 sm:px-8 py-8">
+  <div class="flex items-center justify-between border-b border-stone-300 pb-3 text-sm">
+    <%= link_to :back, class: "text-stone-500 hover:text-amber-700" do %>
+      <span class="select-none">&larr;</span> back
+    <% end %>
+
+    <%# Marks read on render, keeping #show a safe GET (Turbo prefetch won't mark read). %>
+    <div id="<%= dom_id(@saved_item, :actions) %>" class="flex items-center gap-2"
+         data-controller="mark-read"
+         data-mark-read-url-value="<%= saved_item_read_path(@saved_item) %>">
+      <%= render "saved_items/actions", saved_item: @saved_item %>
+    </div>
+  </div>
+
+  <header class="py-6">
+    <div class="mb-3 space-y-0.5 text-xs leading-relaxed">
+      <% if @saved_item.source_label.present? %>
+        <div class="flex gap-3">
+          <span class="w-16 shrink-0 select-none text-stone-400">SITE</span>
+          <span class="min-w-0 truncate text-stone-600"><%= @saved_item.source_label %></span>
+        </div>
+      <% end %>
+      <div class="flex gap-3">
+        <span class="w-16 shrink-0 select-none text-stone-400">SAVED</span>
+        <span class="text-stone-600">
+          <%= @saved_item.saved_at.strftime("%Y-%m-%d") %>
+          <span aria-hidden="true">&middot;</span>
+          <%= @saved_item.saved_at.strftime("%H:%M") %>
+        </span>
+      </div>
+      <% if (source_url = @saved_item.safe_url) %>
+        <div class="flex gap-3">
+          <span class="w-16 shrink-0 select-none text-stone-400">SOURCE</span>
+          <%= link_to source_url, source_url, target: "_blank", rel: "noopener",
+                class: "min-w-0 truncate text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" %>
+        </div>
+      <% end %>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-semibold leading-tight tracking-tight text-stone-900"><%= @saved_item.display_title %></h1>
+  </header>
+
+  <div class="entry-content border-t border-stone-300 pt-7">
+    <% if @saved_item.image_url.present? %>
+      <img src="<%= @saved_item.image_url %>" alt="" loading="lazy"
+           class="mb-6 max-h-80 w-full rounded object-cover" referrerpolicy="no-referrer">
+    <% end %>
+
+    <% if @saved_item.excerpt.present? %>
+      <p class="text-base leading-relaxed text-stone-700"><%= @saved_item.excerpt %></p>
+    <% else %>
+      <p class="text-sm text-stone-500">No preview was captured for this page.</p>
+    <% end %>
+
+    <% if (open_url = @saved_item.safe_url) %>
+      <div class="mt-7">
+        <%= link_to open_url, target: "_blank", rel: "noopener",
+              class: "term-btn inline-flex items-center gap-1" do %>
+          open original <span class="select-none">&#8599;</span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-12 flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
+    <span class="select-none text-stone-400">&mdash; end &mdash;</span>
+    <%= button_to "remove", saved_item_path(@saved_item), method: :delete,
+          form: { data: { turbo_confirm: "Remove this from your reading list?" } },
+          class: "text-stone-500 hover:text-red-600 underline" %>
+  </div>
+</article>

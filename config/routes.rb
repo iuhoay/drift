@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     delete "sessions/others", to: "sessions#destroy_others", as: :other_sessions
     resources :sessions, only: [ :index, :destroy ]
     resources :identities, only: [ :destroy ]
+    resources :api_tokens, only: [ :index, :create, :destroy ]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
@@ -53,6 +54,17 @@ Rails.application.routes.draw do
   resources :entries, only: [ :index, :show ] do
     resource :read, only: [ :create, :destroy ], module: :entries
     resource :star, only: [ :create, :destroy ], module: :entries
+  end
+
+  # Read-it-later. The web UI (cookie auth) lists, reads, and removes saved
+  # pages; the browser extension posts new ones to the token-authenticated API.
+  resources :saved_items, only: [ :index, :show, :create, :destroy ] do
+    resource :read, only: [ :create, :destroy ], module: :saved_items
+    resource :star, only: [ :create, :destroy ], module: :saved_items
+  end
+
+  namespace :api do
+    resources :saved_items, only: [ :create ]
   end
 
   root "entries#index"

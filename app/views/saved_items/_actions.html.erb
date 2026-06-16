@@ -1,0 +1,11 @@
+<% if saved_item.starred? %>
+  <%= button_to saved_item_star_path(saved_item), method: :delete, form: { class: "inline" }, class: "term-btn term-btn-on" do %>[★ starred]<% end %>
+<% else %>
+  <%= button_to saved_item_star_path(saved_item), form: { class: "inline" }, class: "term-btn" do %>[☆ star]<% end %>
+<% end %>
+
+<% if saved_item.read? %>
+  <%= button_to saved_item_read_path(saved_item), method: :delete, form: { class: "inline" }, class: "term-btn" do %>[unread]<% end %>
+<% else %>
+  <%= button_to saved_item_read_path(saved_item), form: { class: "inline" }, class: "term-btn" do %>[read]<% end %>
+<% end %>

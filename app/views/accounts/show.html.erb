@@ -72,6 +72,15 @@
       </div>
       <%= link_to "Manage", account_sessions_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
     </section>
+
+    <%# Browser extension %>
+    <section class="py-4 flex items-start justify-between gap-4">
+      <div>
+        <div class="text-xs uppercase tracking-widest text-stone-500">Browser extension</div>
+        <div class="mt-1 text-stone-500 text-sm">Generate API tokens to save pages to your reading list.</div>
+      </div>
+      <%= link_to "Manage", account_api_tokens_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
+    </section>
   </div>
 
   <%# Danger zone %>

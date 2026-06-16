@@ -1,0 +1,25 @@
+<%
+  read = saved_item.read?
+  starred = saved_item.starred?
+  marker = starred ? "★" : (read ? "·" : "●")
+  marker_color = (starred || !read) ? "text-amber-700" : "text-stone-300"
+%>
+<li id="<%= dom_id(saved_item) %>" class="term-row group">
+  <%= link_to saved_item_path(saved_item), class: "flex gap-3 border-l-2 border-transparent px-4 py-2.5 transition-colors group-hover:border-amber-700 group-hover:bg-amber-700/[0.07]" do %>
+    <div class="min-w-0 flex-1">
+      <div class="flex items-baseline gap-3 text-[0.7rem] uppercase tracking-[0.18em] text-stone-500">
+        <span class="min-w-0 flex-1 truncate">[<%= saved_item.source_label %>]</span>
+        <time datetime="<%= saved_item.saved_at.iso8601 %>" class="shrink-0 normal-case tracking-normal tabular-nums text-stone-300"><%= relative_time(saved_item.saved_at) %></time>
+      </div>
+
+      <h2 class="mt-1 flex items-baseline gap-2 text-sm leading-snug <%= read ? 'text-stone-500' : 'text-stone-900 font-medium' %>">
+        <span class="w-2 shrink-0 select-none text-center <%= marker_color %>"><%= marker %></span>
+        <span class="truncate"><%= saved_item.display_title %></span>
+      </h2>
+
+      <% if saved_item.excerpt.present? %>
+        <p class="mt-1 pl-4 text-xs leading-relaxed text-stone-500 line-clamp-2"><%= saved_item.excerpt.truncate(180) %></p>
+      <% end %>
+    </div>
+  <% end %>
+</li>
