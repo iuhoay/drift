@@ -34,6 +34,17 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal Entry.all.to_a.sort, Entry.search("").to_a.sort
   end
 
+  test "search matches a Chinese sub-word via bigram tokenization" do
+    feed = feeds(:example)
+    match = feed.entries.create!(guid: "cjk-match", title: "搜索引擎优化指南")
+    miss  = feed.entries.create!(guid: "cjk-miss", title: "完全不同的标题")
+
+    results = Entry.search("引擎") # an interior 2-gram of the title
+
+    assert_includes results, match
+    assert_not_includes results, miss
+  end
+
   test "excerpt strips html and truncates" do
     entry = Entry.new(content: "<p>Hello <strong>world</strong>!  This  has  whitespace.</p>")
 
