@@ -28,7 +28,7 @@ gem "bcrypt", "~> 3.1.7"
 gem "omniauth", "~> 2.1"
 gem "omniauth-github", "~> 2.0"
 gem "omniauth-google-oauth2", "~> 1.1"
-gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Feed parsing and HTTP
 gem "feedjira", "~> 4.0"
