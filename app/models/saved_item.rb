@@ -10,6 +10,7 @@ require "uri"
 # Feed.http_connection (reusing the SSRF guard). Reading opens the original site.
 class SavedItem < ApplicationRecord
   include Readable
+  include Searchable
 
   belongs_to :user
 
@@ -20,15 +21,10 @@ class SavedItem < ApplicationRecord
                   uniqueness: { scope: :user_id, case_sensitive: false }
 
   before_validation :assign_saved_at, on: :create
-  before_save :assign_search_vector
+
+  search_columns title: "A", excerpt: "B", content: "C"
 
   scope :recent, -> { order(saved_at: :desc) }
-  scope :search, ->(query) {
-    next all if query.blank?
-
-    where("search_vector @@ websearch_to_tsquery('english', ?)", query)
-      .reorder(Arel.sql("ts_rank(search_vector, websearch_to_tsquery('english', #{connection.quote(query)})) DESC"))
-  }
 
   def display_title
     title.presence || url
@@ -54,19 +50,5 @@ class SavedItem < ApplicationRecord
 
   def assign_saved_at
     self.saved_at ||= Time.current
-  end
-
-  def assign_search_vector
-    return unless title_changed? || excerpt_changed? || content_changed?
-
-    sql = <<~SQL.squish
-      setweight(to_tsvector('english', coalesce(?, '')), 'A') ||
-      setweight(to_tsvector('english', coalesce(?, '')), 'B') ||
-      setweight(to_tsvector('english', coalesce(?, '')), 'C')
-    SQL
-
-    self.search_vector = self.class.connection.select_value(
-      self.class.sanitize_sql_array([ "SELECT #{sql}", title, excerpt, content ])
-    )
   end
 end
