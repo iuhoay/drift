@@ -45,6 +45,11 @@ class FeedTest < ActiveSupport::TestCase
     assert_equal Feed::REFRESH_INTERVAL, feeds(:example).refresh_interval
   end
 
+  test "refresh_interval drops to the websub interval when a push subscription is active" do
+    assert feeds(:youtube).web_sub_subscription.active?
+    assert_equal Feed::WEBSUB_REFRESH_INTERVAL, feeds(:youtube).refresh_interval
+  end
+
   test "backoff_interval grows exponentially and is capped" do
     feed = feeds(:example)
     base = feed.refresh_interval.to_i
@@ -83,11 +88,12 @@ class FeedTest < ActiveSupport::TestCase
   end
 
   test "dead_at_after preserves the first dead_at once set" do
-    first = 3.days.ago
     feed = feeds(:example)
-    feed.dead_at = first
+    feed.dead_at = 3.days.ago
 
-    assert_equal first, feed.dead_at_after(Feed::DEAD_AFTER_FAILURES + 5, now: Time.current)
+    # Compare against the stored value: assigning to the datetime attribute truncates
+    # to the column's microsecond precision, while a raw Time keeps nanoseconds.
+    assert_equal feed.dead_at, feed.dead_at_after(Feed::DEAD_AFTER_FAILURES + 5, now: Time.current)
   end
 
   test "dead? and dead/alive scopes reflect dead_at" do

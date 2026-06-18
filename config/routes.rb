@@ -23,6 +23,11 @@ Rails.application.routes.draw do
     resources :api_tokens, only: [ :index, :create, :destroy ]
   end
 
+  # WebSub (PubSubHubbub) push: the hub confirms intent via GET (echo hub.challenge)
+  # and delivers feed updates via POST. See WebSub::CallbacksController.
+  get  "web_sub/callbacks/:token" => "web_sub/callbacks#verify", as: :web_sub_callback
+  post "web_sub/callbacks/:token" => "web_sub/callbacks#receive"
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/*

@@ -19,6 +19,11 @@ class Feed < ApplicationRecord
   REFRESH_INTERVAL = 30.minutes
   YOUTUBE_REFRESH_INTERVAL = 1.hour
 
+  # Feeds with a live WebSub push subscription poll far less often: the hub pushes
+  # new entries in near-realtime, so polling is only a safety net for missed pushes.
+  # This is the scaling win — it cuts YouTube request volume ~6x per channel.
+  WEBSUB_REFRESH_INTERVAL = 12.hours
+
   # Failure backoff: each consecutive failure doubles the wait (capped by the
   # exponent so 2** can't blow up), never exceeding MAX_BACKOFF. A server-sent
   # Retry-After overrides this — YouTube returns one with its 429s, and ignoring
@@ -63,6 +68,7 @@ class Feed < ApplicationRecord
   has_many :entries, dependent: :destroy
   has_many :subscriptions, dependent: :destroy
   has_many :users, through: :subscriptions
+  has_one :web_sub_subscription, dependent: :destroy
 
   normalizes :feed_url, with: ->(url) { url.strip }
 
@@ -70,6 +76,11 @@ class Feed < ApplicationRecord
   # space serves no RSS, so we synthesize one via Feed::Bilibili instead of
   # GETting the page. Deriving it here means the subscribe flow needs no change.
   before_validation :assign_kind
+
+  # YouTube polling throttles at scale, so we register a WebSub push subscription
+  # for each new YouTube feed (in environments with a publicly reachable callback).
+  # Covers every creation path without thickening SubscriptionsController.
+  after_create_commit :subscribe_to_web_sub
 
   validates :feed_url, presence: true, uniqueness: { case_sensitive: false },
                        format: { with: %r{\Ahttps?://\S+\z}i }
@@ -114,6 +125,8 @@ class Feed < ApplicationRecord
   end
 
   def refresh_interval
+    return WEBSUB_REFRESH_INTERVAL if web_sub_subscription&.active?
+
     youtube? ? YOUTUBE_REFRESH_INTERVAL : REFRESH_INTERVAL
   end
 
@@ -148,5 +161,11 @@ class Feed < ApplicationRecord
 
   def assign_kind
     self.kind = Feed::Bilibili.handles?(feed_url) ? "bilibili" : "rss"
+  end
+
+  def subscribe_to_web_sub
+    return unless youtube? && WebSubSubscription.enabled?
+
+    WebSubSubscribeJob.perform_later(id)
   end
 end

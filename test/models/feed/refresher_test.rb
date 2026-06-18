@@ -15,6 +15,38 @@ class Feed::RefresherTest < ActiveSupport::TestCase
     </feed>
   XML
 
+  # A YouTube-style Atom payload as a WebSub hub would push it: feed metadata plus a
+  # single changed entry, carrying the yt: namespace.
+  YOUTUBE_PUSH_BODY = <<~XML
+    <?xml version="1.0" encoding="UTF-8"?>
+    <feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns="http://www.w3.org/2005/Atom">
+      <title>YouTube Channel</title>
+      <link rel="alternate" href="https://www.youtube.com/channel/UCfixture0000000000001"/>
+      <entry>
+        <id>yt:video:VIDEO123</id>
+        <yt:videoId>VIDEO123</yt:videoId>
+        <title>Pushed Video</title>
+        <link rel="alternate" href="https://www.youtube.com/watch?v=VIDEO123"/>
+        <author><name>YouTube Channel</name></author>
+        <published>2026-06-18T10:00:00+00:00</published>
+        <updated>2026-06-18T10:05:00+00:00</updated>
+      </entry>
+    </feed>
+  XML
+
+  test "ingest upserts pushed entries and clears prior failures" do
+    feed = feeds(:youtube)
+    feed.update!(fetch_failure_count: 4, last_error: "HTTP 404")
+
+    Feed::Refresher.ingest(feed, YOUTUBE_PUSH_BODY)
+    feed.reload
+
+    assert feed.entries.exists?(title: "Pushed Video")
+    assert_equal 0, feed.fetch_failure_count
+    assert_nil feed.last_error
+    assert_not_nil feed.last_success_at
+  end
+
   test "a failure backs off, increments the count, and is not yet dead" do
     feed = feeds(:example)
 
