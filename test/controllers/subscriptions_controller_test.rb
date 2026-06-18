@@ -114,17 +114,4 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
-
-  private
-
-  # Replaces Feed::Discovery.call with a canned result for the block so the
-  # controller never reaches out to the network during the test. (Minitest 6
-  # dropped the bundled mock, so there's no Object#stub to lean on here.)
-  def stub_discovery(result)
-    original = Feed::Discovery.method(:call)
-    Feed::Discovery.define_singleton_method(:call) { |_url| result }
-    yield
-  ensure
-    Feed::Discovery.define_singleton_method(:call, original)
-  end
 end

@@ -143,4 +143,40 @@ class FeedTest < ActiveSupport::TestCase
     assert_not_equal "Drift RSS Reader/0.1 (+https://rdrift.app)", Feed::USER_AGENT
     assert_includes Feed::USER_AGENT, Rails.env
   end
+
+  test "resolve_url returns a tracked feed url as-is without discovery" do
+    tracked = feeds(:example).feed_url
+
+    resolved = stub_discovery([]) do
+      Feed.resolve_url(tracked)
+    end
+
+    assert_equal tracked, resolved
+  end
+
+  test "resolve_url strips the address before matching a tracked feed" do
+    resolved = stub_discovery([]) do
+      Feed.resolve_url("  #{feeds(:example).feed_url}  ")
+    end
+
+    assert_equal feeds(:example).feed_url, resolved
+  end
+
+  test "resolve_url delegates to discovery for an unknown address" do
+    feed_url = "https://discovered.example.com/atom.xml"
+
+    resolved = stub_discovery([ feed_url ]) do
+      Feed.resolve_url("https://discovered.example.com")
+    end
+
+    assert_equal feed_url, resolved
+  end
+
+  test "resolve_url returns nil when nothing resolves to a feed" do
+    resolved = stub_discovery([]) do
+      Feed.resolve_url("https://no-feed.example.com")
+    end
+
+    assert_nil resolved
+  end
 end
