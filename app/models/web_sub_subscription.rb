@@ -60,6 +60,14 @@ class WebSubSubscription < ApplicationRecord
     state == "active" && lease_expires_at&.future?
   end
 
+  # Whether an operator should look at this subscription: the hub denied us, the
+  # lease expired, or a once-confirmed ("active") subscription's lease has lapsed
+  # without renewal — in which case the hub has very likely stopped delivering and
+  # only polling keeps the feed fresh. Drives the admin WebSub dashboard's triage.
+  def needs_attention?
+    state.in?(%w[denied expired]) || (state == "active" && !active?)
+  end
+
   # Ask the hub to (re)subscribe. The hub confirms asynchronously by calling our
   # verify endpoint, which flips state to "active" — so this only fires the request.
   # http is injectable for tests, mirroring Feed::Refresher.

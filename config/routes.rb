@@ -44,6 +44,7 @@ Rails.application.routes.draw do
   # First-party admin landing page (front door to the mounted dashboards above).
   namespace :admin do
     root "dashboard#show"
+    resources :web_sub_subscriptions, only: :index
   end
 
   # Static pages — readable without an account (linked from sign-in / sign-up).

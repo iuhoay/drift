@@ -1,0 +1,114 @@
+<% content_for :title, "WebSub — Admin — Drift" %>
+
+<div class="mx-auto max-w-5xl px-5 sm:px-8 py-8">
+  <header class="flex items-baseline gap-0.5 overflow-hidden border-b border-stone-300 pb-3">
+    <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><%= link_to "admin", admin_root_path, class: "text-stone-500 hover:text-amber-700" %><span class="text-stone-400">/</span><span class="font-medium text-stone-900">websub</span><span class="term-caret select-none"></span>
+  </header>
+
+  <p class="mt-4 text-sm text-stone-600">
+    Push subscriptions for YouTube feeds — the hub POSTs new videos to us instead of us polling.
+    Created automatically per YouTube feed and re-subscribed within
+    <%= distance_of_time_in_words(@renew_within) %> of expiry.
+  </p>
+
+  <% if @total.zero? %>
+    <p class="mt-6 text-sm text-stone-500">
+      No push subscriptions yet.
+      <% unless Rails.env.production? %>
+        WebSub only runs in production — feeds are polled directly here.
+      <% end %>
+    </p>
+  <% else %>
+    <div class="mt-5 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// at a glance</div>
+    <dl class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded border border-stone-300 bg-stone-300 sm:grid-cols-5">
+      <div class="bg-stone-50 px-4 py-3">
+        <dt class="select-none text-[0.65rem] uppercase tracking-[0.15em] text-stone-500">total</dt>
+        <dd class="mt-1 tabular-nums text-2xl text-stone-900"><%= number_with_delimiter(@total) %></dd>
+      </div>
+      <% WebSubSubscription::STATES.each do |state| %>
+        <div class="bg-stone-50 px-4 py-3">
+          <dt class="select-none text-[0.65rem] uppercase tracking-[0.15em] text-stone-500"><%= state %></dt>
+          <dd class="mt-1 tabular-nums text-2xl text-stone-900"><%= number_with_delimiter(@counts[state]) %></dd>
+        </div>
+      <% end %>
+    </dl>
+
+    <div class="mt-6 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// signal</div>
+    <dl class="mt-2 flex flex-wrap items-baseline gap-x-7 gap-y-2 text-sm text-stone-700">
+      <div>
+        <dt class="inline select-none text-stone-500">renewing soon</dt>
+        <dd class="ml-1 inline tabular-nums text-stone-900"><%= number_with_delimiter(@expiring_soon) %></dd>
+      </div>
+      <div>
+        <dt class="inline select-none text-stone-500">awaiting first push</dt>
+        <dd class="ml-1 inline tabular-nums text-stone-900"><%= number_with_delimiter(@awaiting_first) %></dd>
+      </div>
+      <div>
+        <dt class="inline select-none text-stone-500">last push received</dt>
+        <dd class="ml-1 inline tabular-nums text-stone-900"><%= @last_delivery_at ? relative_time(@last_delivery_at) : "never" %></dd>
+      </div>
+    </dl>
+
+    <% if @problems.any? %>
+      <div class="mt-7 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// needs attention</div>
+      <ul class="mt-2 divide-y divide-stone-300 border-y border-stone-300">
+        <% @problems.each do |sub| %>
+          <% label, badge = case sub.state
+               when "denied"  then [ "denied", "bg-red-100 text-red-700" ]
+               when "expired" then [ "expired", "bg-red-100 text-red-700" ]
+               else                [ "lapsed lease", "bg-amber-100 text-amber-700" ]
+             end %>
+          <li class="px-1 py-2.5">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate font-medium text-stone-900"><%= sub.feed.display_title %></span>
+              <span class="select-none rounded <%= badge %> px-1.5 py-0.5 text-[0.6rem] uppercase tracking-[0.1em]"><%= label %></span>
+            </div>
+            <div class="truncate text-xs text-stone-500"><%= sub.topic_url %></div>
+            <div class="mt-0.5 text-xs text-stone-500">
+              <% if sub.lease_expires_at.nil? %>
+                no lease granted
+              <% elsif sub.lease_expires_at.past? %>
+                lease expired <%= relative_time(sub.lease_expires_at) %> ago
+              <% else %>
+                lease <%= time_until(sub.lease_expires_at) %>
+              <% end %>
+              <span class="text-stone-400">·</span>
+              <%= sub.last_delivery_at ? "last push #{relative_time(sub.last_delivery_at)}" : "no push yet" %>
+              <% if sub.verified_at %>
+                <span class="text-stone-400">·</span> verified <%= relative_time(sub.verified_at) %>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @healthy.any? %>
+      <div class="mt-7 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// subscriptions</div>
+      <ul class="mt-2 divide-y divide-stone-300 border-y border-stone-300">
+        <% @healthy.each do |sub| %>
+          <li class="px-1 py-2.5">
+            <div class="flex items-baseline justify-between gap-3">
+              <span class="min-w-0 truncate font-medium text-stone-900"><%= sub.feed.display_title %></span>
+              <% if sub.active? %>
+                <span class="select-none rounded bg-green-100 px-1.5 py-0.5 text-[0.6rem] uppercase tracking-[0.1em] text-green-700">active</span>
+              <% else %>
+                <span class="select-none rounded bg-stone-200 px-1.5 py-0.5 text-[0.6rem] uppercase tracking-[0.1em] text-stone-600"><%= sub.state %></span>
+              <% end %>
+            </div>
+            <div class="truncate text-xs text-stone-500"><%= sub.topic_url %></div>
+            <div class="mt-0.5 text-xs text-stone-500">
+              <% if sub.active? %>
+                lease <%= time_until(sub.lease_expires_at) %>
+              <% else %>
+                awaiting hub confirmation
+              <% end %>
+              <span class="text-stone-400">·</span>
+              <%= sub.last_delivery_at ? "last push #{relative_time(sub.last_delivery_at)}" : "no push yet" %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  <% end %>
+</div>

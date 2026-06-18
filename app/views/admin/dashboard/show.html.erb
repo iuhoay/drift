@@ -105,6 +105,13 @@
   <div class="mt-7 select-none text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// dashboards</div>
   <ul class="mt-2 divide-y divide-stone-300 border-y border-stone-300">
     <li>
+      <%= link_to admin_web_sub_subscriptions_path, class: "group flex items-baseline gap-2 px-1 py-2.5 text-stone-700 hover:text-amber-700" do %>
+        <span class="select-none text-stone-300 group-hover:text-amber-700">&gt;</span>
+        <span class="font-medium">websub</span>
+        <span class="text-sm text-stone-500">— YouTube push subscriptions: state, leases, deliveries</span>
+      <% end %>
+    </li>
+    <li>
       <%= link_to "/jobs", class: "group flex items-baseline gap-2 px-1 py-2.5 text-stone-700 hover:text-amber-700" do %>
         <span class="select-none text-stone-300 group-hover:text-amber-700">&gt;</span>
         <span class="font-medium">background jobs</span>

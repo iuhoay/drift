@@ -20,6 +20,7 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1, header", text: /admin/i
     assert_select "a[href='/jobs']"
     assert_select "a[href='/rails_pulse']"
+    assert_select "a[href='#{admin_web_sub_subscriptions_path}']"
     assert_includes @response.body, "// signal"
     assert_includes @response.body, "// recent"
   end
