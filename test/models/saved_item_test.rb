@@ -62,6 +62,12 @@ class SavedItemTest < ActiveSupport::TestCase
     assert_equal 1, results.count
   end
 
+  test "search matches the extracted content body" do
+    match = @user.saved_items.create!(url: "https://example.com/c", content: "<p>quantum entanglement explained</p>")
+
+    assert_includes @user.saved_items.search("entanglement"), match
+  end
+
   test "recent orders newest saved first" do
     ordered = @user.saved_items.recent.to_a
     assert_equal ordered.sort_by(&:saved_at).reverse, ordered

@@ -42,15 +42,20 @@
   </header>
 
   <div class="entry-content border-t border-stone-300 pt-7">
-    <% if @saved_item.image_url.present? %>
-      <img src="<%= @saved_item.image_url %>" alt="" loading="lazy"
-           class="mb-6 max-h-80 w-full rounded object-cover" referrerpolicy="no-referrer">
-    <% end %>
-
-    <% if @saved_item.excerpt.present? %>
-      <p class="text-base leading-relaxed text-stone-700"><%= @saved_item.excerpt %></p>
+    <% if @saved_item.content.present? %>
+      <%# Reader view: Readability-extracted, sanitized at save and again here. %>
+      <%= sanitize(@saved_item.content) %>
     <% else %>
-      <p class="text-sm text-stone-500">No preview was captured for this page.</p>
+      <% if @saved_item.image_url.present? %>
+        <img src="<%= @saved_item.image_url %>" alt="" loading="lazy"
+             class="mb-6 max-h-80 w-full rounded object-cover" referrerpolicy="no-referrer">
+      <% end %>
+
+      <% if @saved_item.excerpt.present? %>
+        <p class="text-base leading-relaxed text-stone-700"><%= @saved_item.excerpt %></p>
+      <% else %>
+        <p class="text-sm text-stone-500">No preview was captured for this page.</p>
+      <% end %>
     <% end %>
 
     <% if (open_url = @saved_item.safe_url) %>

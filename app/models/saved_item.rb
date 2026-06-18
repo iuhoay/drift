@@ -57,15 +57,16 @@ class SavedItem < ApplicationRecord
   end
 
   def assign_search_vector
-    return unless title_changed? || excerpt_changed?
+    return unless title_changed? || excerpt_changed? || content_changed?
 
     sql = <<~SQL.squish
       setweight(to_tsvector('english', coalesce(?, '')), 'A') ||
-      setweight(to_tsvector('english', coalesce(?, '')), 'B')
+      setweight(to_tsvector('english', coalesce(?, '')), 'B') ||
+      setweight(to_tsvector('english', coalesce(?, '')), 'C')
     SQL
 
     self.search_vector = self.class.connection.select_value(
-      self.class.sanitize_sql_array([ "SELECT #{sql}", title, excerpt ])
+      self.class.sanitize_sql_array([ "SELECT #{sql}", title, excerpt, content ])
     )
   end
 end

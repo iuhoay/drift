@@ -38,6 +38,9 @@ gem "faraday-follow_redirects", "~> 0.3"
 # HTML sanitization for entry content
 gem "sanitize", "~> 7.0"
 
+# Readability-style article extraction for saved-page reader view
+gem "ruby-readability", "~> 0.7", require: "readability"
+
 # Self-hosted performance monitoring (requests, SQL/N+1, jobs) [https://github.com/railspulse/rails_pulse]
 gem "rails_pulse", "~> 0.3.2"
 
