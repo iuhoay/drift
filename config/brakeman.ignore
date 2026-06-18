@@ -33,6 +33,40 @@
       "confidence": "Weak",
       "cwe_id": [79],
       "note": "Entry#safe_url returns the URL only when it matches \\Ahttps?:// — see app/models/entry.rb."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "e5662a9356199beceb8ce3e3d097ed2f419430b94af5b0d99082fb0cecae47bd",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/saved_items/show.html.erb",
+      "line": 36,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Current.user.saved_items.find(params[:id]).safe_url, Current.user.saved_items.find(params[:id]).safe_url, :target => \"_blank\", :rel => \"noopener\", :class => \"min-w-0 truncate text-amber-700 underline underline-offset-2 hover:bg-amber-700/15\")",
+      "render_path": [{"type": "controller", "class": "SavedItemsController", "method": "show", "line": 12, "file": "app/controllers/saved_items_controller.rb", "rendered": {"name": "saved_items/show", "file": "app/views/saved_items/show.html.erb"}}],
+      "location": {"type": "template", "template": "saved_items/show"},
+      "user_input": "Current.user.saved_items.find(params[:id]).safe_url",
+      "confidence": "Weak",
+      "cwe_id": [79],
+      "note": "SavedItem#safe_url returns the URL only when it matches \\Ahttps?:// — see app/models/saved_item.rb."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "f5842b895957954f3dd0bd60dd64c0f9a01b28d8f09cbe2d7ff4889c20ef0796",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/saved_items/show.html.erb",
+      "line": 63,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(Current.user.saved_items.find(params[:id]).safe_url, :target => \"_blank\", :rel => \"noopener\", :class => \"term-btn inline-flex items-center gap-1\")",
+      "render_path": [{"type": "controller", "class": "SavedItemsController", "method": "show", "line": 12, "file": "app/controllers/saved_items_controller.rb", "rendered": {"name": "saved_items/show", "file": "app/views/saved_items/show.html.erb"}}],
+      "location": {"type": "template", "template": "saved_items/show"},
+      "user_input": "Current.user.saved_items.find(params[:id]).safe_url",
+      "confidence": "Weak",
+      "cwe_id": [79],
+      "note": "SavedItem#safe_url returns the URL only when it matches \\Ahttps?:// — see app/models/saved_item.rb."
     }
   ],
   "brakeman_version": "8.0.4"

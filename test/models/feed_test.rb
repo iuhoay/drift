@@ -88,11 +88,12 @@ class FeedTest < ActiveSupport::TestCase
   end
 
   test "dead_at_after preserves the first dead_at once set" do
-    first = 3.days.ago
     feed = feeds(:example)
-    feed.dead_at = first
+    feed.dead_at = 3.days.ago
 
-    assert_equal first, feed.dead_at_after(Feed::DEAD_AFTER_FAILURES + 5, now: Time.current)
+    # Compare against the stored value: assigning to the datetime attribute truncates
+    # to the column's microsecond precision, while a raw Time keeps nanoseconds.
+    assert_equal feed.dead_at, feed.dead_at_after(Feed::DEAD_AFTER_FAILURES + 5, now: Time.current)
   end
 
   test "dead? and dead/alive scopes reflect dead_at" do
