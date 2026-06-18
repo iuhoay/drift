@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_06_17_130000) do
+ActiveRecord::Schema[8.2].define(version: 2026_06_18_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -140,6 +140,21 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_17_130000) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  create_table "web_sub_subscriptions", force: :cascade do |t|
+    t.string "callback_token", null: false
+    t.datetime "created_at", null: false
+    t.bigint "feed_id", null: false
+    t.datetime "last_delivery_at"
+    t.datetime "lease_expires_at"
+    t.string "secret", null: false
+    t.string "state", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "verified_at"
+    t.index ["callback_token"], name: "index_web_sub_subscriptions_on_callback_token", unique: true
+    t.index ["feed_id"], name: "index_web_sub_subscriptions_on_feed_id", unique: true
+    t.index ["lease_expires_at"], name: "index_web_sub_subscriptions_on_lease_expires_at"
+  end
+
   add_foreign_key "api_tokens", "users"
   add_foreign_key "entries", "feeds"
   add_foreign_key "identities", "users"
@@ -149,4 +164,5 @@ ActiveRecord::Schema[8.2].define(version: 2026_06_17_130000) do
   add_foreign_key "subscriptions", "users"
   add_foreign_key "user_entries", "entries"
   add_foreign_key "user_entries", "users"
+  add_foreign_key "web_sub_subscriptions", "feeds"
 end

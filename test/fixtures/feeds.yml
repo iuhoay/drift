@@ -28,3 +28,22 @@ failing:
   last_error: HTTP 500
   last_fetched_at: <%= 5.minutes.ago.iso8601 %>
   next_fetch_at: <%= 5.minutes.ago.iso8601 %>
+
+# A YouTube channel feed with a live WebSub push subscription
+# (see web_sub_subscriptions.yml :youtube).
+youtube:
+  title: YouTube Channel
+  feed_url: https://www.youtube.com/feeds/videos.xml?channel_id=UCfixture0000000000001
+  site_url: https://www.youtube.com/channel/UCfixture0000000000001
+  fetch_failure_count: 0
+  last_fetched_at: <%= 2.hours.ago.iso8601 %>
+  next_fetch_at: <%= 1.hour.ago.iso8601 %>
+
+# A YouTube channel feed with no subscription yet — exercises the backfill path.
+youtube_pending:
+  title: YouTube Channel Pending
+  feed_url: https://www.youtube.com/feeds/videos.xml?channel_id=UCfixture0000000000002
+  site_url: https://www.youtube.com/channel/UCfixture0000000000002
+  fetch_failure_count: 0
+  last_fetched_at: <%= 2.hours.ago.iso8601 %>
+  next_fetch_at: <%= 1.hour.ago.iso8601 %>

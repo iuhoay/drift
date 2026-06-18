@@ -45,6 +45,11 @@ class FeedTest < ActiveSupport::TestCase
     assert_equal Feed::REFRESH_INTERVAL, feeds(:example).refresh_interval
   end
 
+  test "refresh_interval drops to the websub interval when a push subscription is active" do
+    assert feeds(:youtube).web_sub_subscription.active?
+    assert_equal Feed::WEBSUB_REFRESH_INTERVAL, feeds(:youtube).refresh_interval
+  end
+
   test "backoff_interval grows exponentially and is capped" do
     feed = feeds(:example)
     base = feed.refresh_interval.to_i

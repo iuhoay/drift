@@ -7,6 +7,14 @@ class Feed::Refresher
     new(feed).call
   end
 
+  # Ingests an Atom payload pushed to us by a WebSub hub (see WebSubSubscription),
+  # reusing the same parse + upsert path as a polled fetch. A push body is just a
+  # feed containing the changed entries, so it flows through apply!/upsert_entry
+  # unchanged. There's no HTTP response, so success is recorded with a nil response.
+  def self.ingest(feed, body)
+    new(feed).ingest(body)
+  end
+
   # http is injectable so tests can drive the status-handling paths with a
   # Faraday test adapter; in production it defaults to Feed.http_connection.
   def initialize(feed, http: nil)
@@ -22,6 +30,15 @@ class Feed::Refresher
     @feed
   rescue Feedjira::NoParserAvailable => e
     record_failure("Parse error: #{e.message}")
+    @feed
+  end
+
+  def ingest(body)
+    apply!(Feedjira.parse(body), nil)
+    record_success(nil)
+    @feed
+  rescue Feedjira::NoParserAvailable => e
+    record_failure("Push parse error: #{e.message}")
     @feed
   end
 

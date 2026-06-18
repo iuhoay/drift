@@ -1,0 +1,9 @@
+# An active push subscription for the :youtube feed. Its secret is the HMAC key the
+# controller test signs payloads with.
+youtube:
+  feed: youtube
+  callback_token: token-active-fixture
+  secret: <%= "a" * 40 %>
+  state: active
+  lease_expires_at: <%= 5.days.from_now.iso8601 %>
+  verified_at: <%= 1.day.ago.iso8601 %>

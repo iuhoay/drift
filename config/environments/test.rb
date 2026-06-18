@@ -40,6 +40,11 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 
+  # Host for absolute URLs built outside a request (e.g. WebSub callback URLs in jobs).
+  # Matches ActionDispatch's integration-test default host so referrer-based redirects
+  # (redirect_back_or_to) still treat helper-generated URLs as same-host.
+  Rails.application.routes.default_url_options = { host: "www.example.com" }
+
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
