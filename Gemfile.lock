@@ -188,6 +188,9 @@ GEM
       activesupport (>= 6.1)
     hashie (5.1.0)
       logger
+    honeybadger (6.9.0)
+      logger
+      ostruct
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -522,6 +525,7 @@ DEPENDENCIES
   faraday (~> 2.9)
   faraday-follow_redirects (~> 0.3)
   feedjira (~> 3.2)
+  honeybadger (~> 6.9)
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
@@ -607,6 +611,7 @@ CHECKSUMS
   fugit (1.12.1) sha256=5898f478ede9b415f0804e42b8f3fd53f814bd85eebffceebdbc34e1107aaf68
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
   hashie (5.1.0) sha256=c266471896f323c446ea8207f8ffac985d2718df0a0ba98651a3057096ca3870
+  honeybadger (6.9.0) sha256=f90b4f0dd37b8bfb1decb40f17349459828f6fd6933ef8cf1b1881dbc4a9eb75
   i18n (1.14.8) sha256=285778639134865c5e0f6269e0b818256017e8cde89993fdfcbfb64d088824a5
   image_processing (1.14.0) sha256=754cc169c9c262980889bec6bfd325ed1dafad34f85242b5a07b60af004742fb
   importmap-rails (2.2.3) sha256=7101be2a4dc97cf1558fb8f573a718404c5f6bcfe94f304bf1f39e444feeb16a
