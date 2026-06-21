@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html class="h-full" data-theme="<%= cookies[:theme] %>">
+<html lang="en" class="h-full" data-theme="<%= cookies[:theme] %>">
   <head>
     <title><%= content_for(:title) || "Drift — a calm RSS reader" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="application-name" content="Drift">
-    <meta name="description" content="Drift is a fast, distraction-free RSS reader. Subscribe to the sites, blogs, and channels you care about and read them in one quiet place — no ads, no tracking, no algorithm.">
+    <%= render "shared/seo_meta",
+          title: content_for(:title) || "Drift — a calm RSS reader",
+          description: "Drift is a fast, distraction-free RSS reader. Follow the sites, blogs, and channels you care about and read them in one calm place — no ads, no tracking, no algorithm." %>
     <% case cookies[:theme] %>
     <% when "light" %>
       <meta name="theme-color" content="#f5f5f4">
@@ -28,6 +30,20 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <%= tag.script type: "application/ld+json" do %>
+      <%== {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "Drift",
+        applicationCategory: "BrowserApplication",
+        operatingSystem: "Web",
+        url: request.base_url + "/",
+        description: "A fast, distraction-free RSS reader. Follow the sites, blogs, and channels you care about and read them in one calm place — no ads, no tracking, no algorithm.",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        license: "https://www.gnu.org/licenses/agpl-3.0.html"
+      }.to_json %>
+    <% end %>
   </head>
 
   <body class="term term-screen min-h-full bg-stone-50 text-stone-900 antialiased">

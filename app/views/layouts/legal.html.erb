@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html class="h-full" data-theme="<%= cookies[:theme] %>">
+<% page_title = [ content_for(:title), "Drift" ].compact.join(" — ") %>
+<html lang="en" class="h-full" data-theme="<%= cookies[:theme] %>">
   <head>
-    <title><%= content_for(:title) || "Drift" %></title>
+    <title><%= page_title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="application-name" content="Drift">
     <% case cookies[:theme] %>
@@ -15,6 +16,9 @@
     <% end %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <%= render "shared/seo_meta", title: page_title,
+          description: content_for(:description) || "Drift is a fast, distraction-free, open-source RSS reader — no ads, no tracking, no algorithm." %>
 
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

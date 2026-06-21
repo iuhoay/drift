@@ -52,6 +52,10 @@ Rails.application.routes.draw do
   get "terms" => "pages#terms", as: :terms
   get "privacy" => "pages#privacy", as: :privacy
 
+  # SEO: crawler directives and sitemap, rendered dynamically (host-aware).
+  get "robots.txt" => "pages#robots", as: :robots, format: false, defaults: { format: "text" }
+  get "sitemap.xml" => "pages#sitemap", as: :sitemap, format: false, defaults: { format: "xml" }
+
   resource :theme, only: :update
   resource :activity, only: :show
 

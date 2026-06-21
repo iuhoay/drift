@@ -24,4 +24,16 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_redirected_to entries_path
   end
+
+  test "landing page carries SEO meta and structured data" do
+    get root_path
+    assert_response :success
+
+    assert_select "html[lang=en]"
+    assert_select "link[rel=canonical][href=?]", root_url
+    assert_select "meta[name=description]"
+    assert_select "meta[property='og:title']"
+    assert_select "meta[property='og:image']"
+    assert_select "script[type='application/ld+json']", /WebApplication/
+  end
 end

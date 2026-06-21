@@ -1,0 +1,29 @@
+<%#
+  Shared SEO/social meta. Emits a canonical URL, meta description, and Open
+  Graph / Twitter Card tags from the current request (host-agnostic, so it's
+  correct on any self-hosted domain). Locals:
+    title:       page title (falls back to the :title content_for, then "Drift")
+    description: meta/OG description
+    image:       absolute-from-root image path (defaults to the 512px app icon)
+    type:        og:type (defaults to "website")
+%>
+<% page_title       = local_assigns.fetch(:title) { content_for(:title) || "Drift" } %>
+<% page_description = local_assigns.fetch(:description) { "Drift is a fast, distraction-free RSS reader. Follow the sites, blogs, and channels you care about and read them in one calm place." } %>
+<% page_url         = request.base_url + request.path %>
+<% page_image       = request.base_url + local_assigns.fetch(:image, "/icon.png") %>
+<% og_type          = local_assigns.fetch(:type, "website") %>
+
+<link rel="canonical" href="<%= page_url %>">
+<meta name="description" content="<%= page_description %>">
+
+<meta property="og:type" content="<%= og_type %>">
+<meta property="og:site_name" content="Drift">
+<meta property="og:title" content="<%= page_title %>">
+<meta property="og:description" content="<%= page_description %>">
+<meta property="og:url" content="<%= page_url %>">
+<meta property="og:image" content="<%= page_image %>">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="<%= page_title %>">
+<meta name="twitter:description" content="<%= page_description %>">
+<meta name="twitter:image" content="<%= page_image %>">
