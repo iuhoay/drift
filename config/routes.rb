@@ -73,5 +73,7 @@ Rails.application.routes.draw do
     resources :saved_items, only: [ :create ]
   end
 
-  root "entries#index"
+  # Front door: HomeController renders the landing page for signed-out visitors
+  # and redirects signed-in readers to their inbox (entries#index at /entries).
+  root "home#index"
 end

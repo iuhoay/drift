@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html class="h-full" data-theme="<%= cookies[:theme] %>">
+  <head>
+    <title><%= content_for(:title) || "Drift — a calm RSS reader" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="application-name" content="Drift">
+    <meta name="description" content="Drift is a fast, distraction-free RSS reader. Subscribe to the sites, blogs, and channels you care about and read them in one quiet place — no ads, no tracking, no algorithm.">
+    <% case cookies[:theme] %>
+    <% when "light" %>
+      <meta name="theme-color" content="#f5f5f4">
+    <% when "dark" %>
+      <meta name="theme-color" content="#181614">
+    <% else %>
+      <meta name="theme-color" content="#f5f5f4">
+      <meta name="theme-color" content="#181614" media="(prefers-color-scheme: dark)">
+    <% end %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="manifest" href="<%= pwa_manifest_path %>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="term term-screen min-h-full bg-stone-50 text-stone-900 antialiased">
+    <header class="term-topbar sticky top-0 z-40 flex min-h-9 items-center justify-between border-b border-stone-300 px-4 pt-[env(safe-area-inset-top)] text-xs">
+      <%= link_to root_path, class: "brand-logo text-stone-900", aria: { label: "Drift RSS reader" } do %>
+        <span class="brand-logo__rail" aria-hidden="true"></span>
+        <span class="brand-logo__name">drift</span>
+        <span class="brand-logo__tagline" aria-hidden="true">&#8212; rss reader</span>
+      <% end %>
+      <nav class="flex items-center gap-4 text-stone-400">
+        <%= link_to "sign in", new_session_path, class: "hover:text-amber-700" %>
+        <%= link_to "get started", new_registration_path, class: "term-btn" %>
+      </nav>
+    </header>
+
+    <main>
+      <%= yield %>
+    </main>
+
+    <footer class="border-t border-stone-200 px-5 py-8 text-sm text-stone-500">
+      <div class="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-5 gap-y-3">
+        <nav class="flex flex-wrap gap-x-5 gap-y-2">
+          <%= link_to "About", about_path, class: "underline underline-offset-2 hover:text-stone-900" %>
+          <%= link_to "Terms", terms_path, class: "underline underline-offset-2 hover:text-stone-900" %>
+          <%= link_to "Privacy", privacy_path, class: "underline underline-offset-2 hover:text-stone-900" %>
+          <%= link_to "Source", "https://github.com/iuhoay/drift", class: "underline underline-offset-2 hover:text-stone-900" %>
+        </nav>
+        <span class="select-none text-stone-400">tty/01</span>
+      </div>
+    </footer>
+  </body>
+</html>
