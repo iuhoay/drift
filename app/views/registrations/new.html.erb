@@ -1,12 +1,16 @@
 <% content_for :title, "Sign up" %>
 
-<div class="bg-white rounded-lg shadow-sm border border-stone-200 px-8 py-10 font-sans">
-  <h1 class="text-2xl font-semibold tracking-tight mb-1">Drift</h1>
-  <p class="text-sm text-stone-500 mb-6">Create your reader.</p>
+<p class="text-sm">
+  <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/signup</span><span class="term-caret select-none" aria-hidden="true"></span>
+</p>
+<h1 class="mt-4 text-base font-semibold tracking-tight text-stone-900">Create your reader.</h1>
+
+<div class="mt-6">
+  <%= render "shared/oauth_buttons" %>
 
   <%= form_with model: @user, url: registration_path, class: "space-y-4" do |f| %>
     <% if @user.errors.any? %>
-      <div class="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+      <div class="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
         <% @user.errors.full_messages.each do |msg| %>
           <div><%= msg %></div>
         <% end %>
@@ -14,36 +18,31 @@
     <% end %>
 
     <div>
-      <%= f.label :email_address, "Email", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
-      <%= f.email_field :email_address, autofocus: true, autocomplete: "email",
-            class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none" %>
+      <%= f.label :email_address, "email", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1.5" %>
+      <%= f.email_field :email_address, autofocus: true, autocomplete: "email", class: "term-field" %>
     </div>
 
     <div>
-      <%= f.label :password, class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
-      <%= f.password_field :password, autocomplete: "new-password",
-            class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none" %>
-      <p class="text-xs text-stone-500 mt-1">At least 8 characters.</p>
+      <%= f.label :password, "password", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1.5" %>
+      <%= f.password_field :password, autocomplete: "new-password", class: "term-field" %>
+      <p class="mt-1.5 text-xs text-stone-500">At least 8 characters.</p>
     </div>
 
     <div>
-      <%= f.label :password_confirmation, "Confirm password", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
-      <%= f.password_field :password_confirmation, autocomplete: "new-password",
-            class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none" %>
+      <%= f.label :password_confirmation, "confirm password", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1.5" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "term-field" %>
     </div>
 
-    <%= f.submit "Create account", class: "w-full py-2 rounded bg-stone-900 text-white hover:bg-stone-700" %>
+    <%= f.submit "create account", class: "term-submit" %>
 
-    <p class="text-xs text-stone-500 text-center">
+    <p class="text-xs text-stone-500">
       By creating an account you agree to our
-      <%= link_to "Terms", terms_path, class: "underline text-stone-900" %>
-      and <%= link_to "Privacy Policy", privacy_path, class: "underline text-stone-900" %>.
+      <%= link_to "Terms", terms_path, class: "text-amber-700 underline underline-offset-2" %>
+      and <%= link_to "Privacy Policy", privacy_path, class: "text-amber-700 underline underline-offset-2" %>.
     </p>
   <% end %>
-
-  <%= render "shared/oauth_buttons" %>
-
-  <p class="mt-6 text-sm text-stone-500 text-center">
-    Already have an account? <%= link_to "Sign in", new_session_path, class: "underline text-stone-900" %>
-  </p>
 </div>
+
+<p class="mt-6 text-sm text-stone-500">
+  Already have an account? <%= link_to "Sign in", new_session_path, class: "text-amber-700 underline underline-offset-2 hover:text-amber-900" %>
+</p>

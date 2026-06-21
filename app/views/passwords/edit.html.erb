@@ -1,21 +1,26 @@
-<div class="mx-auto md:w-2/3 w-full">
-  <% if alert = flash[:alert] %>
-    <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
-  <% end %>
+<% content_for :title, "Update password" %>
 
-  <h1 class="font-bold text-4xl">Update your password</h1>
+<p class="text-sm">
+  <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/reset</span><span class="term-caret select-none" aria-hidden="true"></span>
+</p>
+<h1 class="mt-4 text-base font-semibold tracking-tight text-stone-900">Update your password</h1>
 
-  <%= form_with url: password_path(params[:token]), method: :put, class: "contents" do |form| %>
-    <div class="my-5">
-      <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter new password", maxlength: 72, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-solid focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-    </div>
+<%= form_with url: password_path(params[:token]), method: :put, class: "mt-6 space-y-4" do |form| %>
+  <div>
+    <%= form.label :password, "new password", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1.5" %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72,
+          class: "term-field" %>
+  </div>
 
-    <div class="my-5">
-      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Repeat new password", maxlength: 72, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-solid focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
-    </div>
+  <div>
+    <%= form.label :password_confirmation, "confirm password", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1.5" %>
+    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72,
+          class: "term-field" %>
+  </div>
 
-    <div class="inline">
-      <%= form.submit "Save", class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
-    </div>
-  <% end %>
-</div>
+  <%= form.submit "Save new password", class: "term-submit" %>
+<% end %>
+
+<p class="mt-6 text-sm text-stone-500">
+  <%= link_to "&larr; Back to sign in".html_safe, new_session_path, class: "text-amber-700 underline underline-offset-2 hover:text-amber-900" %>
+</p>

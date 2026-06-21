@@ -1,18 +1,25 @@
+<%#
+  Third-party sign-in, rendered as the prominent, primary path above the
+  email/password form on the sessions/registrations pages. Only the providers
+  with credentials configured render (see Identity.configured_providers); when
+  none are set, this partial — divider included — renders nothing, leaving the
+  email form standing alone.
+%>
 <% providers = Identity.configured_providers %>
 <% if providers.any? %>
-  <div class="mt-6">
-    <div class="mb-3 flex items-center gap-3 text-xs uppercase tracking-widest text-stone-400">
-      <span class="h-px flex-1 bg-stone-200"></span>
-      <span>or</span>
-      <span class="h-px flex-1 bg-stone-200"></span>
-    </div>
-    <div class="space-y-2">
-      <% providers.each do |name, cfg| %>
-        <%= button_to "/auth/#{name}", form: { data: { turbo: false }, class: "block" },
-              class: "w-full py-2 rounded border border-stone-300 text-stone-700 hover:bg-stone-50 cursor-pointer" do %>
-          Continue with <%= cfg[:label] %>
-        <% end %>
+  <div class="space-y-2">
+    <% providers.each do |name, cfg| %>
+      <%= button_to "/auth/#{name}", form: { data: { turbo: false }, class: "block" },
+            class: "flex w-full items-center justify-center gap-2.5 border border-stone-300 py-2.5 font-medium text-stone-800 hover:border-stone-400 hover:bg-stone-50 cursor-pointer" do %>
+        <%= render "shared/oauth_icons/#{name}" %>
+        <span>Continue with <%= cfg[:label] %></span>
       <% end %>
-    </div>
+    <% end %>
+  </div>
+
+  <div class="my-5 flex items-center gap-3 text-xs uppercase tracking-widest text-stone-400">
+    <span class="h-px flex-1 bg-stone-200"></span>
+    <span>or</span>
+    <span class="h-px flex-1 bg-stone-200"></span>
   </div>
 <% end %>
