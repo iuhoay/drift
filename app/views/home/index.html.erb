@@ -3,29 +3,23 @@
 <%#
   Marketing landing page, shown at the root URL to signed-out visitors only
   (HomeController redirects signed-in readers to their inbox). Rendered in the
-  `landing` layout, which carries the brand topbar and footer. Styling stays in
-  the existing terminal vocabulary: mono type, stone screen, amber phosphor.
+  `landing` layout, which carries the brand topbar and footer (legal + Source
+  links). Styling stays in the existing terminal vocabulary: mono type, stone
+  screen, amber phosphor. Deliberately kept to a single screen — RSS is simple,
+  so the page is too.
 %>
 
 <%
   cta_primary = "inline-flex items-center border border-stone-900 bg-stone-900 px-4 py-2.5 text-sm text-stone-50 transition-colors hover:border-stone-700 hover:bg-stone-700"
 
   features = [
-    { cmd: "subscribe", body: "Paste a feed URL — or just a site address — and Drift finds the feed. Even sites with no native RSS: built-in adapters for Bilibili, plus push for YouTube." },
-    { cmd: "read",      body: "Your feeds in the order they were published. No infinite scroll, no algorithmic timeline, no notifications. Read and starred state is tracked per account." },
-    { cmd: "search",    body: "Full-text search across everything you follow, weighted by title, summary, and content — with Chinese (CJK) support built in." },
-    { cmd: "anywhere",  body: "Light and dark themes that follow your system, and a Progressive Web App you can install to your home screen and read offline." }
-  ]
-
-  no = [
-    "no advertising, ever",
-    "no third-party tracking",
-    "no AI summaries — you read the source, not a paraphrase of it",
-    "no social feed, no engagement metrics, no algorithm deciding what you see"
+    { cmd: "subscribe", body: "Paste a URL and Drift finds the feed for you." },
+    { cmd: "read",      body: "Every feed in one timeline, in the order it was published." },
+    { cmd: "search",    body: "Full-text search across everything you follow." }
   ]
 %>
 
-<section class="mx-auto w-full max-w-3xl px-5 pt-16 pb-20 sm:pt-24">
+<section class="mx-auto w-full max-w-2xl px-5 pt-16 pb-24 sm:pt-24">
   <p class="text-sm">
     <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="term-caret select-none" aria-hidden="true"></span>
   </p>
@@ -35,9 +29,9 @@
   </h1>
 
   <p class="mt-5 max-w-xl leading-relaxed text-stone-600">
-    Drift is a fast, distraction-free RSS reader. Subscribe to the sites, blogs,
-    and channels you care about, and read them in one quiet place — in the order
-    they were published, with nothing in between.
+    Drift is a fast, distraction-free RSS reader. Subscribe to the sites and
+    blogs you follow, and read them in one quiet place — in the order they were
+    published, with nothing in between.
   </p>
 
   <div class="mt-8 flex flex-wrap items-center gap-3">
@@ -48,57 +42,16 @@
   <p class="mt-4 text-xs text-stone-500">
     Free and open source. No ads, no tracking, no AI summaries.
   </p>
-</section>
 
-<section class="mx-auto w-full max-w-3xl px-5 pb-20">
-  <div class="grid gap-4 sm:grid-cols-2">
+  <dl class="mt-12 space-y-3 border-t border-stone-200 pt-8 text-sm">
     <% features.each do |feature| %>
-      <div class="border border-stone-300 p-5">
-        <p class="text-sm font-medium tracking-tight text-stone-900">
+      <div class="sm:flex sm:gap-3">
+        <dt class="font-medium tracking-tight text-stone-900 sm:w-28 sm:shrink-0">
           <span class="select-none text-amber-700" aria-hidden="true">&gt;</span>
           <%= feature[:cmd] %>
-        </p>
-        <p class="mt-2 text-sm leading-relaxed text-stone-600">
-          <%= feature[:body] %>
-        </p>
+        </dt>
+        <dd class="leading-relaxed text-stone-600"><%= feature[:body] %></dd>
       </div>
     <% end %>
-  </div>
-</section>
-
-<section class="mx-auto w-full max-w-3xl px-5 pb-20">
-  <h2 class="text-sm uppercase tracking-widest text-stone-500">What it doesn&rsquo;t do</h2>
-  <ul class="mt-4 border-l-2 border-amber-700 bg-amber-700/10 py-4 pl-5 pr-4 text-stone-700">
-    <% no.each do |line| %>
-      <li class="flex gap-2 py-1 leading-relaxed">
-        <span class="select-none text-amber-700" aria-hidden="true">—</span>
-        <span><%= line %></span>
-      </li>
-    <% end %>
-  </ul>
-</section>
-
-<section class="mx-auto w-full max-w-3xl px-5 pb-20">
-  <h2 class="text-sm uppercase tracking-widest text-stone-500">Open source</h2>
-  <p class="mt-4 max-w-xl leading-relaxed text-stone-600">
-    Drift is free software, released under the GNU Affero General Public License
-    v3.0. Read the code, file issues, contribute, or self-host your own instance —
-    the source lives at
-    <%= link_to "github.com/iuhoay/drift", "https://github.com/iuhoay/drift", class: "text-amber-700 underline underline-offset-2" %>.
-    It&rsquo;s built with Ruby on Rails and Hotwire: server-rendered, deliberately
-    simple.
-  </p>
-</section>
-
-<section class="mx-auto w-full max-w-3xl px-5 pb-28">
-  <div class="border-t border-stone-200 pt-12 text-center">
-    <h2 class="text-2xl font-semibold tracking-tight">Start reading the calm web.</h2>
-    <p class="mx-auto mt-3 max-w-md leading-relaxed text-stone-600">
-      Just the feeds you chose, waiting for you. No account fees, no lock-in.
-    </p>
-    <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
-      <%= link_to "[ get started ]", new_registration_path, class: cta_primary %>
-      <%= link_to "sign in →", new_session_path, class: "term-btn" %>
-    </div>
-  </div>
+  </dl>
 </section>
