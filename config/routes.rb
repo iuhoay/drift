@@ -41,6 +41,9 @@ Rails.application.routes.draw do
   # Background job dashboard (admin-only; see config/initializers/mission_control.rb)
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
+  # Preview captured outgoing mail in development (see development.rb delivery_method).
+  mount Mailbin::Engine => "/mailbin" if Rails.env.development?
+
   # First-party admin landing page (front door to the mounted dashboards above).
   namespace :admin do
     root "dashboard#show"
