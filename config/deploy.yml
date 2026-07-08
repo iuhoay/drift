@@ -61,6 +61,10 @@ env:
     SMTP_USERNAME: resend
     MAILER_FROM_ADDRESS: <%= ENV.fetch("MAILER_FROM_ADDRESS", "Drift <no-reply@rdrift.app>") %>
 
+    # Founder's welcome email — personal from/reply-to (see FounderWelcomeMailer).
+    FOUNDER_EMAIL: <%= ENV.fetch("FOUNDER_EMAIL", "jack@rdrift.app") %>
+    FOUNDER_NAME: <%= ENV.fetch("FOUNDER_NAME", "Jack") %>
+
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
 
