@@ -1,6 +1,8 @@
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
+  include ActionMailer::TestHelper
+
   test "downcases and strips email_address" do
     user = User.new(email_address: " DOWNCASED@EXAMPLE.COM ")
     assert_equal("downcased@example.com", user.email_address)
@@ -72,6 +74,37 @@ class UserTest < ActiveSupport::TestCase
     first = user.verified_at
     user.verify!
     assert_equal first, user.reload.verified_at
+  end
+
+  test "creating an already-verified user schedules one founder welcome email" do
+    assert_enqueued_emails 1 do
+      User.create!(email_address: "oauth@example.com", password: "password1", verified_at: Time.current)
+    end
+  end
+
+  test "creating an unverified user schedules no welcome yet" do
+    assert_no_enqueued_emails do
+      User.create!(email_address: "pending@example.com", password: "password1")
+    end
+  end
+
+  test "verifying for the first time schedules the founder welcome and stamps founder_welcomed_at" do
+    user = users(:unverified)
+
+    assert_enqueued_emails 1 do
+      user.verify!
+    end
+    assert user.reload.founder_welcomed_at.present?
+  end
+
+  test "re-verifying after an email change does not welcome the user again" do
+    user = users(:unverified)
+    user.verify!
+    user.update_column(:verified_at, nil) # account/emails un-verifies on email change
+
+    assert_no_enqueued_emails do
+      user.verify!
+    end
   end
 
   test "email_verification token round-trips and is invalidated by an email change" do

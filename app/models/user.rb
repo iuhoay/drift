@@ -12,6 +12,10 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
+  # Founder's welcome, once the address is verified (here for OAuth signups,
+  # created verified; from #verify! for password signups).
+  after_create_commit :schedule_founder_welcome, if: :verified?
+
   validates :email_address, presence: true, uniqueness: true,
                             format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, allow_nil: true
@@ -27,7 +31,9 @@ class User < ApplicationRecord
   end
 
   def verify!
-    update_column(:verified_at, Time.current) unless verified?
+    return if verified?
+    update_column(:verified_at, Time.current)
+    schedule_founder_welcome
   end
 
   def subscribed_entries
@@ -50,4 +56,13 @@ class User < ApplicationRecord
       end
     end
   end
+
+  private
+    # Once per user: a later email change re-verifies and must not welcome again.
+    def schedule_founder_welcome
+      return if founder_welcomed_at?
+
+      update_column(:founder_welcomed_at, Time.current)
+      FounderWelcomeMailer.welcome(self).deliver_later(wait: 15.minutes)
+    end
 end
