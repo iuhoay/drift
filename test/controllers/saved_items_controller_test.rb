@@ -44,6 +44,7 @@ class SavedItemsControllerTest < ActionDispatch::IntegrationTest
     get saved_item_path(saved_items(:one_unread))
     assert_response :success
     assert_not saved_items(:one_unread).reload.read?
+    assert_select ".entry-content[data-controller=syntax-highlight]"
   end
 
   test "show is scoped to the current user" do

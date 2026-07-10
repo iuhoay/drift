@@ -59,10 +59,22 @@ class EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "##{dom_id(target, :actions)}[data-controller=mark-read][data-mark-read-url-value=?]",
       entry_read_path(target)
+    assert_select ".entry-content[data-controller=syntax-highlight]"
+    assert_select 'link[rel="modulepreload"][href*="@shikijs"]', count: 0
   end
 
   test "show is scoped to subscribed entries" do
     get entry_path(entries(:unsubscribed_first))
     assert_response :not_found
+  end
+
+  test "show preserves a code block language hint for syntax highlighting" do
+    @entry.update!(content: '<pre><code class="language-ruby">def answer = 42</code></pre>')
+
+    get entry_path(@entry)
+
+    assert_response :success
+    assert_select ".entry-content[data-controller=syntax-highlight] pre > code.language-ruby",
+      text: "def answer = 42"
   end
 end

@@ -43,6 +43,22 @@
     --color-amber-300: light-dark(oklch(87.9% .169 91.605), oklch(70%   .15  68));
     --color-amber-700: light-dark(oklch(55.5% .163 48.998), oklch(80%   .155 72));
 
+    /* Syntax highlighting: a restrained phosphor palette for Shiki's TextMate
+       scopes. These stay separate from the Tailwind scale so code can gain
+       semantic color without changing the terminal UI's hand-tuned ramps. */
+    --syntax-background:  light-dark(oklch(96% .006 75), oklch(17% .005 65));
+    --syntax-foreground:  light-dark(oklch(31% .012 65), oklch(86% .006 70));
+    --syntax-comment:     light-dark(oklch(52% .012 65), oklch(58% .009 65));
+    --syntax-keyword:     light-dark(oklch(49% .145 52), oklch(80% .155 72));
+    --syntax-string:      light-dark(oklch(42% .105 153), oklch(75% .115 151));
+    --syntax-constant:    light-dark(oklch(46% .095 238), oklch(76% .095 220));
+    --syntax-function:    light-dark(oklch(43% .105 255), oklch(78% .09 245));
+    --syntax-type:        light-dark(oklch(47% .115 78), oklch(82% .12 83));
+    --syntax-tag:         light-dark(oklch(45% .12 28), oklch(74% .13 32));
+    --syntax-property:    light-dark(oklch(43% .095 315), oklch(76% .105 315));
+    --syntax-punctuation: light-dark(oklch(49% .012 65), oklch(65% .008 65));
+    --syntax-invalid:     light-dark(oklch(48% .18 25), oklch(76% .16 25));
+
     /* Terminal reading UI */
     --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
                  Consolas, "Liberation Mono", monospace;
@@ -89,12 +105,15 @@
     margin: 1.2em 0;
   }
   .entry-content pre {
-    background: var(--color-stone-100);
+    background: var(--syntax-background);
+    color: var(--syntax-foreground);
     padding: 1em;
     border-radius: 6px;
     overflow-x: auto;
     font-size: 0.9em;
+    line-height: 1.65;
     margin: 1.2em 0;
+    tab-size: 2;
   }
   .entry-content code {
     background: var(--color-stone-100);
@@ -309,6 +328,29 @@
   }
   .term .entry-content pre code {
     border: 0;
+  }
+  .term .entry-content pre[data-shiki-highlighted] {
+    position: relative;
+    padding-top: 2.35rem;
+    border-color: color-mix(in oklab, var(--color-amber-700) 45%, var(--color-stone-300));
+    box-shadow: inset 3px 0 0 color-mix(in oklab, var(--color-amber-700) 72%, transparent);
+  }
+  .term .entry-content pre[data-shiki-highlighted]::before {
+    content: "[ " attr(data-language-label) " ]";
+    position: absolute;
+    top: 0.65rem;
+    right: 0.8rem;
+    color: var(--color-stone-400);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .term .entry-content pre[data-shiki-highlighted]::selection,
+  .term .entry-content pre[data-shiki-highlighted] *::selection {
+    color: var(--color-stone-900);
+    background: color-mix(in oklab, var(--color-amber-700) 35%, transparent);
   }
   .term .entry-content img,
   .term .entry-content video,

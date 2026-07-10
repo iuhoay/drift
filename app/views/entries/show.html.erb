@@ -77,7 +77,7 @@
     </div>
   <% end %>
 
-  <div class="entry-content border-t border-stone-300 pt-7">
+  <div class="entry-content border-t border-stone-300 pt-7" data-controller="syntax-highlight">
     <%= sanitize(@entry.content.presence || @entry.summary.to_s) %>
   </div>
 
