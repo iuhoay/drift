@@ -25,6 +25,10 @@ development_environments:
 # Enable verbose debug logging (useful for troubleshooting).
 debug: false
 
-# Enable Honeybadger Insights
+# Error reporting only — Insights (events/metrics and its plugins) stays off.
+# Besides being unused (Rails Pulse covers perf), its solid_queue plugin
+# force-loads ActiveRecord::Base mid-boot, tripping Rails' premature-load-hook
+# warning on non-eager-loaded boots such as `kamal reindex`; see
+# https://github.com/honeybadger-io/honeybadger-ruby/issues/811.
 insights:
-  enabled: true
+  enabled: false
