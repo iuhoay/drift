@@ -9,12 +9,17 @@
 #
 # CJK text carries no spaces, so Postgres' default parser collapses a whole run
 # of Han/Kana/Hangul characters into a single lexeme — making sub-word search
-# impossible. `bigramize` works around this without a server-side parser
-# (zhparser/pg_jieba) by rewriting each CJK run into overlapping 2-grams, e.g.
-# "搜索引擎" -> "搜索 索引 引擎". The same transform runs on both the indexed text
-# and the query, so a search for "搜索" matches. ASCII is left untouched, so
-# English stemming under the 'english' config keeps working. The tradeoff is
-# that single-character CJK queries don't match (they never form a 2-gram).
+# impossible. We work around this without a server-side parser (zhparser/pg_jieba)
+# by rewriting each CJK run into overlapping 2-grams, e.g. "搜索引擎" -> "搜索 索引
+# 引擎". ASCII is left untouched, so English stemming under the 'english' config
+# keeps working.
+#
+# The index and the query are tokenized slightly differently. `bigramize_index`
+# stores both the unigrams and the bigrams of each run; `bigramize` turns a query
+# into just its bigrams — or a lone unigram when the query is a single CJK
+# character. That asymmetry keeps multi-character matches precise (they still
+# hinge on the bigrams) while letting a single-character query match the unigrams
+# the index carries.
 module Searchable
   extend ActiveSupport::Concern
 
@@ -33,15 +38,28 @@ module Searchable
     before_save :assign_search_vector
   end
 
-  # Rewrites every CJK run into space-separated overlapping bigrams, leaving the
-  # rest of the string (ASCII words, punctuation) in place.
+  # Query form: rewrites every CJK run into space-separated overlapping bigrams,
+  # leaving the rest of the string (ASCII words, punctuation) in place. A lone CJK
+  # character can't form a bigram, so it stays a unigram — which the index also
+  # carries, so single-character searches match.
   def self.bigramize(text)
-    text.to_s.gsub(CJK_RUN) do |run|
-      chars = run.chars
-      grams = chars.size > 1 ? chars.each_cons(2).map(&:join) : chars
-      " #{grams.join(' ')} "
-    end
+    segment(text) { |chars| chars.size > 1 ? chars.each_cons(2).map(&:join) : chars }
   end
+
+  # Index form of the same text: carries BOTH the unigrams and the overlapping
+  # bigrams of every CJK run, so a single-character query (only ever a unigram)
+  # still finds the row while multi-character queries keep matching on the more
+  # precise bigrams.
+  def self.bigramize_index(text)
+    segment(text) { |chars| chars + chars.each_cons(2).map(&:join) }
+  end
+
+  # Rewrites each CJK run in `text` through the block, joining the returned grams
+  # with spaces and leaving non-CJK text untouched.
+  def self.segment(text)
+    text.to_s.gsub(CJK_RUN) { |run| " #{yield(run.chars).join(' ')} " }
+  end
+  private_class_method :segment
 
   class_methods do
     def search_columns(weights)
@@ -77,7 +95,7 @@ module Searchable
     sql = weights.values.map { |weight|
       "setweight(to_tsvector('english', coalesce(?, '')), '#{weight}')"
     }.join(" || ")
-    values = weights.keys.map { |column| Searchable.bigramize(public_send(column)) }
+    values = weights.keys.map { |column| Searchable.bigramize_index(public_send(column)) }
 
     self.search_vector = self.class.connection.select_value(
       self.class.sanitize_sql_array([ "SELECT #{sql}", *values ])

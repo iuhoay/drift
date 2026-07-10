@@ -19,13 +19,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bin/rails test` — Minitest. Rails 8.2's `creds` only merges `.env` in dev, so test sees nil from `creds.option(...)`; `config/database.yml` carries `root` / `password` defaults on each call as the local-dev fallback. Real `ENV` overrides if your Postgres differs. See atom `invariant_dotenv_test_env`.
 - `bin/rubocop` — omakase style (Ruby files only)
 - `bin/ci` — full local gate before a PR (config in `config/ci.rb`): setup + RuboCop + bundler-audit + importmap audit + Brakeman + tests. GitHub Actions runs the same plus Capybara system tests.
+- `bin/rails search:reindex` — rebuild every `Entry` and `SavedItem` search vector after a tokenization change; in production run it through the `bin/kamal reindex` alias after deploying the new tokenizer.
 - Recurring (`config/recurring.yml`): `RefreshDueFeedsJob` every 10 min (all envs); production also renews WebSub leases (6 h), clears finished Solid Queue jobs (hourly), and runs Rails Pulse summarize/cleanup.
 - Config is read via `Rails.app.creds.option(...)` (merges `.env` in dev, encrypted credentials in prod) — not stock `Rails.application.credentials` or bare `ENV`.
 - Deploy: Kamal (`config/deploy.yml`, host `rdrift.app`, `bin/kamal`).
 
 ## Domain
 
-RSS reader: `Feed` → `Subscription` (user↔feed) → `Entry` → `UserEntry` (per-user `read_at`/`starred_at`, created lazily). Auth is the Rails 8 generator (DB-backed `Session`) plus a hand-written `RegistrationsController`, OAuth via OmniAuth (`Identity` — GitHub/Google), and long-lived `ApiToken`s for the browser extension's JSON API. Full-text search lives in the `Searchable` concern (shared by `Entry` and `SavedItem`), not on `Entry` directly — weighted `tsvector` (title A > summary B > content C > author D) rebuilt before_save. CJK runs are rewritten into overlapping 2-grams (`bigramize`) so sub-word search works without a server-side parser; single-character CJK queries intentionally don't match.
+RSS reader: `Feed` → `Subscription` (user↔feed) → `Entry` → `UserEntry` (per-user `read_at`/`starred_at`, created lazily). Auth is the Rails 8 generator (DB-backed `Session`) plus a hand-written `RegistrationsController`, OAuth via OmniAuth (`Identity` — GitHub/Google), and long-lived `ApiToken`s for the browser extension's JSON API. Full-text search lives in the `Searchable` concern (shared by `Entry` and `SavedItem`), not on `Entry` directly — weighted `tsvector` (title A > summary B > content C > author D) rebuilt before_save. CJK indexing stores both unigrams and overlapping 2-grams, while queries use 2-grams except for a lone CJK character; this preserves precise sub-word matching and lets single-character searches match without a server-side parser.
 
 Feeds aren't all polled RSS: `Feed::Discovery` resolves a pasted site URL to its feed, `Feed::Bilibili` is an in-house adapter (`Feed#kind`) for sites with no native RSS, and YouTube uses WebSub push (`WebSubSubscription`) instead of polling. `Feed::PublicAddressGuard` is an SSRF guard on all outbound feed fetches.
 

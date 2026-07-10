@@ -45,6 +45,17 @@ class EntryTest < ActiveSupport::TestCase
     assert_not_includes results, miss
   end
 
+  test "search matches a single Chinese character against the indexed unigrams" do
+    feed = feeds(:example)
+    match = feed.entries.create!(guid: "cjk-unigram-match", title: "搜索引擎优化指南")
+    miss  = feed.entries.create!(guid: "cjk-unigram-miss", title: "完全不同的标题")
+
+    results = Entry.search("擎") # a single character that only appears in the match
+
+    assert_includes results, match
+    assert_not_includes results, miss
+  end
+
   test "excerpt strips html and truncates" do
     entry = Entry.new(content: "<p>Hello <strong>world</strong>!  This  has  whitespace.</p>")
 
