@@ -1,3 +1,31 @@
+# == Schema Information
+#
+# Table name: entries
+#
+#  id            :bigint           not null, primary key
+#  author        :string
+#  content       :text
+#  guid          :string           not null
+#  published_at  :datetime
+#  search_vector :tsvector
+#  summary       :text
+#  title         :string
+#  url           :string
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  feed_id       :bigint           not null
+#
+# Indexes
+#
+#  index_entries_on_feed_id           (feed_id)
+#  index_entries_on_feed_id_and_guid  (feed_id,guid) UNIQUE
+#  index_entries_on_published_at      (published_at)
+#  index_entries_on_search_vector     (search_vector) USING gin
+#
+# Foreign Keys
+#
+#  fk_rails_...  (feed_id => feeds.id)
+#
 class Entry < ApplicationRecord
   include Searchable
 

@@ -1,3 +1,29 @@
+# == Schema Information
+#
+# Table name: feeds
+#
+#  id                  :bigint           not null, primary key
+#  dead_at             :datetime
+#  description         :text
+#  etag                :string
+#  feed_url            :string           not null
+#  fetch_failure_count :integer          default(0), not null
+#  kind                :string           default("rss"), not null
+#  last_error          :text
+#  last_fetched_at     :datetime
+#  last_modified       :string
+#  last_success_at     :datetime
+#  next_fetch_at       :datetime
+#  site_url            :string
+#  title               :string
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#
+# Indexes
+#
+#  index_feeds_on_feed_url       (feed_url) UNIQUE
+#  index_feeds_on_next_fetch_at  (next_fetch_at)
+#
 class Feed < ApplicationRecord
   # Sent on every outbound HTTP request we make on a feed's behalf (discovery
   # and refresh). The per-environment value lives in config/feed.yml: only

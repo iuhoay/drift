@@ -7,6 +7,31 @@ require "openssl"
 #
 # The stored feed_url *is* the WebSub topic (YouTube advertises the Google hub on
 # that URL), so there's no separate topic column.
+# == Schema Information
+#
+# Table name: web_sub_subscriptions
+#
+#  id               :bigint           not null, primary key
+#  callback_token   :string           not null
+#  last_delivery_at :datetime
+#  lease_expires_at :datetime
+#  secret           :string           not null
+#  state            :string           default("pending"), not null
+#  verified_at      :datetime
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  feed_id          :bigint           not null
+#
+# Indexes
+#
+#  index_web_sub_subscriptions_on_callback_token    (callback_token) UNIQUE
+#  index_web_sub_subscriptions_on_feed_id           (feed_id) UNIQUE
+#  index_web_sub_subscriptions_on_lease_expires_at  (lease_expires_at)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (feed_id => feeds.id)
+#
 class WebSubSubscription < ApplicationRecord
   # Google's public hub — it operates the WebSub hub for every youtube.com feed.
   HUB_URL = "https://pubsubhubbub.appspot.com/subscribe"

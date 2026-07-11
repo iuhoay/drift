@@ -92,6 +92,8 @@ group :development do
 
   # Preview outgoing mail in a web UI at /mailbin instead of sending it [https://github.com/excid3/mailbin]
   gem "mailbin"
+
+  gem "annotaterb"
 end
 
 group :test do
