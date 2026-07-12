@@ -63,13 +63,16 @@ blocked; everything else runs.
 Pass `--sql` only when you actually want to write raw SQL.
 
 ```bash
-bin/kamal query "Feed.failing.count"                  # ActiveRecord (default)
-bin/kamal query --sql "SELECT COUNT(*) FROM feeds"    # raw SQL (needs --sql)
+bin/kamal query "'Feed.failing.count'"                    # ActiveRecord (default)
+bin/kamal query --sql "'SELECT COUNT(*) FROM feeds'"      # raw SQL (needs --sql)
 ```
 
 Passing `"SELECT ..."` without `--sql` will try to evaluate it as Ruby and fail
 with a JSON error. Prefer the ActiveRecord form — it goes through the app's own
 scopes and associations and is harder to get subtly wrong.
+
+The doubled quoting (`"'…'"`) is not a typo — it's required. See
+[Quoting through kamal](#quoting-through-kamal).
 
 ## drift's Feed vocabulary (there is no `active` column)
 
@@ -89,32 +92,32 @@ dashboard uses them directly:
 future. Map "active" to `Feed.alive` (or alive + healthy) and say which you meant.
 
 ```bash
-bin/kamal query "Feed.count"                                 # total
-bin/kamal query "Feed.alive.count"                           # not dead
-bin/kamal query "Feed.alive.where(fetch_failure_count: 0).count"   # alive + healthy
-bin/kamal query "Feed.failing.count"                         # any current failures (incl. dead)
-bin/kamal query "Feed.dead.count"                            # flagged dead
+bin/kamal query "'Feed.count'"                                 # total
+bin/kamal query "'Feed.alive.count'"                           # not dead
+bin/kamal query "'Feed.alive.where(fetch_failure_count: 0).count'"   # alive + healthy
+bin/kamal query "'Feed.failing.count'"                         # any current failures (incl. dead)
+bin/kamal query "'Feed.dead.count'"                            # flagged dead
 ```
 
 ## Core usage
 
 ```bash
 # Scalars / aggregates
-bin/kamal query "Entry.where('created_at > ?', 1.day.ago).count"
-bin/kamal query "Entry.group(:feed_id).count"
+bin/kamal query "'Entry.where(\"created_at > ?\", 1.day.ago).count'"
+bin/kamal query "'Entry.group(:feed_id).count'"
 
 # Relations return rows (paginated). meta.sql shows the SQL that actually ran.
-bin/kamal query "Feed.troubled.limit(10)"
+bin/kamal query "'Feed.troubled.limit(10)'"
 
-# String literals: single-quote them inside the double-quoted expression
-bin/kamal query "User.where(email: 'someone@example.com')"
+# Ruby string literals: escaped double quotes \"…\" — the single quotes are taken by the wrapper
+bin/kamal query "'User.where(email: \"someone@example.com\")'"
 
 # Raw SQL when you need it
-bin/kamal query --sql "SELECT id, title, last_error FROM feeds WHERE dead_at IS NOT NULL"
+bin/kamal query --sql "'SELECT id, title, last_error FROM feeds WHERE dead_at IS NOT NULL'"
 ```
 
-The expression and flags can appear in any order — `bin/kamal query "Entry.all"
---per 20` and `bin/kamal query --per 20 "Entry.all"` are equivalent.
+The expression and flags can appear in any order — `bin/kamal query "'Entry.all'"
+--per 20` and `bin/kamal query --per 20 "'Entry.all'"` are equivalent.
 
 ### Return-type shapes (for the default envelope)
 
@@ -171,7 +174,7 @@ Defaults: `--page 1`, `--per 100`. `--per` is clamped to `[1, 10000]` and
 `--page` is floored at 1.
 
 ```bash
-bin/kamal query "Entry.order(created_at: :desc)" --per 25 --page 2
+bin/kamal query "'Entry.order(created_at: :desc)'" --per 25 --page 2
 ```
 
 For `--sql`, the command appends `LIMIT`/`OFFSET` only if your SQL doesn't
@@ -188,15 +191,15 @@ Production runs separate databases (see `config/database.yml`). The routing rule
   use the model — no `--db` needed:
 
   ```bash
-  bin/kamal query "SolidQueue::FailedExecution.count"     # failed jobs, auto-routed
-  bin/kamal query "SolidQueue::Job.count"
+  bin/kamal query "'SolidQueue::FailedExecution.count'"     # failed jobs, auto-routed
+  bin/kamal query "'SolidQueue::Job.count'"
   ```
 
 - **Raw `--sql` always runs against the primary connection** unless you point it
   elsewhere with `--db` (alias `--database`). That's the only time you need it:
 
   ```bash
-  bin/kamal query --db queue --sql "SELECT COUNT(*) FROM solid_queue_failed_executions"
+  bin/kamal query --db queue --sql "'SELECT COUNT(*) FROM solid_queue_failed_executions'"
   bin/kamal query --db queue schema     # list the queue DB's tables
   ```
 
@@ -206,50 +209,71 @@ So: prefer the model (it picks the right DB); reach for `--db` only for raw
 ## EXPLAIN for slow queries
 
 ```bash
-bin/kamal query explain "Entry.where(read_at: nil)"
-bin/kamal query explain --sql "SELECT * FROM entries WHERE feed_id = 42"
+bin/kamal query explain "'Entry.where(read_at: nil)'"
+bin/kamal query explain --sql "'SELECT * FROM entries WHERE feed_id = 42'"
 ```
 
 Returns the query plan as rows — useful before reaching for an index change.
 
 ## Quoting through kamal
 
-The expression is passed as a single shell argument down to the container.
-Keep it on one quoting level: double-quote the whole expression, single-quote
-any string literals inside it. Passing the expression via stdin (`query -`)
-isn't wired through this alias, so always pass it as a quoted argument.
-`RAILS_ENV` is already `production` in the container, so `-e` is unnecessary.
+kamal splices the expression into the remote `docker exec … bin/rails query …`
+command line **without re-quoting it**. The local shell strips your outer double
+quotes, so anything containing a space, `(`, `)`, `[`, `]`, or `{ }` reaches the
+remote bash unquoted and dies with:
 
-**Avoid Ruby brace literals `{ … }` in the expression.** kamal re-quotes the
-argument twice on the way down (local shell → SSH → `docker exec`), and inline
-hashes or blocks don't survive — the braces and the spaces inside them get
-mangled. This bites most often on association conditions. Use a brace-free
-string condition instead:
-
-```bash
-# Mangled — nested hash literal with { }:
-bin/kamal query "User.joins(:subscriptions).where(subscriptions: { feed_id: 8 })"
-# Works — string condition, no braces:
-bin/kamal query "User.joins(:subscriptions).where('subscriptions.feed_id = 8')"
+```
+bash: -c: line 1: syntax error near unexpected token `('
 ```
 
-Top-level keyword hashes are fine because they need no braces
-(`where(active: true)`, `group(:feed_id)`); it's the `{ }` that breaks. If an
-expression genuinely needs braces or both quote types, simplify it or fall back
-to `--sql`.
+Only single-token expressions (`Feed.count`) survive bare. The fix is to supply
+the remote quoting layer yourself: **wrap the expression in single quotes inside
+the double quotes, always** — it's harmless on simple expressions and required on
+everything else (verified 2026-07-12):
+
+```bash
+bin/kamal query "'Entry.where(\"created_at > ?\", 1.day.ago).count'"
+```
+
+Rules that follow from the wrapper:
+
+- **Ruby string literals** use escaped double quotes `\"…\"` — the single quotes
+  are taken by the wrapper.
+- **Nested hash literals are fine** inside the wrapper —
+  `"'User.joins(:subscriptions).where(subscriptions: { feed_id: 8 }).count'"`
+  arrives intact (check `meta.sql` to confirm what ran).
+- **SQL string literals** can't use `'…'` either; use Postgres dollar-quoting,
+  escaped from the local shell as `\$\$…\$\$`:
+
+  ```bash
+  bin/kamal query --db queue --sql "'SELECT COUNT(*) FROM solid_queue_jobs WHERE queue_name = \$\$default\$\$'"
+  ```
+
+- **Batch several scalars into one call** with an array literal — each kamal
+  round-trip costs ~8s of SSH/docker overhead:
+
+  ```bash
+  bin/kamal query "'[Feed.count, Feed.dead.count, Entry.count]'"
+  ```
+
+Passing the expression via stdin (`query -`) isn't wired through this alias, so
+always pass it as a quoted argument. `RAILS_ENV` is already `production` in the
+container, so `-e` is unnecessary. Local `bin/rails query` in dev needs none of
+this — it's purely the kamal transport.
 
 ## Quick reference
 
 | Goal | Command |
 |------|---------|
-| Total / alive / dead feeds | `bin/kamal query "Feed.count"` · `"Feed.alive.count"` · `"Feed.dead.count"` |
-| Failing feeds (worst first) | `bin/kamal query "Feed.troubled.limit(20)"` |
-| Recent entries | `bin/kamal query "Entry.order(created_at: :desc)" --per 20` |
-| Find by attribute | `bin/kamal query "User.where(email: 'x@y.com')"` |
-| Group / aggregate | `bin/kamal query "Entry.group(:feed_id).count"` |
-| Failed background jobs | `bin/kamal query "SolidQueue::FailedExecution.count"` |
-| Raw SQL | `bin/kamal query --sql "SELECT ..."` |
+| Total / alive / dead feeds | `bin/kamal query "'Feed.count'"` · `"'Feed.alive.count'"` · `"'Feed.dead.count'"` |
+| Failing feeds (worst first) | `bin/kamal query "'Feed.troubled.limit(20)'"` |
+| Recent entries | `bin/kamal query "'Entry.order(created_at: :desc)'" --per 20` |
+| Find by attribute | `bin/kamal query "'User.where(email: \"x@y.com\")'"` |
+| Group / aggregate | `bin/kamal query "'Entry.group(:feed_id).count'"` |
+| Several scalars, one call | `bin/kamal query "'[Feed.count, Entry.count]'"` |
+| Failed background jobs | `bin/kamal query "'SolidQueue::FailedExecution.count'"` |
+| Raw SQL | `bin/kamal query --sql "'SELECT ...'"` |
 | List tables / table detail | `bin/kamal query schema` · `bin/kamal query schema entries` |
 | List models | `bin/kamal query models` |
-| Query plan | `bin/kamal query explain "Entry.where(read_at: nil)"` |
-| Non-primary DB (raw SQL) | `bin/kamal query --db queue --sql "SELECT ..."` |
+| Query plan | `bin/kamal query explain "'Entry.where(read_at: nil)'"` |
+| Non-primary DB (raw SQL) | `bin/kamal query --db queue --sql "'SELECT ...'"` |
