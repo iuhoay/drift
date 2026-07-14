@@ -5,6 +5,7 @@
 #  id            :bigint           not null, primary key
 #  author        :string
 #  content       :text
+#  full_content  :text
 #  guid          :string           not null
 #  published_at  :datetime
 #  search_vector :tsvector
@@ -34,7 +35,7 @@ class Entry < ApplicationRecord
 
   validates :guid, presence: true, uniqueness: { scope: :feed_id }
 
-  search_columns title: "A", summary: "B", content: "C", author: "D"
+  search_columns title: "A", summary: "B", content: "C", full_content: "C", author: "D"
 
   scope :recent, -> { order(Arel.sql("COALESCE(entries.published_at, entries.created_at) DESC")) }
 
@@ -42,8 +43,14 @@ class Entry < ApplicationRecord
   BILIBILI_URL = %r{\A(?:https?:)?//(?:www\.|m\.)?bilibili\.com/video/(BV[0-9A-Za-z]{10})}
 
   def excerpt(limit: 280)
-    plain = ActionController::Base.helpers.strip_tags(summary.presence || content.to_s)
+    plain = ActionController::Base.helpers.strip_tags(summary.presence || content.presence || full_content.to_s)
     plain.gsub(/\s+/, " ").strip.truncate(limit)
+  end
+
+  # What the reader page renders: a fetched full copy wins over whatever the
+  # feed shipped, since it only exists when a reader asked for more than that.
+  def body
+    full_content.presence || content.presence || summary.to_s
   end
 
   def for_user(user)

@@ -78,16 +78,24 @@
   <% end %>
 
   <div class="entry-content border-t border-stone-300 pt-7" data-controller="syntax-highlight">
-    <%= sanitize(@entry.content.presence || @entry.summary.to_s) %>
+    <%= sanitize(@entry.body) %>
   </div>
 
   <div class="mt-12 flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
     <span class="select-none text-stone-400">&mdash; end of entry &mdash;</span>
-    <% if (footer_url = @entry.safe_url) %>
-      <%= link_to footer_url, target: "_blank", rel: "noopener",
-            class: "text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>
-        open original <span class="select-none">&#8599;</span>
+    <div class="flex items-center gap-4">
+      <% if @entry.full_content.blank? && @entry.safe_url %>
+        <%= button_to entry_full_content_path(@entry),
+              class: "cursor-pointer text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>
+          load full text <span class="select-none">&darr;</span>
+        <% end %>
       <% end %>
-    <% end %>
+      <% if (footer_url = @entry.safe_url) %>
+        <%= link_to footer_url, target: "_blank", rel: "noopener",
+              class: "text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>
+          open original <span class="select-none">&#8599;</span>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 </article>

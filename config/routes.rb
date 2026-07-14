@@ -67,6 +67,7 @@ Rails.application.routes.draw do
   resources :entries, only: [ :index, :show ] do
     resource :read, only: [ :create, :destroy ], module: :entries
     resource :star, only: [ :create, :destroy ], module: :entries
+    resource :full_content, only: :create, module: :entries
   end
 
   # Read-it-later. The web UI (cookie auth) lists, reads, and removes saved

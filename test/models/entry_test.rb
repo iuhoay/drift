@@ -56,6 +56,17 @@ class EntryTest < ActiveSupport::TestCase
     assert_not_includes results, miss
   end
 
+  test "search matches text in a fetched full copy" do
+    feed = feeds(:example)
+    match = feed.entries.create!(guid: "full-match", title: "Plain Title", full_content: "<p>quuxonium reactor design</p>")
+    miss  = feed.entries.create!(guid: "full-miss", title: "Plain Title Two")
+
+    results = Entry.search("quuxonium")
+
+    assert_includes results, match
+    assert_not_includes results, miss
+  end
+
   test "excerpt strips html and truncates" do
     entry = Entry.new(content: "<p>Hello <strong>world</strong>!  This  has  whitespace.</p>")
 
@@ -65,6 +76,19 @@ class EntryTest < ActiveSupport::TestCase
   test "excerpt prefers summary over content" do
     entry = Entry.new(summary: "Just the summary.", content: "<p>Body</p>")
     assert_equal "Just the summary.", entry.excerpt
+  end
+
+  test "excerpt falls back to full_content when the feed shipped nothing" do
+    entry = Entry.new(full_content: "<p>Fetched full body.</p>")
+    assert_equal "Fetched full body.", entry.excerpt
+  end
+
+  test "body prefers a fetched full copy over feed content" do
+    entry = Entry.new(summary: "s", content: "<p>feed body</p>", full_content: "<p>full body</p>")
+
+    assert_equal "<p>full body</p>", entry.body
+    assert_equal "<p>feed body</p>", Entry.new(summary: "s", content: "<p>feed body</p>").body
+    assert_equal "s", Entry.new(summary: "s").body
   end
 
   test "for_user finds or initializes a user_entry" do
