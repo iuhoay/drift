@@ -89,6 +89,37 @@ class Feed::DiscoveryTest < ActiveSupport::TestCase
     assert_empty Feed::Discovery.new("   ").call
   end
 
+  test "raises FetchFailed when the address cannot be fetched" do
+    stubs = Faraday::Adapter::Test::Stubs.new
+    stubs.get("https://down.example.com/") { raise Faraday::ConnectionFailed, "connection refused" }
+
+    error = assert_raises(Feed::Discovery::FetchFailed) do
+      discover("https://down.example.com/", stubs)
+    end
+    assert_includes error.message, "couldn't be reached"
+  end
+
+  test "raises FetchFailed carrying the status when the address returns an HTTP error" do
+    stubs = Faraday::Adapter::Test::Stubs.new
+    stubs.get("https://example.com/gone") { [ 404, { "Content-Type" => "text/html" }, "not here" ] }
+
+    error = assert_raises(Feed::Discovery::FetchFailed) do
+      discover("https://example.com/gone", stubs)
+    end
+    assert_includes error.message, "HTTP 404"
+  end
+
+  test "a failed probe is a miss, not an error" do
+    html = "<html><head><title>No feed here</title></head><body></body></html>"
+
+    stubs = Faraday::Adapter::Test::Stubs.new
+    stubs.get("https://example.com/blog/") { [ 200, { "Content-Type" => "text/html" }, html ] }
+    stubs.get("https://example.com/blog/feed") { raise Faraday::ConnectionFailed, "connection refused" }
+    stubs.get("https://example.com/blog/feed.xml") { [ 200, { "Content-Type" => "application/rss+xml" }, RSS ] }
+
+    assert_equal [ "https://example.com/blog/feed.xml" ], discover("https://example.com/blog/", stubs)
+  end
+
   private
 
   def discover(url, stubs)

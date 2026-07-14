@@ -11,8 +11,16 @@ require "nokogiri"
 #   3. As a last resort, probe a handful of conventional feed paths.
 #
 # Returns an array of absolute feed URLs (most likely first), or [] when
-# nothing parses as a feed.
+# nothing parses as a feed. Raises FetchFailed when the address itself can't
+# be fetched at all.
 class Feed::Discovery
+  # Raised when the pasted address itself can't be fetched — a network failure
+  # (DNS, timeout, refused or blocked connection) or an HTTP error status.
+  # Distinct from fetching fine and finding no feed, so the subscribe form can
+  # tell the user what actually went wrong instead of a blanket "no feed
+  # found". The message is written to be shown on the :feed_url attribute.
+  class FetchFailed < StandardError; end
+
   # Wall-clock cap for speculative path probing (COMMON_PATHS), which makes one
   # request per path. Without it a slow host could stack a full read timeout per
   # path and pin a request thread; a fast host runs all probes well within it.
@@ -52,8 +60,8 @@ class Feed::Discovery
       return [ Feed::Bilibili.canonical_url(uid) ]
     end
 
-    response = get(@url)
-    return [] unless response&.success?
+    response = fetch(@url)
+    raise FetchFailed, "returned HTTP #{response.status} instead of a feed" unless response.success?
 
     base_uri = response.env.url
 
@@ -69,6 +77,17 @@ class Feed::Discovery
 
   def http
     @http ||= Feed.http_connection
+  end
+
+  # The initial fetch of the pasted address: a failure here means the address
+  # itself is unreachable, which is worth reporting distinctly. Speculative
+  # probes use #get instead — the address was reachable, so a failed probe is
+  # just a miss, not an error.
+  def fetch(url)
+    http.get(url)
+  rescue StandardError => e
+    Rails.logger.info "Feed discovery could not reach #{url}: #{e.class}: #{e.message}"
+    raise FetchFailed, "couldn't be reached — check the address or try again"
   end
 
   def get(url)

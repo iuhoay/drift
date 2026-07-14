@@ -12,8 +12,9 @@ module Subscription::Subscribing
     # first fetch.
     #
     # Returns the Subscription — persisted on success, or an unsaved one carrying
-    # validation errors when the address is blank, resolves to no feed, or a
-    # record is invalid — so the caller branches on `persisted?` and re-renders.
+    # validation errors when the address is blank, can't be fetched, resolves to
+    # no feed, or a record is invalid — so the caller branches on `persisted?`
+    # and re-renders.
     def subscribe(user, address, custom_title: nil)
       url = address.to_s.strip
       subscription = user.subscriptions.new
@@ -41,6 +42,9 @@ module Subscription::Subscribing
       end
 
       FeedRefreshJob.perform_later(feed.id)
+      subscription
+    rescue Feed::Discovery::FetchFailed => e
+      subscription.errors.add(:feed_url, e.message)
       subscription
     rescue ActiveRecord::RecordInvalid => e
       subscription.errors.add(:base, e.message)

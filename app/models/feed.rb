@@ -93,7 +93,8 @@ class Feed < ApplicationRecord
 
   # Turns a pasted address into the feed URL behind it. A URL we already track is
   # a feed by definition, so we skip the network round-trip; anything else is run
-  # through auto-detection. Returns nil when nothing there parses as a feed.
+  # through auto-detection. Returns nil when nothing there parses as a feed;
+  # raises Feed::Discovery::FetchFailed when the address can't be fetched at all.
   def self.resolve_url(address)
     url = address.to_s.strip
     return url if exists?(feed_url: url)

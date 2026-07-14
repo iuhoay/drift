@@ -97,4 +97,17 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_not subscription.persisted?
     assert_includes subscription.errors[:feed_url], "no feed found at that address"
   end
+
+  test "subscribe reports an unreachable address distinctly from no feed found" do
+    failure = Feed::Discovery::FetchFailed.new("couldn't be reached — check the address or try again")
+
+    subscription = stub_discovery(raises: failure) do
+      assert_no_difference -> { Subscription.count } do
+        Subscription.subscribe(users(:two), "https://down.example.com")
+      end
+    end
+
+    assert_not subscription.persisted?
+    assert_includes subscription.errors[:feed_url], "couldn't be reached — check the address or try again"
+  end
 end

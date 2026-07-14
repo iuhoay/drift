@@ -54,8 +54,10 @@ class Feed::BilibiliTest < ActiveSupport::TestCase
     stubs.get("https://space.bilibili.com/26846937") { [ 404, {}, "" ] }
     http = Faraday.new { |b| b.adapter :test, stubs }
 
+    # Raising on the stubbed 404 proves discovery fetched the page over HTTP
+    # instead of short-circuiting to the canonical space URL.
     discovery = Feed::Discovery.new("https://space.bilibili.com/26846937", http: http, bilibili_enabled: false)
-    assert_empty discovery.call
+    assert_raises(Feed::Discovery::FetchFailed) { discovery.call }
   end
 
   test "a Feed at a space URL is classified as the bilibili kind" do
