@@ -1,7 +1,8 @@
 # Fetches the page behind an entry's URL and stores a readable copy in
 # `full_content`, for feeds that truncate or omit the article body (digests,
-# title-only feeds). Triggered by a reader from the entry page; entries are
-# shared across subscribers, so one reader's fetch fills the entry for everyone.
+# title-only feeds). Triggered by a reader from the entry page through
+# EntryScrapeJob; entries are shared across subscribers, so one reader's fetch
+# fills the entry for everyone.
 #
 # Mirrors SavedItem::Fetcher: fetches through Feed.http_connection so it
 # inherits the SSRF guard, User-Agent, redirect limit, and timeouts, and `http`

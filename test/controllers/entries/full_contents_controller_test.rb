@@ -1,61 +1,39 @@
 require "test_helper"
 
 class Entries::FullContentsControllerTest < ActionDispatch::IntegrationTest
-  ARTICLE_HTML = <<~HTML
-    <html><body><article>
-      <p>#{"Enough real article prose to clear the extraction threshold. " * 12}</p>
-    </article></body></html>
-  HTML
+  include ActionView::RecordIdentifier
 
   setup do
     @user = users(:one)
     sign_in_as(@user)
   end
 
-  test "create fetches and stores the full text, then returns to the entry" do
+  test "create enqueues a scrape and swaps the button for a pending state" do
     entry = entries(:example_first)
 
-    stub_http_connection(200, ARTICLE_HTML) do
-      post entry_full_content_path(entry)
+    assert_enqueued_with(job: EntryScrapeJob, args: [ entry.id ]) do
+      post entry_full_content_path(entry), as: :turbo_stream
     end
 
-    assert_redirected_to entry_path(entry)
-    assert_includes entry.reload.full_content.to_s, "Enough real article prose"
+    assert_turbo_stream action: :replace, target: dom_id(entry, :full_content_request)
+    assert_match(/fetching full text/i, response.body)
   end
 
-  test "create alerts when no readable copy could be extracted" do
+  test "create without turbo enqueues and returns to the entry" do
     entry = entries(:example_first)
 
-    stub_http_connection(200, "<html><body><p>hi</p></body></html>") do
-      post entry_full_content_path(entry)
+    assert_enqueued_with(job: EntryScrapeJob, args: [ entry.id ]) do
+      post entry_full_content_path(entry), headers: { "Accept" => "text/html" }
     end
 
     assert_redirected_to entry_path(entry)
-    assert_match(/couldn't extract/i, flash[:alert])
-    assert_nil entry.reload.full_content
   end
 
   test "create is scoped to subscribed entries" do
-    post entry_full_content_path(entries(:unsubscribed_first))
-
-    assert_response :not_found
-  end
-
-  private
-
-  # Swaps Feed.http_connection for a canned Faraday test adapter for the block,
-  # the same manual pattern as stub_discovery (Minitest 6 has no Object#stub).
-  def stub_http_connection(status, body)
-    connection = Faraday.new do |f|
-      f.adapter :test do |stub|
-        stub.get(//) { [ status, {}, body ] }
-      end
+    assert_no_enqueued_jobs do
+      post entry_full_content_path(entries(:unsubscribed_first))
     end
 
-    original = Feed.method(:http_connection)
-    Feed.define_singleton_method(:http_connection) { connection }
-    yield
-  ensure
-    Feed.define_singleton_method(:http_connection, original)
+    assert_response :not_found
   end
 end

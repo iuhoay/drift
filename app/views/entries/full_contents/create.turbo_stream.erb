@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@entry, :full_content_request) do %>
+  <span id="<%= dom_id(@entry, :full_content_request) %>" class="select-none text-stone-400">fetching full text&hellip;</span>
+<% end %>

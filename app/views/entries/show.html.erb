@@ -77,19 +77,17 @@
     </div>
   <% end %>
 
-  <div class="entry-content border-t border-stone-300 pt-7" data-controller="syntax-highlight">
-    <%= sanitize(@entry.body) %>
-  </div>
+  <%# The scraped full text comes back over the entry's stream (EntryScrapeJob). %>
+  <% if @entry.full_content.blank? && @entry.safe_url %>
+    <%= turbo_stream_from @entry %>
+  <% end %>
+
+  <%= render "entries/body", entry: @entry %>
 
   <div class="mt-12 flex items-center justify-between border-t border-stone-300 pt-3 text-xs text-stone-500">
     <span class="select-none text-stone-400">&mdash; end of entry &mdash;</span>
     <div class="flex items-center gap-4">
-      <% if @entry.full_content.blank? && @entry.safe_url %>
-        <%= button_to entry_full_content_path(@entry),
-              class: "cursor-pointer text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>
-          load full text <span class="select-none">&darr;</span>
-        <% end %>
-      <% end %>
+      <%= render "entries/full_content_request", entry: @entry %>
       <% if (footer_url = @entry.safe_url) %>
         <%= link_to footer_url, target: "_blank", rel: "noopener",
               class: "text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>

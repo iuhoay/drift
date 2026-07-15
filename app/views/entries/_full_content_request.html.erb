@@ -1,0 +1,8 @@
+<% if entry.full_content.blank? && entry.safe_url %>
+  <span id="<%= dom_id(entry, :full_content_request) %>">
+    <%= button_to entry_full_content_path(entry),
+          class: "cursor-pointer text-amber-700 underline underline-offset-2 hover:bg-amber-700/15" do %>
+      load full text <span class="select-none">&darr;</span>
+    <% end %>
+  </span>
+<% end %>

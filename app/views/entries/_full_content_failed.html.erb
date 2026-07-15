@@ -1,0 +1,6 @@
+<%# Broadcast from EntryScrapeJob, which renders outside a request — no
+    button_to here, since forging-protected form helpers need a session.
+    The retry button comes back with the next page load. %>
+<span id="<%= dom_id(entry, :full_content_request) %>" class="select-none text-stone-400">
+  couldn't extract a readable copy &mdash; try the original instead
+</span>
