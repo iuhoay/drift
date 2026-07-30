@@ -119,7 +119,7 @@ GEM
       railties
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
-    annotaterb (4.23.0)
+    annotaterb (4.24.0)
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
     ast (2.4.3)
@@ -583,7 +583,7 @@ CHECKSUMS
   activestorage (8.2.0.alpha)
   activesupport (8.2.0.alpha)
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
-  annotaterb (4.23.0) sha256=0fc59b1d40e07bec75d9d9b0cd479493631ce8901e4b59fefc561689f22b4600
+  annotaterb (4.24.0) sha256=3953d3a3fb86ef06639a8d5ea29001e4af1e51cabd147973b1b23524b8fbced6
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   async (2.42.0) sha256=536078293b8c95d5b5679fa01bf7d2458bcc65cd46dec2c4cb3580feaeb965c6
   auth-sanitizer (0.2.1) sha256=917dcf01f7589b06c26726afe90568cf2fb29d37a1f94facfc664f11967cc577
