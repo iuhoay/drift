@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bin/setup` — bootstrap dev (idempotent); requires Postgres reachable and `.env` configured
 - `bin/rails test` — Minitest. Rails 8.2's `creds` only merges `.env` in dev, so test sees nil from `creds.option(...)`; `config/database.yml` carries `root` / `password` defaults on each call as the local-dev fallback. Real `ENV` overrides if your Postgres differs. See atom `invariant_dotenv_test_env`.
 - `bin/rubocop` — omakase style (Ruby files only)
-- `bin/ci` — full local gate before a PR (config in `config/ci.rb`): setup + RuboCop + bundler-audit + importmap audit + Brakeman + tests. GitHub Actions runs the same plus Capybara system tests.
+- `bin/ci` — mandatory before ANY commit (user-mandated 2026-08-01): setup + RuboCop + bundler-audit + importmap audit + Brakeman + tests. Config in `config/ci.rb`. GitHub Actions runs the same plus Capybara system tests.
 - `bin/rails search:reindex` — rebuild every `Entry` and `SavedItem` search vector after a tokenization change; in production run it through the `bin/kamal reindex` alias after deploying the new tokenizer.
 - Recurring (`config/recurring.yml`): `RefreshDueFeedsJob` every 10 min (all envs); production also renews WebSub leases (6 h), clears finished Solid Queue jobs (hourly), and runs Rails Pulse summarize/cleanup.
 - Config is read via `Rails.app.creds.option(...)` (merges `.env` in dev, encrypted credentials in prod) — not stock `Rails.application.credentials` or bare `ENV`.
