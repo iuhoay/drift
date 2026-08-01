@@ -30,9 +30,12 @@ Rails.application.routes.draw do
 
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/*
-  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # Render dynamic PWA files from app/views/pwa/*. Each exists in a single
+  # format (manifest.json.erb, service-worker.js), so pin it — clients that
+  # don't Accept it (crawlers send no Accept header) would otherwise 500 with
+  # a MissingTemplate looking for an HTML variant.
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest, defaults: { format: "json" }
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker, defaults: { format: "js" }
   get "offline" => "pwa#offline", as: :pwa_offline
 
   # Self-hosted performance monitoring dashboard (admin-only; see config/initializers/rails_pulse.rb)
