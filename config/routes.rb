@@ -88,10 +88,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     resources :saved_items, only: [ :create ]
-    # One helper, both verbs: GET is the inbox, QUERY carries search in the body.
-    # A GET-only resources#index never matches QUERY (no HEAD-style fallback).
-    match "entries", to: "entries#index", via: [ :get, :query ], as: :entries
-    resources :entries, only: [ :show ]
+    resources :entries, only: [ :index, :show ] do
+      # QUERY is a collection verb on index (canonical → /api/entries, not /index).
+      # A GET-only resources#index never matches QUERY (no HEAD-style fallback).
+      query :index, on: :collection
+    end
     resources :subscriptions, only: [ :index ]
     namespace :cli do
       resource :token, only: :create
