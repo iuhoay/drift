@@ -11,8 +11,8 @@ echo "$KAMAL_PERFORMER deployed $KAMAL_SERVICE_VERSION in ${KAMAL_RUNTIME}s"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if [[ "$CURRENT_BRANCH" == "main" && "${KAMAL_DESTINATION:-production}" == "production" ]]; then
-  # origin is tangled.org; GitHub is the `github` remote. Push the tag (and the
-  # deployed SHA) so `gh release create` has something to point at.
-  git push github "$KAMAL_VERSION:refs/tags/$KAMAL_SERVICE_VERSION" || true
+  # origin is GitHub. Push the tag (and the deployed SHA) so `gh release create`
+  # has something to point at.
+  git push origin "$KAMAL_VERSION:refs/tags/$KAMAL_SERVICE_VERSION" || true
   gh release create "$KAMAL_SERVICE_VERSION" --generate-notes || true
 fi
