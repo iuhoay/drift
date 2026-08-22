@@ -91,6 +91,16 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal "s", Entry.new(summary: "s").body
   end
 
+  test "plain_body strips tags and turns block breaks into newlines" do
+    entry = Entry.new(content: "<p>The full body of the <strong>first</strong> post.</p>")
+    assert_equal "The full body of the first post.", entry.plain_body
+  end
+
+  test "plain_body collapses extra blank lines" do
+    entry = Entry.new(content: "<p>One</p><p></p><p></p><p>Two</p>")
+    assert_equal "One\n\nTwo", entry.plain_body
+  end
+
   test "for_user finds or initializes a user_entry" do
     entry = entries(:example_first)
     user = users(:one)

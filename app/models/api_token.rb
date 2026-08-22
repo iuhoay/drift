@@ -1,10 +1,11 @@
-# A long-lived bearer token the browser extension uses to authenticate against
-# the JSON API (POST /api/saved_items). Cookies are SameSite=Lax, so a cross-site
-# POST from an arbitrary tab carries no session — the token fills that gap.
+# A long-lived bearer token for the JSON API. The browser extension uses it to
+# save pages (cookies are SameSite=Lax, so a cross-site POST from an arbitrary
+# tab carries no session). A CLI can use the same token to read the inbox and
+# list subscriptions. There are no scopes — a token can do both.
 #
 # The value is generated once and stored in plaintext (has_secure_token); the
-# account UI shows it once on creation and only a masked tail afterwards. A token
-# grants nothing beyond saving pages for its owner, and is revocable any time.
+# account UI shows it once on creation and only a masked tail afterwards. A
+# token is revocable any time.
 # == Schema Information
 #
 # Table name: api_tokens

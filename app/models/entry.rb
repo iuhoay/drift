@@ -53,6 +53,16 @@ class Entry < ApplicationRecord
     full_content.presence || content.presence || summary.to_s
   end
 
+  # Tag-stripped body for the JSON API. Block close tags and <br> become
+  # newlines so paragraphs survive; everything else is stripped.
+  def plain_body
+    text = body.to_s
+    text = text.gsub(%r{</(?:p|div|h[1-6]|li|ul|ol|tr|td|th|blockquote|pre|section|article|header|footer|figure|figcaption|nav|main|aside|dl|dt|dd|table)>}i, "\n")
+    text = text.gsub(%r{<br\s*/?>}i, "\n")
+    text = ActionController::Base.helpers.strip_tags(text)
+    text.gsub(/\n{3,}/, "\n\n").strip
+  end
+
   def for_user(user)
     user_entries.find_or_initialize_by(user: user)
   end

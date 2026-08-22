@@ -82,6 +82,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     resources :saved_items, only: [ :create ]
+    resources :entries, only: [ :index, :show ]
+    resources :subscriptions, only: [ :index ]
   end
 
   # Front door: HomeController renders the landing page for signed-out visitors
