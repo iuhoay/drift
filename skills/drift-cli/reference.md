@@ -4,15 +4,24 @@ Companion to `SKILL.md`. Source of truth lives in the Drift repo (`skills/drift-
 
 ## Install
 
-From the Drift repository root:
+Do **not** clone the repo or run `cargo install`. The user-facing binary comes from GitHub Releases tagged `cli/v*` (not the Kamal `drift@<sha>` deploy tags).
 
 ```sh
-cargo install --path cli
+tag=$(gh release list --repo iuhoay/drift --json tagName --jq '.[] | select(.tagName | startswith("cli/v")) | .tagName' | head -1)
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64)  asset=drift-aarch64-apple-darwin ;;
+  Linux-x86_64)  asset=drift-x86_64-unknown-linux-gnu ;;
+  *) echo "no published binary for $(uname -s)-$(uname -m)"; exit 1 ;;
+esac
+gh release download "$tag" --repo iuhoay/drift --pattern "$asset" --dir .
+install -m 0755 "./$asset" "$HOME/.local/bin/drift"
 ```
 
-Binary name: `drift`. Config: `$XDG_CONFIG_HOME/drift/config.toml` or `~/.config/drift/config.toml` (mode `0600`).
+`$HOME/.local/bin` must be on `PATH`. If `gh` is missing, point the user at https://github.com/iuhoay/drift/releases and the matching asset — still no source install.
 
-If `drift` is not on `PATH`, do not fall back to curling the API.
+This skill file is the source; agents see it when `skills/drift-cli` is linked into `~/.pi/agent/skills/` or `~/.agents/skills/`.
+
+If `drift` is not on `PATH` after that, stop. Do not fall back to curling the API.
 
 ## Auth
 
@@ -22,6 +31,8 @@ drift auth status   # host + masked token + ok/unauthorized
 ```
 
 `auth login` starts a loopback listener and exchanges a one-time code for an API token. The agent cannot complete the browser step.
+
+Order: install the binary first, then `auth login`. Do not run login when `drift` is missing.
 
 Unauthorized after a working install usually means the token was revoked on the Account → API tokens page. The user must `drift auth login` again.
 

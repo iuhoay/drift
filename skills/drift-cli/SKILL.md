@@ -33,7 +33,8 @@ Do not use this skill for SavedItem / read-later, starring, marking read, or edi
 
 ## Core Rules
 
-- Prefer the installed `drift` binary. Do not curl `/api/*` and do not open rdrift.app in a browser to read.
+- Prefer the installed `drift` binary. Do not curl `/api/*`, do not open rdrift.app to read, and do not `cargo install` from the repo.
+- If `drift` is missing: install the latest `cli/v*` GitHub Release (see [reference.md](reference.md)), then tell the user to run `drift auth login`. Do not invent a token.
 - Default JSON is already raw (one line). Do **not** add `--output json`. Use `--output text` only when the user wants a table.
 - List first (`inbox` / `search` / `feeds`), then `show` only the ids that matter. Do not `show` every inbox row.
 - `--feed` takes **`feed_id`**, not the subscription `id`. Copy `feed_id` from `drift feeds`.
@@ -50,6 +51,7 @@ Do not use this skill for SavedItem / read-later, starring, marking read, or edi
 | Article body | `drift show <id>` |
 | List feeds | `drift feeds` |
 | Auth check | `drift auth status` |
+| `drift` not on PATH | install from the `cli/v*` Release, then user runs `drift auth login` |
 | First-time / expired login | user runs `drift auth login` |
 
 Optional: `--limit N` (1–50, server default 20) on `inbox` and `search`.
