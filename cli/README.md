@@ -72,7 +72,14 @@ token = "..."
 
 ## Agent skill
 
-A skill for coding agents lives at [`../skills/drift-cli`](../skills/drift-cli). Symlink that directory into `~/.pi/agent/skills/` or `~/.agents/skills/`.
+No repo clone. Fetch the two files:
+
+```sh
+dir="$HOME/.pi/agent/skills/drift-cli"   # or $HOME/.agents/skills/drift-cli
+mkdir -p "$dir"
+curl -fsSL https://raw.githubusercontent.com/iuhoay/drift/main/skills/drift-cli/SKILL.md -o "$dir/SKILL.md"
+curl -fsSL https://raw.githubusercontent.com/iuhoay/drift/main/skills/drift-cli/reference.md -o "$dir/reference.md"
+```
 
 ## Developing
 
