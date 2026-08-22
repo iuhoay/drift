@@ -27,6 +27,10 @@
 # threads. This includes Active Record's `pool` parameter in `database.yml`.
 threads ENV.fetch("RAILS_MAX_THREADS", 3)
 
+# QUERY (RFC 10008) is not in Puma 8's default allowlist or IANA_HTTP_METHODS
+# (2023). Without this, CLI search dies with a blank 501 before Rails.
+supported_http_methods(Puma::Const::SUPPORTED_HTTP_METHODS + [ "QUERY" ])
+
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
 

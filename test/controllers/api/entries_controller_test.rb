@@ -60,6 +60,50 @@ class Api::EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, response.parsed_body["entries"].size
   end
 
+  test "rejects a QUERY with no token" do
+    query api_entries_path, params: { q: "hello" }, as: :json
+    assert_response :unauthorized
+    assert_equal "unauthorized", response.parsed_body["error"]
+  end
+
+  test "GET q= searches subscribed entries" do
+    match = feeds(:example).entries.create!(guid: "api-search-match", title: "Searchable Foobar Title")
+    miss  = feeds(:example).entries.create!(guid: "api-search-miss", title: "Different Words")
+    hidden = feeds(:unsubscribed).entries.create!(guid: "api-search-hidden", title: "Searchable Foobar Hidden")
+
+    get api_entries_path, params: { q: "foobar", scope: "all" }, as: :json, headers: auth
+    assert_response :success
+
+    ids = response.parsed_body["entries"].map { |entry| entry["id"] }
+    assert_equal [ match.id ], ids
+    assert_not_includes ids, miss.id
+    assert_not_includes ids, hidden.id
+  end
+
+  test "QUERY searches from a JSON body" do
+    match = feeds(:example).entries.create!(guid: "api-query-match", title: "Searchable Foobar Title")
+    miss  = feeds(:example).entries.create!(guid: "api-query-miss", title: "Different Words")
+
+    query api_entries_path, params: { q: "foobar", scope: "all", limit: 20 }, as: :json, headers: auth
+    assert_response :success
+
+    ids = response.parsed_body["entries"].map { |entry| entry["id"] }
+    assert_equal [ match.id ], ids
+    assert_not_includes ids, miss.id
+  end
+
+  test "QUERY matches a single CJK character" do
+    match = feeds(:example).entries.create!(guid: "api-cjk-match", title: "搜索引擎优化指南")
+    miss  = feeds(:example).entries.create!(guid: "api-cjk-miss", title: "完全不同的标题")
+
+    query api_entries_path, params: { q: "擎", scope: "all" }, as: :json, headers: auth
+    assert_response :success
+
+    ids = response.parsed_body["entries"].map { |entry| entry["id"] }
+    assert_equal [ match.id ], ids
+    assert_not_includes ids, miss.id
+  end
+
   test "show returns a tag-stripped body" do
     get api_entry_path(entries(:example_first)), as: :json, headers: auth
     assert_response :success
