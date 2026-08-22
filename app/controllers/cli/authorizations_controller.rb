@@ -3,7 +3,7 @@
 # listener on 127.0.0.1 — never the ApiToken itself, never a caller-supplied host.
 #
 # Built as a raw Location header instead of redirect_to(...). url_for would
-# merge onto /cli/authorize; Brakeman would flag a string redirect_to.
+# merge onto this resource; Brakeman would flag a string redirect_to.
 class Cli::AuthorizationsController < ApplicationController
   layout "cli"
 

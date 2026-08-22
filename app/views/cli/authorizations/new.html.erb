@@ -10,7 +10,7 @@
   You can revoke the token later under Account → API tokens.
 </p>
 
-<%= form_with url: cli_authorize_path, data: { turbo: false }, class: "mt-6 space-y-3" do %>
+<%= form_with url: cli_authorizations_path, data: { turbo: false }, class: "mt-6 space-y-3" do %>
   <%= hidden_field_tag :redirect_uri, @redirect_uri %>
   <%= hidden_field_tag :state, @state %>
   <%= submit_tag "Authorize CLI", class: "term-submit" %>

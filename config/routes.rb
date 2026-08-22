@@ -80,10 +80,11 @@ Rails.application.routes.draw do
     resource :star, only: [ :create, :destroy ], module: :saved_items
   end
 
-  # CLI loopback login: the browser confirms, then bounces a one-time code to
-  # 127.0.0.1. GET is the confirm page (no token minted). See Cli::AuthorizationsController.
-  get  "cli/authorize", to: "cli/authorizations#new", as: :cli_authorize
-  post "cli/authorize", to: "cli/authorizations#create"
+  # CLI loopback login: new is the confirm page (no token minted), create
+  # mints a one-time code and bounces it to 127.0.0.1.
+  namespace :cli do
+    resources :authorizations, only: [ :new, :create ]
+  end
 
   namespace :api do
     resources :saved_items, only: [ :create ]

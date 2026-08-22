@@ -8,7 +8,7 @@ class Cli::AuthorizationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "requires authentication and keeps the authorize URL as return_to" do
-    get cli_authorize_path, params: { redirect_uri: @redirect_uri, state: @state }
+    get new_cli_authorization_path, params: { redirect_uri: @redirect_uri, state: @state }
 
     assert_redirected_to new_session_path
     follow_redirect!
@@ -27,11 +27,11 @@ class Cli::AuthorizationsControllerTest < ActionDispatch::IntegrationTest
     OmniAuth.config.mock_auth[:github] = auth
     Rails.application.env_config["omniauth.auth"] = auth
 
-    get cli_authorize_path, params: { redirect_uri: @redirect_uri, state: @state }
+    get new_cli_authorization_path, params: { redirect_uri: @redirect_uri, state: @state }
     assert_redirected_to new_session_path
 
     get "/auth/github/callback"
-    assert_redirected_to cli_authorize_url(redirect_uri: @redirect_uri, state: @state)
+    assert_redirected_to new_cli_authorization_url(redirect_uri: @redirect_uri, state: @state)
   ensure
     OmniAuth.config.mock_auth.clear
     Rails.application.env_config.delete("omniauth.auth")
@@ -43,12 +43,12 @@ class Cli::AuthorizationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_no_difference -> { CliAuthorization.count } do
       assert_no_difference -> { @user.api_tokens.count } do
-        get cli_authorize_path, params: { redirect_uri: @redirect_uri, state: @state }
+        get new_cli_authorization_path, params: { redirect_uri: @redirect_uri, state: @state }
       end
     end
 
     assert_response :success
-    assert_select "form[action=?][data-turbo=false]", cli_authorize_path
+    assert_select "form[action=?][data-turbo=false]", cli_authorizations_path
     assert_select "input[name=redirect_uri][value=?]", @redirect_uri
     assert_select "input[name=state][value=?]", @state
     assert_select "aside", count: 0
@@ -58,7 +58,7 @@ class Cli::AuthorizationsControllerTest < ActionDispatch::IntegrationTest
   test "GET rejects a non-loopback redirect" do
     sign_in_as(@user)
 
-    get cli_authorize_path, params: { redirect_uri: "https://evil.example/callback", state: @state }
+    get new_cli_authorization_path, params: { redirect_uri: "https://evil.example/callback", state: @state }
 
     assert_response :unprocessable_entity
     assert_select "h1", text: /invalid/i
@@ -69,7 +69,7 @@ class Cli::AuthorizationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference -> { CliAuthorization.count } => 1 do
       assert_no_difference -> { @user.api_tokens.count } do
-        post cli_authorize_path, params: { redirect_uri: @redirect_uri, state: @state }
+        post cli_authorizations_path, params: { redirect_uri: @redirect_uri, state: @state }
       end
     end
 
@@ -87,7 +87,7 @@ class Cli::AuthorizationsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
 
     assert_no_difference -> { CliAuthorization.count } do
-      post cli_authorize_path, params: { redirect_uri: "http://example.com/callback", state: @state }
+      post cli_authorizations_path, params: { redirect_uri: "http://example.com/callback", state: @state }
     end
 
     assert_response :unprocessable_entity
