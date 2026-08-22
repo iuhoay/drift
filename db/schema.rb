@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_07_14_041743) do
+ActiveRecord::Schema[8.2].define(version: 2026_08_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,17 @@ ActiveRecord::Schema[8.2].define(version: 2026_07_14_041743) do
     t.datetime "updated_at", null: false
     t.index ["token"], name: "index_api_tokens_on_token", unique: true
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "cli_authorizations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "code", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "consumed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_cli_authorizations_on_code", unique: true
+    t.index ["user_id"], name: "index_cli_authorizations_on_user_id"
   end
 
   create_table "entries", force: :cascade do |t|
@@ -158,6 +169,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_07_14_041743) do
   end
 
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "cli_authorizations", "users"
   add_foreign_key "entries", "feeds"
   add_foreign_key "identities", "users"
   add_foreign_key "saved_items", "users"

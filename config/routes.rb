@@ -80,10 +80,19 @@ Rails.application.routes.draw do
     resource :star, only: [ :create, :destroy ], module: :saved_items
   end
 
+  # CLI loopback login: new is the confirm page (no token minted), create
+  # mints a one-time code and bounces it to 127.0.0.1.
+  namespace :cli do
+    resources :authorizations, only: [ :new, :create ]
+  end
+
   namespace :api do
     resources :saved_items, only: [ :create ]
     resources :entries, only: [ :index, :show ]
     resources :subscriptions, only: [ :index ]
+    namespace :cli do
+      resource :token, only: :create
+    end
   end
 
   # Front door: HomeController renders the landing page for signed-out visitors

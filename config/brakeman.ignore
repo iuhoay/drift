@@ -69,5 +69,5 @@
       "note": "SavedItem#safe_url returns the URL only when it matches \\Ahttps?:// — see app/models/saved_item.rb."
     }
   ],
-  "brakeman_version": "8.0.4"
+  "brakeman_version": "8.0.6"
 }

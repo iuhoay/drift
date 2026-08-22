@@ -26,6 +26,7 @@ class User < ApplicationRecord
   has_many :entries, through: :user_entries
   has_many :saved_items, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :cli_authorizations, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
