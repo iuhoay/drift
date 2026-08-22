@@ -10,7 +10,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_session_path
     assert_select "dt", text: /agent/
     assert_select "p", text: /drift inbox/
-    assert_select "a[href=?]", "https://github.com/iuhoay/drift/tree/main/skills/drift-cli", text: "skills/drift-cli"
+    assert_select "a[href=?]", "https://github.com/iuhoay/drift-cli", text: "skills/drift-cli"
   end
 
   test "landing page links to the legal pages" do

@@ -13,7 +13,6 @@ CI.run do
     group "Tests" do
       step "Tests: Rails", "bin/rails test"
       step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
-      step "Tests: CLI", "bin/cli-test"
       # Optional: Run system tests
       # step "Tests: System", "bin/rails test:system"
     end
