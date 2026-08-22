@@ -51,6 +51,8 @@ class Cli::AuthorizationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?][data-turbo=false]", cli_authorize_path
     assert_select "input[name=redirect_uri][value=?]", @redirect_uri
     assert_select "input[name=state][value=?]", @state
+    assert_select "aside", count: 0
+    assert_select "nav", count: 0
   end
 
   test "GET rejects a non-loopback redirect" do

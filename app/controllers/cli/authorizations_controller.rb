@@ -5,6 +5,8 @@
 # Built as a raw Location header instead of redirect_to(...). url_for would
 # merge onto /cli/authorize; Brakeman would flag a string redirect_to.
 class Cli::AuthorizationsController < ApplicationController
+  layout "cli"
+
   before_action :assign_oauth_params
   before_action :require_valid_oauth_request
 
