@@ -1,6 +1,9 @@
 # Browser half of `drift auth login`. GET is a confirm page (side-effect free).
-# POST mints a short-lived CliAuthorization and redirects to the CLI listener
-# on 127.0.0.1 — never the ApiToken itself, never a caller-supplied host.
+# POST mints a short-lived CliAuthorization and sends the browser to the CLI
+# listener on 127.0.0.1 — never the ApiToken itself, never a caller-supplied host.
+#
+# Built as a raw Location header instead of redirect_to(...). url_for would
+# merge onto /cli/authorize; Brakeman would flag a string redirect_to.
 class Cli::AuthorizationsController < ApplicationController
   before_action :assign_oauth_params
   before_action :require_valid_oauth_request
@@ -10,10 +13,7 @@ class Cli::AuthorizationsController < ApplicationController
 
   def create
     authorization = Current.user.cli_authorizations.create!(expires_at: CliAuthorization::TTL.from_now)
-    redirect_to({ protocol: "http", host: "127.0.0.1", port: @port,
-                  path: "/callback",
-                  params: { code: authorization.code, state: @state } },
-                allow_other_host: true)
+    head :found, location: loopback_callback_url(code: authorization.code, state: @state)
   end
 
   private
@@ -28,4 +28,14 @@ class Cli::AuthorizationsController < ApplicationController
 
       render :invalid, status: :unprocessable_entity
     end
+
+    def loopback_callback_url(**query)
+      URI::HTTP.build(
+        host: "127.0.0.1",
+        port: @port,
+        path: "/callback",
+        query: query.to_query
+      ).to_s
+    end
+    helper_method :loopback_callback_url
 end
