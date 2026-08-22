@@ -68,6 +68,25 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  cli:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: cli
+
+      - name: Test and lint CLI
+        run: bin/cli-test
+
   test:
     runs-on: ubuntu-latest
 

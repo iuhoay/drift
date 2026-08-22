@@ -42,3 +42,4 @@
 
 # Skill-creator eval scaffolding (test runs, benchmarks, logs)
 .claude/skills/*-workspace/
+/cli/target
