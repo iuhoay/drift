@@ -72,14 +72,7 @@ token = "..."
 
 ## Agent skill
 
-No repo clone. Fetch the two files:
-
-```sh
-dir="$HOME/.pi/agent/skills/drift-cli"   # or $HOME/.agents/skills/drift-cli
-mkdir -p "$dir"
-curl -fsSL https://raw.githubusercontent.com/iuhoay/drift/main/skills/drift-cli/SKILL.md -o "$dir/SKILL.md"
-curl -fsSL https://raw.githubusercontent.com/iuhoay/drift/main/skills/drift-cli/reference.md -o "$dir/reference.md"
-```
+Source: [`skills/drift-cli`](../skills/drift-cli). Agents install skills their own way.
 
 ## Developing
 
