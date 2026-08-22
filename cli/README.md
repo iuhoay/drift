@@ -4,19 +4,15 @@ Command-line client for [Drift](https://rdrift.app). Talks to the live HTTP API 
 
 ## Install
 
-From a GitHub Release (`cli/v*` tags, not the Kamal `drift@<sha>` deploy tags):
+Install the binary from a GitHub Release (`cli/v*` tags, not the Kamal `drift@<sha>` deploy tags). Do not `cargo install` the repo.
 
 ```sh
-gh release download cli/v0.1.0 --repo iuhoay/drift --pattern 'drift-*' --dir .
-install ./drift-aarch64-apple-darwin ~/.local/bin/drift   # Apple Silicon
-# install ./drift-x86_64-unknown-linux-gnu ~/.local/bin/drift
+tag=$(gh release list --repo iuhoay/drift --json tagName --jq '.[] | select(.tagName | startswith("cli/v")) | .tagName' | head -1)
+gh release download "$tag" --repo iuhoay/drift --pattern 'drift-aarch64-apple-darwin' --dir .
+install -m 0755 ./drift-aarch64-apple-darwin ~/.local/bin/drift
 ```
 
-Or from the repository root:
-
-```sh
-cargo install --path cli
-```
+Linux amd64 uses `drift-x86_64-unknown-linux-gnu`. Put `~/.local/bin` on `PATH`.
 
 Cut a release after merging CLI changes to main:
 
@@ -77,3 +73,12 @@ token = "..."
 ## Agent skill
 
 A skill for coding agents lives at [`../skills/drift-cli`](../skills/drift-cli). Symlink that directory into `~/.pi/agent/skills/` or `~/.agents/skills/`.
+
+## Developing
+
+From the repository root, while working on the CLI itself:
+
+```sh
+cargo test --manifest-path cli/Cargo.toml
+cargo install --path cli
+```
