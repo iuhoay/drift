@@ -19,9 +19,18 @@ install -m 0755 "./$asset" "$HOME/.local/bin/drift"
 
 `$HOME/.local/bin` must be on `PATH`. If `gh` is missing, point the user at https://github.com/iuhoay/drift/releases and the matching asset — still no source install.
 
-This skill file is the source; agents see it when `skills/drift-cli` is linked into `~/.pi/agent/skills/` or `~/.agents/skills/`.
-
 If `drift` is not on `PATH` after that, stop. Do not fall back to curling the API.
+
+## Install the skill
+
+The user does not have this repo. Fetch the two files; do not `git clone` or `ln -s` a checkout.
+
+```sh
+dir="$HOME/.pi/agent/skills/drift-cli"   # or $HOME/.agents/skills/drift-cli
+mkdir -p "$dir"
+curl -fsSL https://raw.githubusercontent.com/iuhoay/drift/main/skills/drift-cli/SKILL.md -o "$dir/SKILL.md"
+curl -fsSL https://raw.githubusercontent.com/iuhoay/drift/main/skills/drift-cli/reference.md -o "$dir/reference.md"
+```
 
 ## Auth
 
