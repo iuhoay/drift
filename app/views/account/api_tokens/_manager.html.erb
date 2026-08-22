@@ -4,7 +4,7 @@
   <div class="mb-6 rounded border border-emerald-200 bg-emerald-50/60 px-4 py-4">
     <div class="text-xs uppercase tracking-widest text-emerald-700">New token — copy it now</div>
     <code class="mt-2 block break-all rounded bg-white/70 px-3 py-2 font-mono text-sm text-stone-900"><%= new_token.token %></code>
-    <p class="mt-2 text-xs text-stone-600">Paste it into the extension's options. For security it won't be shown in full again.</p>
+    <p class="mt-2 text-xs text-stone-600">Paste it into the extension or CLI. For security it won't be shown in full again.</p>
   </div>
 <% end %>
 
@@ -30,11 +30,11 @@
           </div>
         </div>
         <%= button_to "Revoke", account_api_token_path(token), method: :delete,
-              form: { data: { turbo_confirm: "Revoke this token? The extension using it will stop working." } },
+              form: { data: { turbo_confirm: "Revoke this token? Anything using it will stop working." } },
               class: "shrink-0 text-xs text-stone-500 hover:text-red-600 underline" %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <p class="text-sm text-stone-500">No tokens yet. Generate one above, then paste it into the extension.</p>
+  <p class="text-sm text-stone-500">No tokens yet. Generate one above, then paste it into the extension or CLI.</p>
 <% end %>
