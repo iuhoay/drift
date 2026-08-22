@@ -1,7 +1,8 @@
 # Drift
 
 A calm, fast, distraction-free RSS reader. Server-rendered Rails 8 + Hotwire,
-no SPA, no AI summaries, no social features — just feeds.
+no SPA, no AI summaries, no social features — just feeds. The CLI and agent
+skill live in [iuhoay/drift-cli](https://github.com/iuhoay/drift-cli).
 
 ## Stack
 
