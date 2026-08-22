@@ -4,10 +4,25 @@ Command-line client for [Drift](https://rdrift.app). Talks to the live HTTP API 
 
 ## Install
 
-From the repository root:
+From a GitHub Release (`cli/v*` tags, not the Kamal `drift@<sha>` deploy tags):
+
+```sh
+gh release download cli/v0.1.0 --repo iuhoay/drift --pattern 'drift-*' --dir .
+install ./drift-aarch64-apple-darwin ~/.local/bin/drift   # Apple Silicon
+# install ./drift-x86_64-unknown-linux-gnu ~/.local/bin/drift
+```
+
+Or from the repository root:
 
 ```sh
 cargo install --path cli
+```
+
+Cut a release after merging CLI changes to main:
+
+```sh
+git tag cli/v0.1.0
+git push origin cli/v0.1.0
 ```
 
 Sign in through the browser (GitHub, Google, or password). The CLI never asks you to paste a token:
