@@ -77,7 +77,12 @@
     <section class="py-4 flex items-start justify-between gap-4">
       <div>
         <div class="text-xs uppercase tracking-widest text-stone-500">API tokens</div>
-        <div class="mt-1 text-stone-500 text-sm">Tokens for the browser extension and a CLI that reads your inbox.</div>
+        <div class="mt-1 text-stone-500 text-sm">
+          Tokens for the browser extension and a CLI that reads your inbox.
+          Give your agent the
+          <%= link_to "rDrift skill", "https://github.com/iuhoay/drift/tree/main/skills/drift-cli",
+                class: "underline text-stone-700 hover:text-amber-700" %>.
+        </div>
       </div>
       <%= link_to "Manage", account_api_tokens_path, class: "shrink-0 text-sm underline text-stone-700 hover:text-amber-700" %>
     </section>

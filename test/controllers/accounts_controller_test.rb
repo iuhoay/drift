@@ -7,6 +7,7 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     get account_path
     assert_response :success
     assert_select "h1", text: "Account"
+    assert_select "a[href=?]", "https://github.com/iuhoay/drift/tree/main/skills/drift-cli", text: "rDrift skill"
   end
 
   test "show requires authentication" do
