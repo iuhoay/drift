@@ -67,7 +67,24 @@
       "confidence": "Weak",
       "cwe_id": [79],
       "note": "SavedItem#safe_url returns the URL only when it matches \\Ahttps?:// — see app/models/saved_item.rb."
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "222bdc0f909aa2542a38d6a925b4088740972f4456df7996d41c868f4f8de5bb",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/cli/authorizations_controller.rb",
+      "line": 13,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Current.user.cli_authorizations.create!(:expires_at => CliAuthorization::TTL.from_now).callback_url(params[:redirect_uri].to_s, params[:state].to_s), :allow_other_host => true)",
+      "render_path": null,
+      "location": {"type": "method", "class": "Cli::AuthorizationsController", "method": "create"},
+      "user_input": "Current.user.cli_authorizations.create!(:expires_at => CliAuthorization::TTL.from_now).callback_url(params[:redirect_uri].to_s, params[:state].to_s)",
+      "confidence": "Weak",
+      "cwe_id": [601],
+      "note": "callback_url rebuilds http://{whitelisted loopback host}:{port}{path} via URI::HTTP.build. redirect_uri is rejected unless host is 127.0.0.1/localhost/::1. allow_other_host is required for the CLI listener."
     }
   ],
-  "brakeman_version": "8.0.4"
+  "brakeman_version": "8.0.6"
 }

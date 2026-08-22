@@ -80,10 +80,18 @@ Rails.application.routes.draw do
     resource :star, only: [ :create, :destroy ], module: :saved_items
   end
 
+  # CLI loopback login: the browser confirms, then bounces a one-time code to
+  # 127.0.0.1. GET is the confirm page (no token minted). See Cli::AuthorizationsController.
+  get  "cli/authorize", to: "cli/authorizations#new", as: :cli_authorize
+  post "cli/authorize", to: "cli/authorizations#create"
+
   namespace :api do
     resources :saved_items, only: [ :create ]
     resources :entries, only: [ :index, :show ]
     resources :subscriptions, only: [ :index ]
+    namespace :cli do
+      resource :token, only: :create
+    end
   end
 
   # Front door: HomeController renders the landing page for signed-out visitors
