@@ -111,7 +111,7 @@ pub fn token_url(host: &str) -> String {
 
 pub fn authorize_url(host: &str, redirect_uri: &str, state: &str) -> String {
     format!(
-        "{}/cli/authorize?redirect_uri={}&state={}",
+        "{}/cli/authorizations/new?redirect_uri={}&state={}",
         normalize_host(host),
         percent_encode(redirect_uri),
         percent_encode(state)
@@ -292,7 +292,7 @@ mod tests {
                 "http://127.0.0.1:9/callback",
                 "abc_def-12"
             ),
-            "https://rdrift.app/cli/authorize?redirect_uri=http%3A%2F%2F127.0.0.1%3A9%2Fcallback&state=abc_def-12"
+            "https://rdrift.app/cli/authorizations/new?redirect_uri=http%3A%2F%2F127.0.0.1%3A9%2Fcallback&state=abc_def-12"
         );
         assert_eq!(
             subscriptions_url("https://rdrift.app/"),
