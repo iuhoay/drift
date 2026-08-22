@@ -18,46 +18,12 @@ class Api::EntriesController < Api::BaseController
 
     entries = entries.recent if query.blank?
 
-    page = entries.limit(limit)
-    user_entries_by_id = current_user.user_entries.where(entry_id: page.map(&:id)).index_by(&:entry_id)
-
-    render json: { entries: page.map { |entry| serialize(entry, user_entries_by_id[entry.id]) } }
+    @entries = entries.limit(limit)
+    @user_entries_by_id = current_user.user_entries.where(entry_id: @entries.map(&:id)).index_by(&:entry_id)
   end
 
   def show
-    entry = current_user.subscribed_entries.includes(:feed).find(params[:id])
-    user_entry = current_user.user_entries.find_by(entry: entry)
-
-    render json: serialize_show(entry, user_entry)
-  end
-
-  private
-
-  def serialize(entry, user_entry)
-    {
-      id: entry.id,
-      title: entry.title,
-      url: entry.url,
-      published_at: entry.published_at&.iso8601,
-      excerpt: entry.excerpt,
-      read: user_entry&.read? || false,
-      starred: user_entry&.starred? || false,
-      feed: { id: entry.feed_id, title: entry.feed.display_title }
-    }
-  end
-
-  def serialize_show(entry, user_entry)
-    {
-      id: entry.id,
-      title: entry.title,
-      url: entry.url,
-      author: entry.author,
-      published_at: entry.published_at&.iso8601,
-      read: user_entry&.read? || false,
-      starred: user_entry&.starred? || false,
-      has_full_content: entry.full_content.present?,
-      body: entry.plain_body,
-      feed: { id: entry.feed_id, title: entry.feed.display_title }
-    }
+    @entry = current_user.subscribed_entries.includes(:feed).find(params[:id])
+    @user_entry = current_user.user_entries.find_by(entry: @entry)
   end
 end
