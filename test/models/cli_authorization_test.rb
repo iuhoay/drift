@@ -29,16 +29,18 @@ class CliAuthorizationTest < ActiveSupport::TestCase
     end
   end
 
-  test "loopback_redirect? allows only http loopback hosts" do
-    assert CliAuthorization.loopback_redirect?("http://127.0.0.1:12345/callback")
-    assert CliAuthorization.loopback_redirect?("http://localhost:9/callback")
-    assert CliAuthorization.loopback_redirect?("http://[::1]:12345/callback")
+  test "loopback_port accepts only http://127.0.0.1 and returns the port" do
+    assert_equal 12345, CliAuthorization.loopback_port("http://127.0.0.1:12345/callback")
+    assert_equal 80, CliAuthorization.loopback_port("http://127.0.0.1/callback")
 
-    assert_not CliAuthorization.loopback_redirect?("https://127.0.0.1:12345/callback")
-    assert_not CliAuthorization.loopback_redirect?("http://127.0.0.1.evil.test/callback")
-    assert_not CliAuthorization.loopback_redirect?("http://example.com/callback")
-    assert_not CliAuthorization.loopback_redirect?("http://user@127.0.0.1/callback")
-    assert_not CliAuthorization.loopback_redirect?("not-a-url")
+    assert_nil CliAuthorization.loopback_port("http://localhost:9/callback")
+    assert_nil CliAuthorization.loopback_port("http://[::1]:12345/callback")
+    assert_nil CliAuthorization.loopback_port("https://127.0.0.1:12345/callback")
+    assert_nil CliAuthorization.loopback_port("http://127.0.0.1.evil.test/callback")
+    assert_nil CliAuthorization.loopback_port("http://example.com/callback")
+    assert_nil CliAuthorization.loopback_port("http://user@127.0.0.1/callback")
+    assert_nil CliAuthorization.loopback_port("http://127.0.0.1:12345/elsewhere")
+    assert_nil CliAuthorization.loopback_port("not-a-url")
   end
 
   test "valid_state? requires a short opaque token" do
