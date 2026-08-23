@@ -93,7 +93,7 @@ Rails.application.routes.draw do
       # A GET-only resources#index never matches QUERY (no HEAD-style fallback).
       query :index, on: :collection
     end
-    resources :subscriptions, only: [ :index ]
+    resources :subscriptions, only: [ :index, :update ]
     namespace :cli do
       resource :token, only: :create
     end

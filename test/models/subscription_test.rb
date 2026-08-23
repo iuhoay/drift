@@ -64,6 +64,28 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal existing, result
   end
 
+  test "with_category matches case-insensitively" do
+    assert_includes Subscription.with_category("apple"), subscriptions(:one_stale)
+    assert_includes Subscription.with_category("APPLE"), subscriptions(:one_stale)
+    assert_not_includes Subscription.with_category("apple"), subscriptions(:one_example)
+  end
+
+  test "category is stripped, squeezed, and blanked" do
+    subscription = subscriptions(:one_example)
+    subscription.update!(category: "  Rails   News  ")
+    assert_equal "Rails News", subscription.category
+
+    subscription.update!(category: "   ")
+    assert_nil subscription.category
+  end
+
+  test "category cannot exceed 40 characters" do
+    subscription = subscriptions(:one_example)
+    subscription.category = "a" * 41
+    assert_not subscription.valid?
+    assert_includes subscription.errors[:category], "is too long (maximum is 40 characters)"
+  end
+
   test "subscribe stores a custom_title when given, leaving it nil when blank" do
     user = users(:two)
 
@@ -76,6 +98,15 @@ class SubscriptionTest < ActiveSupport::TestCase
       Subscription.subscribe(user, "https://untitled.example.com/feed.xml", custom_title: "  ")
     end
     assert_nil untitled.custom_title
+  end
+
+  test "subscribe stores a category when given" do
+    user = users(:two)
+
+    subscription = stub_discovery([ "https://categorized.example.com/feed.xml" ]) do
+      Subscription.subscribe(user, "https://categorized.example.com/feed.xml", category: " rails ")
+    end
+    assert_equal "rails", subscription.category
   end
 
   test "subscribe with a blank address returns an unsaved subscription with an error" do

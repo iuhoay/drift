@@ -15,7 +15,7 @@ module Subscription::Subscribing
     # validation errors when the address is blank, can't be fetched, resolves to
     # no feed, or a record is invalid — so the caller branches on `persisted?`
     # and re-renders.
-    def subscribe(user, address, custom_title: nil)
+    def subscribe(user, address, custom_title: nil, category: nil)
       url = address.to_s.strip
       subscription = user.subscriptions.new
 
@@ -38,6 +38,7 @@ module Subscription::Subscribing
         feed.save!
         subscription = user.subscriptions.find_or_create_by!(feed: feed) do |s|
           s.custom_title = custom_title.presence
+          s.category = category.presence
         end
       end
 

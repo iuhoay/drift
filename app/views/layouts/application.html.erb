@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full" data-theme="<%= cookies[:theme] %>">
+<html lang="en" class="h-full<%= ' overflow-hidden' if authenticated? %>" data-theme="<%= cookies[:theme] %>">
   <head>
     <title><%= content_for(:title) || "Drift" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -37,7 +37,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="term term-screen h-full bg-stone-50 text-stone-900 antialiased">
+  <body class="term term-screen h-full bg-stone-50 text-stone-900 antialiased<%= ' overflow-hidden' if authenticated? %>">
     <% if authenticated? %>
       <div class="flex h-dvh flex-col overflow-hidden">
         <header class="term-topbar flex min-h-9 shrink-0 items-center justify-between border-b border-stone-300 px-4 pt-[env(safe-area-inset-top)] text-xs">
@@ -62,9 +62,9 @@
         <div class="flex flex-1 overflow-hidden">
           <%= render "shared/sidebar" %>
 
-          <main class="flex-1 min-w-0 overflow-y-auto">
+          <main id="page-scroll" data-controller="scroll-preserve" class="flex-1 min-w-0 overflow-y-auto">
             <%= render "shared/email_verification_banner" %>
-            <%= render "shared/flash" %>
+            <div id="flash"><%= render "shared/flash" %></div>
             <%= yield %>
           </main>
         </div>
@@ -74,7 +74,7 @@
     <% else %>
       <main class="flex min-h-dvh items-center justify-center px-4">
         <div class="w-full max-w-md">
-          <%= render "shared/flash" %>
+          <div id="flash"><%= render "shared/flash" %></div>
           <%= yield %>
         </div>
       </main>

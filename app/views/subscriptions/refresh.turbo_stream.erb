@@ -1,0 +1,12 @@
+<%= turbo_stream.update "subscriptions" do %>
+  <%= render "subscriptions/list" %>
+<% end %>
+<%= turbo_stream.replace "sidebar-feeds" do %>
+  <%= render "shared/sidebar_feeds",
+        subs: @subscriptions,
+        sections: subscription_nav_sections(@subscriptions),
+        counts: unread_counts_for(Current.user) %>
+<% end %>
+<%= turbo_stream.update "flash" do %>
+  <%= render "shared/flash" %>
+<% end %>
