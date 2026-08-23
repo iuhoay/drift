@@ -1,6 +1,7 @@
 <li id="<%= dom_id(subscription) %>" class="py-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-  <%= link_to entries_path(feed_id: subscription.feed_id, scope: "unread"), class: "group min-w-0 flex-1 basis-full sm:basis-0" do %>
-    <div class="font-medium truncate group-hover:text-amber-700"><%= subscription.display_title %></div>
+  <div class="min-w-0 flex-1 basis-full sm:basis-0">
+    <%= link_to subscription.display_title, entries_path(feed_id: subscription.feed_id, scope: "unread"),
+          class: "block w-fit max-w-full font-medium truncate hover:text-amber-700" %>
     <div class="text-xs text-stone-500 truncate">
       <%= subscription.feed.feed_url %>
       <% if subscription.feed.dead? %>
@@ -11,23 +12,10 @@
         <span class="ml-2">last fetched <%= relative_time(subscription.feed.last_success_at) %></span>
       <% end %>
     </div>
-  <% end %>
+  </div>
 
   <%= form_with model: subscription, class: "flex items-center", html: { onchange: "this.requestSubmit()" } do |f| %>
-    <%= f.label :category, for: dom_id(subscription, :category), class: "sr-only" %>
-    <%= f.text_field :category, id: dom_id(subscription, :category),
-          list: "subscription-categories", maxlength: 40,
-          placeholder: "category", autocomplete: "off",
-          class: "w-28 bg-transparent border-0 border-b border-transparent px-0 py-0.5 text-xs text-stone-500 placeholder:text-stone-300 hover:border-stone-300 focus:border-amber-700 focus:text-stone-900 focus:outline-none" %>
-  <% end %>
-
-  <% if subscription.category.present? %>
-    <%= button_to "×", subscription_path(subscription),
-          method: :patch,
-          params: { subscription: { category: "" } },
-          form: { class: "inline" },
-          class: "text-xs text-stone-300 hover:text-stone-600",
-          title: "Remove category" %>
+    <%= render "subscriptions/category_field", f: f, options: @category_options || [], variant: :inline %>
   <% end %>
 
   <%= button_to "Unsubscribe", subscription_path(subscription),

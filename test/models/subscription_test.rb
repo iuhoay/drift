@@ -86,6 +86,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_includes subscription.errors[:category], "is too long (maximum is 40 characters)"
   end
 
+  test "category adopts the casing of an existing sibling label" do
+    subscription = subscriptions(:one_example)
+    subscription.update!(category: "apple")
+    assert_equal "Apple", subscription.category
+  end
+
+  test "category keeps typed casing when it is the only member" do
+    subscription = subscriptions(:one_stale)
+    subscription.update!(category: "apple")
+    assert_equal "apple", subscription.category
+  end
+
   test "subscribe stores a custom_title when given, leaving it nil when blank" do
     user = users(:two)
 
@@ -107,6 +119,13 @@ class SubscriptionTest < ActiveSupport::TestCase
       Subscription.subscribe(user, "https://categorized.example.com/feed.xml", category: " rails ")
     end
     assert_equal "rails", subscription.category
+  end
+
+  test "subscribe adopts the casing of an existing label" do
+    subscription = stub_discovery([ "https://also-apple.example.com/feed.xml" ]) do
+      Subscription.subscribe(users(:one), "https://also-apple.example.com/feed.xml", category: "APPLE")
+    end
+    assert_equal "Apple", subscription.category
   end
 
   test "subscribe with a blank address returns an unsaved subscription with an error" do

@@ -24,11 +24,21 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", entries_path(category: "Apple", scope: "unread"), text: "Apple"
     assert_select "input[name='subscription[category]']"
     assert_select "input[type=submit][value=Save]", count: 0
+    assert_select "[data-controller=category-combobox]"
+    assert_select "[role=listbox]"
+    assert_select "[role=option][data-value=Apple]", text: "Apple"
   end
 
   test "new" do
     get new_subscription_path
     assert_response :success
+  end
+
+  test "new offers existing categories as chips" do
+    get new_subscription_path
+    assert_response :success
+    assert_select "button[data-category-combobox-target=chip]", text: "Apple"
+    assert_select "input[name='subscription[category]']"
   end
 
   test "create reuses an existing feed and enqueues a refresh" do
@@ -113,6 +123,15 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "rails", subscription.reload.category
   end
 
+  test "update adopts the casing of an existing category" do
+    subscription = subscriptions(:one_example)
+
+    patch subscription_path(subscription), params: { subscription: { category: "apple" } }
+
+    assert_redirected_to subscriptions_path
+    assert_equal "Apple", subscription.reload.category
+  end
+
   test "update clears the category when blank" do
     subscription = subscriptions(:one_stale)
 
@@ -160,10 +179,19 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   test "create stores category" do
     existing = feeds(:unsubscribed)
 
+    post subscriptions_path, params: { subscription: { feed_url: existing.feed_url, category: "news" } }
+
+    assert_redirected_to subscriptions_path
+    assert_equal "news", @user.subscriptions.find_by!(feed: existing).category
+  end
+
+  test "create adopts the casing of an existing category" do
+    existing = feeds(:unsubscribed)
+
     post subscriptions_path, params: { subscription: { feed_url: existing.feed_url, category: "apple" } }
 
     assert_redirected_to subscriptions_path
-    assert_equal "apple", @user.subscriptions.find_by!(feed: existing).category
+    assert_equal "Apple", @user.subscriptions.find_by!(feed: existing).category
   end
 
   test "destroy removes the subscription" do

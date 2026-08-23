@@ -31,6 +31,7 @@ class Subscription < ApplicationRecord
   validates :category, length: { maximum: 40 }, allow_nil: true
 
   normalizes :category, with: ->(value) { value.to_s.strip.gsub(/[[:space:]]+/, " ").presence }
+  before_validation :canonicalize_category
 
   def display_title
     custom_title.presence || feed.display_title
@@ -41,4 +42,16 @@ class Subscription < ApplicationRecord
   def self.with_category(name)
     where("LOWER(#{table_name}.category) = ?", name.to_s.strip.downcase)
   end
+
+  private
+    # Reuse the first sibling's spelling so "apple" lands in "Apple" instead
+    # of forking a second label. The only member of a bucket may rename it.
+    def canonicalize_category
+      return if category.blank? || user.nil?
+
+      siblings = user.subscriptions
+      siblings = siblings.where.not(id: id) if id
+      match = siblings.where("LOWER(category) = ?", category.downcase).pick(:category)
+      self.category = match if match.present?
+    end
 end

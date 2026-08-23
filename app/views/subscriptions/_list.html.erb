@@ -1,14 +1,6 @@
 <% if @subscriptions.empty? %>
   <p class="text-stone-500 font-sans">You haven't subscribed to anything yet.</p>
 <% else %>
-  <% if @category_options.present? %>
-    <datalist id="subscription-categories">
-      <% @category_options.each do |name| %>
-        <option value="<%= name %>"></option>
-      <% end %>
-    </datalist>
-  <% end %>
-
   <% sections = subscription_nav_sections(@subscriptions) %>
   <div class="font-sans">
     <% sections.each do |label, group| %>
