@@ -1,0 +1,26 @@
+<% if @subscriptions.empty? %>
+  <p class="text-stone-500 font-sans">You haven't subscribed to anything yet.</p>
+<% else %>
+  <% sections = subscription_nav_sections(@subscriptions) %>
+  <div class="font-sans">
+    <% sections.each do |label, group| %>
+      <section class="mt-8 first:mt-0">
+        <% if label %>
+          <div class="mb-1 flex items-baseline justify-between gap-3">
+            <%= link_to entries_path(category: label, scope: "unread"),
+                  class: "text-xs uppercase tracking-widest text-stone-500 hover:text-amber-700" do %>
+              <%= label %>
+            <% end %>
+            <span class="tabular-nums text-xs text-stone-400"><%= group.size %></span>
+          </div>
+        <% elsif sections.size > 1 %>
+          <div class="mb-1 text-xs uppercase tracking-widest text-stone-400">uncategorized</div>
+        <% end %>
+
+        <ul class="divide-y divide-stone-200">
+          <%= render partial: "subscriptions/subscription", collection: group, as: :subscription %>
+        </ul>
+      </section>
+    <% end %>
+  </div>
+<% end %>

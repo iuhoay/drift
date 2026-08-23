@@ -54,6 +54,22 @@ class Api::EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ entries(:stale_first).id ], ids
   end
 
+  test "category limits the list to feeds in that bucket" do
+    get api_entries_path, params: { scope: "all", category: "apple" }, as: :json, headers: auth
+    assert_response :success
+
+    ids = response.parsed_body["entries"].map { |entry| entry["id"] }
+    assert_equal [ entries(:stale_first).id ], ids
+  end
+
+  test "QUERY accepts category in the JSON body" do
+    query api_entries_path, params: { scope: "all", category: "Apple" }, as: :json, headers: auth
+    assert_response :success
+
+    ids = response.parsed_body["entries"].map { |entry| entry["id"] }
+    assert_equal [ entries(:stale_first).id ], ids
+  end
+
   test "limit is honored" do
     get api_entries_path, params: { limit: 1 }, as: :json, headers: auth
     assert_response :success

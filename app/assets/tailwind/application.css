@@ -360,6 +360,46 @@
   }
 }
 
+/* Category pick: square list under the manage-page field. No motion — this is a
+   typing surface, not a decorative popover. Chips on the new-feed form reuse
+   .term-btn. */
+.category-combobox { position: relative; }
+.category-combobox__menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.2rem);
+  left: 0;
+  min-width: 10rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.2rem 0;
+  list-style: none;
+  background: var(--color-stone-50);
+  border: 1px solid var(--color-stone-300);
+}
+.category-combobox__option {
+  display: block;
+  width: 100%;
+  padding: 0.35rem 0.65rem;
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--color-stone-600);
+  cursor: pointer;
+  user-select: none;
+}
+.category-combobox__option[aria-selected="true"] {
+  color: var(--color-amber-700);
+  background: color-mix(in oklab, var(--color-amber-700) 12%, transparent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .category-combobox__option:hover {
+    color: var(--color-amber-700);
+    background: color-mix(in oklab, var(--color-amber-700) 12%, transparent);
+  }
+}
+
 /* Activity heatmap (GitHub-style), in amber phosphor over the stone screen. */
 @layer components {
   .heat {

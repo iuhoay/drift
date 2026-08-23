@@ -1,0 +1,75 @@
+<% options = local_assigns.fetch(:options, []) %>
+<% variant = local_assigns.fetch(:variant, :form) %>
+<% compact = variant == :inline %>
+<% list_id = f.object.persisted? ? dom_id(f.object, :category_list) : "new_subscription_category_list" %>
+<% input_id = f.object.persisted? ? dom_id(f.object, :category) : "subscription_category" %>
+
+<div class="category-combobox<%= " category-combobox--compact" if compact %>"
+     data-controller="category-combobox"
+     data-category-combobox-autosubmit-value="<%= compact %>">
+  <%= f.label :category,
+        for: input_id,
+        class: compact ? "sr-only" : "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
+
+  <div class="<%= "flex items-center gap-1" if compact %>">
+    <%= f.text_field :category,
+          id: input_id,
+          list: ("subscription-categories" if !compact && options.present?),
+          maxlength: 40,
+          autocomplete: "off",
+          spellcheck: false,
+          placeholder: compact ? "category" : (options.present? ? "or type a new one" : "optional"),
+          role: ("combobox" if compact && options.present?),
+          aria: (compact && options.present?) ? { expanded: false, controls: list_id, autocomplete: "list" } : {},
+          data: {
+            category_combobox_target: "input",
+            action: compact ?
+              "focus->category-combobox#open input->category-combobox#filter keydown->category-combobox#keydown blur->category-combobox#close" :
+              "input->category-combobox#sync"
+          },
+          class: compact ?
+            "w-36 shrink-0 bg-transparent border-0 border-b border-transparent px-0 py-0.5 text-xs text-stone-500 placeholder:text-stone-300 hover:border-stone-300 focus:border-amber-700 focus:text-stone-900 focus:outline-none" :
+            "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none bg-white" %>
+
+    <% if compact && f.object.category.present? %>
+      <button type="button"
+              data-category-combobox-target="clear"
+              data-action="pointerdown->category-combobox#clear"
+              class="text-xs text-stone-300 hover:text-stone-600"
+              title="Remove category">×</button>
+    <% end %>
+  </div>
+
+  <% if compact && options.present? %>
+    <ul id="<%= list_id %>"
+        class="category-combobox__menu"
+        role="listbox"
+        hidden
+        data-category-combobox-target="list">
+      <% options.each_with_index do |name, index| %>
+        <li id="<%= list_id %>_<%= index %>"
+            class="category-combobox__option"
+            role="option"
+            data-category-combobox-target="option"
+            data-action="pointerdown->category-combobox#pick"
+            data-value="<%= name %>"><%= name %></li>
+      <% end %>
+    </ul>
+  <% elsif !compact && options.present? %>
+    <datalist id="subscription-categories">
+      <% options.each do |name| %>
+        <option value="<%= name %>"></option>
+      <% end %>
+    </datalist>
+
+    <div class="mt-2 flex flex-wrap gap-1.5" role="group" aria-label="Existing categories">
+      <% options.each do |name| %>
+        <button type="button"
+                class="term-btn"
+                data-category-combobox-target="chip"
+                data-action="click->category-combobox#pick"
+                data-value="<%= name %>"><%= name %></button>
+      <% end %>
+    </div>
+  <% end %>
+</div>

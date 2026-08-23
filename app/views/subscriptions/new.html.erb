@@ -21,10 +21,15 @@
             class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none bg-white" %>
     </div>
 
-    <div>
-      <%= label_tag "subscription[custom_title]", "Custom title (optional)", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
-      <%= text_field_tag "subscription[custom_title]", nil,
-            class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none bg-white" %>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <%= label_tag "subscription[custom_title]", "Custom title", class: "block text-xs uppercase tracking-widest text-stone-500 mb-1" %>
+        <%= text_field_tag "subscription[custom_title]", nil,
+              placeholder: "optional",
+              class: "w-full px-3 py-2 rounded border border-stone-300 focus:border-stone-700 focus:outline-none bg-white" %>
+      </div>
+
+      <%= render "subscriptions/category_field", f: f, options: @category_options || [], variant: :form %>
     </div>
 
     <div class="flex items-center gap-3 pt-2">

@@ -6,6 +6,7 @@ one_stale:
   user: one
   feed: stale
   custom_title: My Stale Feed
+  category: Apple
 
 two_example:
   user: two

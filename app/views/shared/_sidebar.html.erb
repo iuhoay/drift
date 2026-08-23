@@ -2,14 +2,15 @@
   counts = unread_counts_for(Current.user)
   total_unread = counts.values.sum
   subs = Current.user.subscriptions.joins(:feed).includes(:feed).order(Arel.sql("LOWER(COALESCE(NULLIF(subscriptions.custom_title, ''), feeds.title, feeds.feed_url))"))
-  on_inbox = controller_name == "entries" && action_name == "index" && params[:feed_id].blank?
+  sections = subscription_nav_sections(subs)
+  on_inbox = controller_name == "entries" && action_name == "index" && params[:feed_id].blank? && params[:category].blank?
   on_saved = controller_name == "saved_items"
   saved_unread = Current.user.saved_items.unread.count
   nav_base = "group flex items-center gap-2 border-l-2 px-3 py-1.5 transition-colors"
   nav_on   = "border-amber-700 bg-amber-700/10 text-amber-700"
   nav_off  = "border-transparent text-stone-600 hover:bg-stone-200/60 hover:text-stone-900"
 %>
-<aside class="hidden w-64 shrink-0 flex-col border-r border-stone-300 bg-stone-100/30 text-sm md:flex">
+<aside id="sidebar" class="hidden w-64 shrink-0 flex-col border-r border-stone-300 bg-stone-100/30 text-sm md:flex">
   <nav class="flex-1 overflow-y-auto py-4">
     <div class="select-none px-3 pb-1 text-[0.65rem] uppercase tracking-[0.2em] text-stone-400">// inbox</div>
     <ul>
@@ -45,24 +46,7 @@
       <%= link_to "[+]", new_subscription_path, class: "hover:text-amber-700", title: "Add feed" %>
     </div>
 
-    <ul>
-      <% subs.each do |sub| %>
-        <% unread = counts[sub.feed_id].to_i %>
-        <% active = params[:feed_id].to_s == sub.feed_id.to_s %>
-        <li>
-          <%= link_to entries_path(feed_id: sub.feed_id, scope: "unread"), class: "#{nav_base} #{active ? nav_on : nav_off}" do %>
-            <span class="select-none <%= active ? 'text-amber-700' : 'text-stone-300 group-hover:text-amber-700' %>"><%= active ? ">" : "·" %></span>
-            <span class="flex-1 truncate"><%= sub.display_title %></span>
-            <% if unread.positive? %><span class="shrink-0 tabular-nums text-xs <%= active ? 'text-amber-700' : 'text-stone-400' %>"><%= unread %></span><% end %>
-          <% end %>
-        </li>
-      <% end %>
-      <% if subs.empty? %>
-        <li class="px-3 py-2 text-xs text-stone-500">
-          no feeds &mdash; <%= link_to "$ add one", new_subscription_path, class: "text-amber-700 underline underline-offset-2" %>
-        </li>
-      <% end %>
-    </ul>
+    <%= render "shared/sidebar_feeds", subs: subs, sections: sections, counts: counts %>
   </nav>
 
   <div class="border-t border-stone-300 px-4 py-3 text-xs">

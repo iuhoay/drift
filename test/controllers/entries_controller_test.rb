@@ -47,6 +47,25 @@ class EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(entries(:example_first))}", count: 0
   end
 
+  test "index filters by category case-insensitively" do
+    get entries_path, params: { scope: "all", category: "apple" }
+    assert_response :success
+
+    assert_select "##{dom_id(entries(:stale_first))}"
+    assert_select "##{dom_id(entries(:example_first))}", count: 0
+    assert_select "a[href=?]", entries_path(category: "Apple", scope: "unread")
+    assert_select "a[href=?]", entries_path(scope: "all", category: "Apple")
+    assert_select "a[href=?]", entries_path(scope: "all"), text: "[× clear]"
+  end
+
+  test "unknown category yields an empty list" do
+    get entries_path, params: { scope: "all", category: "no-such-bucket" }
+    assert_response :success
+
+    assert_select "##{dom_id(entries(:stale_first))}", count: 0
+    assert_select "##{dom_id(entries(:example_first))}", count: 0
+  end
+
   test "show does not mark the entry as read on GET" do
     target = entries(:stale_first)
 

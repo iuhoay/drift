@@ -6,12 +6,15 @@ class EntriesController < ApplicationController
   def index
     @scope = params[:scope].presence_in(%w[all unread starred]) || "unread"
     @feed = Current.user.feeds.find_by(id: params[:feed_id]) if params[:feed_id]
+    @category = params[:category].to_s.strip.presence
+    @category_options = Current.user.subscriptions.filter_map(&:category).uniq.sort_by(&:downcase)
     @query = params[:q].to_s.strip
     @on = parse_on(params[:on])
     @scope = "all" if @on
 
     entries = Current.user.subscribed_entries.includes(:feed)
     entries = entries.where(feed_id: @feed.id) if @feed
+    entries = entries.merge(Subscription.with_category(@category)) if @category
     if @on
       read_ids = Current.user.user_entries.where("read_at::date = ?", @on).select(:entry_id)
       entries = entries.where(id: read_ids)
