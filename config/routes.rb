@@ -65,7 +65,9 @@ Rails.application.routes.draw do
   resource :theme, only: :update
   resource :activity, only: :show
 
-  resources :subscriptions, only: [ :index, :new, :create, :update, :destroy ]
+  resources :subscriptions, only: [ :index, :new, :create, :update, :destroy ] do
+    resource :watch, only: [ :create, :destroy ], module: :subscriptions
+  end
 
   resources :entries, only: [ :index, :show ] do
     resource :read, only: [ :create, :destroy ], module: :entries
@@ -93,7 +95,9 @@ Rails.application.routes.draw do
       # A GET-only resources#index never matches QUERY (no HEAD-style fallback).
       query :index, on: :collection
     end
-    resources :subscriptions, only: [ :index, :update ]
+    resources :subscriptions, only: [ :index, :update ] do
+      resource :watch, only: [ :create, :destroy ], module: :subscriptions
+    end
     namespace :cli do
       resource :token, only: :create
     end

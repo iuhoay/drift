@@ -1,0 +1,14 @@
+<% watching = subscription.watched? %>
+<div id="<%= dom_id(subscription, :watch) %>">
+  <%= button_to subscription_watch_path(subscription),
+        method: watching ? :delete : :post,
+        form: { class: "inline shrink-0" },
+        class: watching ? "text-xs text-amber-700 hover:text-stone-500" : "text-xs text-stone-500 hover:text-amber-700",
+        title: watching ? "Stop emailing when this feed publishes" : "Email me when this feed publishes something new",
+        aria: { pressed: watching } do %>
+    <span class="relative inline-block">
+      <span class="invisible block" aria-hidden="true">Watching</span>
+      <span class="absolute inset-0"><%= watching ? "Watching" : "Watch" %></span>
+    </span>
+  <% end %>
+</div>

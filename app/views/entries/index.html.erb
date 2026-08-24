@@ -18,16 +18,23 @@
   </header>
 
   <nav class="mt-4 flex items-center gap-2 text-xs">
-    <% %w[unread all starred].each do |s| %>
-      <%= link_to s, entries_path(scope: s, feed_id: @feed&.id, category: @category, q: @query.presence),
-            class: "term-btn #{'term-btn-on' if @on.nil? && @scope == s}" %>
-    <% end %>
-    <% if @on %>
-      <span class="text-stone-500">filtered to <span class="text-amber-700"><%= @on.iso8601 %></span></span>
-      <%= link_to "[× clear]", entries_path, class: "term-btn" %>
-    <% elsif @category %>
-      <span class="text-stone-500">in <span class="text-amber-700"><%= @category %></span></span>
-      <%= link_to "[× clear]", entries_path(scope: @scope, q: @query.presence), class: "term-btn" %>
+    <div class="flex min-w-0 flex-wrap items-center gap-2">
+      <% %w[unread all starred].each do |s| %>
+        <%= link_to s, entries_path(scope: s, feed_id: @feed&.id, category: @category, q: @query.presence),
+              class: "term-btn #{'term-btn-on' if @on.nil? && @scope == s}" %>
+      <% end %>
+      <% if @on %>
+        <span class="text-stone-500">filtered to <span class="text-amber-700"><%= @on.iso8601 %></span></span>
+        <%= link_to "[× clear]", entries_path, class: "term-btn" %>
+      <% elsif @category %>
+        <span class="text-stone-500">in <span class="text-amber-700"><%= @category %></span></span>
+        <%= link_to "[× clear]", entries_path(scope: @scope, q: @query.presence), class: "term-btn" %>
+      <% end %>
+    </div>
+    <% if @subscription %>
+      <div class="ml-auto shrink-0">
+        <%= render "subscriptions/watch_button", subscription: @subscription %>
+      </div>
     <% end %>
   </nav>
 

@@ -47,6 +47,19 @@ class EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(entries(:example_first))}", count: 0
   end
 
+  test "index for a feed offers watch" do
+    get entries_path, params: { scope: "unread", feed_id: feeds(:stale).id }
+    assert_response :success
+
+    assert_select "form[action=?]", subscription_watch_path(subscriptions(:one_stale))
+  end
+
+  test "index without a feed does not offer watch" do
+    get entries_path
+    assert_response :success
+    assert_select "[id^='watch_subscription_']", count: 0
+  end
+
   test "index filters by category case-insensitively" do
     get entries_path, params: { scope: "all", category: "apple" }
     assert_response :success

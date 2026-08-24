@@ -128,6 +128,17 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal "Apple", subscription.category
   end
 
+  test "watched defaults to false" do
+    assert_not subscriptions(:one_example).watched?
+  end
+
+  test "watched scope returns only watched subscriptions" do
+    subscriptions(:one_example).update!(watched: true)
+
+    assert_includes Subscription.watched, subscriptions(:one_example)
+    assert_not_includes Subscription.watched, subscriptions(:one_stale)
+  end
+
   test "subscribe with a blank address returns an unsaved subscription with an error" do
     subscription = assert_no_difference -> { Subscription.count } do
       Subscription.subscribe(users(:two), "   ")
