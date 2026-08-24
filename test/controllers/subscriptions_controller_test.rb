@@ -15,6 +15,8 @@ class SubscriptionsControllerTest < ActionDispatch::IntegrationTest
   test "index lists the user's subscriptions" do
     get subscriptions_path
     assert_response :success
+    assert_select "form[action=?]", subscription_watch_path(subscriptions(:one_example))
+    assert_select "p", /Watch a feed/
   end
 
   test "index groups categorized feeds and links the bucket" do
