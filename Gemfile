@@ -53,11 +53,9 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
 gem "solid_queue"
-# Track main until a release ships the Rails 8.2 ActionCable adapterization fix
-# (rails/solid_cable#80) — v4.0.0 crashes `handle_open` with `nil.mutex`, so no
-# cable connection is ever welcomed in production. Revert to the release once
-# a version newer than 4.0.0 is out.
-gem "solid_cable", github: "rails/solid_cable", branch: "main"
+# v4.0.0 crashed handle_open with nil.mutex on Rails 8.2's Action Cable
+# adapterization (rails/solid_cable#80). That fix shipped in 4.0.1 (2026-07-18).
+gem "solid_cable", "~> 4.0"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", ">= 1.24.1", require: false
