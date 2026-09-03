@@ -45,7 +45,7 @@ gem "ruby-readability", "~> 0.7", require: "readability"
 gem "rails_pulse", "~> 0.3.3"
 
 # Web dashboard for Active Job / Solid Queue (admin-gated) [https://github.com/rails/mission_control-jobs]
-gem "mission_control-jobs", "~> 1.1"
+gem "mission_control-jobs", "~> 1.2"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
