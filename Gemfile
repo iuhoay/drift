@@ -66,7 +66,7 @@ gem "bootsnap", ">= 1.24.1", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 2.0"
+gem "image_processing", "~> 2.1"
 # libvips binding — Active Storage's default variant processor. Declared explicitly
 # because image_processing 2.0 makes it a soft dependency (it must be in the Gemfile).
 # require: false so it loads lazily only when a variant is processed: ruby-vips dlopens
