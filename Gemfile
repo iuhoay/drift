@@ -27,7 +27,7 @@ gem "bcrypt", "~> 3.1.7"
 # button_to, not link_to).
 gem "omniauth", "~> 2.1"
 gem "omniauth-github", "~> 2.0"
-gem "omniauth-google-oauth2", "~> 1.1"
+gem "omniauth-google-oauth2", "~> 1.2"
 gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Feed parsing and HTTP
