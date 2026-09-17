@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@subscription, :watch) do %>
+  <%= render "subscriptions/watch_button", subscription: @subscription %>
+<% end %>
