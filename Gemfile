@@ -42,7 +42,7 @@ gem "sanitize", "~> 7.0"
 gem "ruby-readability", "~> 0.7", require: "readability"
 
 # Self-hosted performance monitoring (requests, SQL/N+1, jobs) [https://github.com/railspulse/rails_pulse]
-gem "rails_pulse", "~> 0.3.3"
+gem "rails_pulse", "~> 0.4.0"
 
 # Web dashboard for Active Job / Solid Queue (admin-gated) [https://github.com/rails/mission_control-jobs]
 gem "mission_control-jobs", "~> 1.1"
@@ -105,5 +105,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-
-gem "honeybadger", "~> 6.9"

@@ -299,6 +299,181 @@ RailsPulse.configure do |config|
     rails_pulse_requests: 10000,    # HTTP requests (moderate volume)
     rails_pulse_operations: 50000,  # Operations within requests (high volume)
     rails_pulse_routes: 1000,       # Unique routes (low volume)
-    rails_pulse_queries: 500        # Normalized SQL queries (low volume)
+    rails_pulse_queries: 500, # Normalized SQL queries (low volume)
+
+    rails_pulse_job_runs: 50_000,                 # Individual job executions (high volume)
+    rails_pulse_jobs: 1_000,                      # Unique job classes (low volume)
+    rails_pulse_exception_occurrences: 50_000,    # Individual exception raises (high volume)
+    rails_pulse_exception_groups: 10_000,         # Distinct exception sites (moderate volume)
+    rails_pulse_deployments: 1_000                # Deploy markers (low volume; oldest pruned first)
   }
+
+  # ====================================================================================================
+  #                              ADDED BY rails generate rails_pulse:upgrade
+  # ====================================================================================================
+  # New settings from this gem version. Existing values above were not changed.
+  # Review with git diff and keep or discard hunks as you like.
+
+
+  # Tracking writes happen on a background thread by default (see `config.async`
+  # under ADVANCED). Transactional tests share one database connection across
+  # threads, so write inline there to keep the writer off the test's connection.
+  config.async = false if Rails.env.test?
+
+
+  # ====================================================================================================
+  #                                          EXCEPTION TRACKING
+  # ====================================================================================================
+  # When enabled, Rails Pulse captures unhandled exceptions raised during web
+  # requests and failed background jobs, groups them by class and location, and
+  # displays them in the Exceptions tab. Rake tasks are not captured automatically —
+  # call ExceptionCaptureService.capture yourself if needed.
+  #
+  # Capture runs synchronously on the calling thread (upsert + insert). That keeps
+  # the implementation simple for v1; under an error storm it adds DB latency to
+  # failing requests and jobs. Set track_exceptions = false to disable.
+  #
+  # The gem default is false so existing installs do not start capturing on
+  # upgrade. New apps get true from this template; the upgrade generator
+  # inserts false into existing initializers.
+  #
+  # Backtraces store the first 50 frames. Request params are filtered via Rails'
+  # filter_parameters. Exception messages are filtered too: the SQL and echoed
+  # values in ActiveRecord::StatementInvalid messages are stripped, and any
+  # `key=value` / `key: value` fragment whose key matches filter_parameters
+  # (password=…, token: …) is masked. Messages are truncated to 500 characters.
+
+  # Enable or disable exception tracking. This is drift's only exception
+  # reporting — there is no external error tracker; exceptions surface in the
+  # dashboard's Exceptions tab (no push alerting).
+  config.track_exceptions = true
+
+
+  # Capture request params with each exception occurrence.
+  # Params are filtered using Rails' filter_parameters config (passwords, tokens, etc. are redacted).
+  # Occurrences with params larger than 10KB after filtering are stored without params.
+  # Set to false to disable entirely, e.g. for strict data-minimization requirements.
+  config.capture_exception_params = true
+
+
+  # Extra redaction for exception messages, applied after the built-in
+  # filter_parameters pass. Receives the message and the exception; return the
+  # message to store. If the hook raises, the message is stored as "[FILTERED]".
+  # config.exception_message_filter = ->(message, exception) {
+  #   message.gsub(/\b\d{13,16}\b/, "[FILTERED]")   # card-number-shaped digits
+  # }
+
+
+  # How many times an exception group has to fire over the dashboard period
+  # before it is called out. These are occurrence counts, not durations.
+  # config.exception_thresholds = {
+  #   warning:  10,
+  #   critical: 100
+  # }
+
+
+  # Capture the raw (unparameterized) SQL for each operation.
+  # WARNING: mysql2 defaults to prepared_statements: false, so every literal
+  # value (emails, passwords, tokens) is inlined and stored in plaintext.
+  # Same applies to PostgreSQL behind PgBouncer in transaction-pool mode.
+  # Default: false (upgrade-safe). New installs may opt in after review.
+  # config.capture_actual_sql = true
+
+
+  # Job tracking mode: :universal (all jobs) or :opt_in (only explicitly tracked jobs)
+  # config.job_tracking_mode = :universal
+
+
+  # Per-adapter settings. Disable adapters or opt into queue-depth tracking:
+  # config.job_adapters = {
+  #   sidekiq: { enabled: true, track_queue_depth: false },
+  #   solid_queue: { enabled: true, track_recurring: false },
+  #   good_job: { enabled: true, track_cron: false },
+  #   delayed_job: { enabled: true },
+  #   resque: { enabled: true }
+  # }
+
+
+  # RECOMMENDED: a fail-closed predicate. Receives the controller; return
+  # true to allow. Anything else (false, nil, no user) is a 403 Forbidden.
+  # config.authorize = ->(controller) { controller.current_user&.admin? }
+
+
+  # STANDALONE DASHBOARD (bundle exec rails_pulse_server; see railspulse.com/documentation/deployment-modes):
+  # that process has your models but not your app's session, Warden or Devise
+  # helpers, and runs on its own hostname, so the hooks above are ignored there.
+  # By default it uses HTTP Basic auth (RAILS_PULSE_USERNAME / RAILS_PULSE_PASSWORD).
+  # Set this to run something else instead; same rules as authentication_method
+  # (deny by rendering or redirecting, or by returning false).
+  # config.standalone_authentication_method = proc {
+  #   authenticate_or_request_with_http_token do |token, _options|
+  #     ActiveSupport::SecurityUtils.secure_compare(token, ENV["RAILS_PULSE_DASHBOARD_TOKEN"].to_s)
+  #   end
+  # }
+
+
+  # ====================================================================================================
+  #                                       HISTORICAL COMPARISON
+  # ====================================================================================================
+
+  # Rails Pulse compares recent behaviour against a route, query or job's own
+  # history to answer "what changed?" rather than only "what is slow?".
+  #
+  # The baseline is the traffic-weighted metric across `baseline_window` of day
+  # summaries; `comparison_window` is the recent slice measured against it. The
+  # two never overlap.
+  # config.baseline_window   = 28.days
+
+  # config.comparison_window = 1.day
+
+
+  # Hourly summaries decide how precisely a change point can be placed. They are
+  # pruned at this age because the 1-day view is otherwise the only thing that
+  # reads them. Inside this window Rails Pulse can say a route slowed down at
+  # 14:00; beyond it, the finest answer is the day. Raising this buys precision
+  # at the cost of summary table growth.
+  # config.hourly_summary_retention = 2.days
+
+
+  # A change is reported as a regression only when it clears both the ratio and
+  # the absolute floor for its unit. The ratio alone flags trivial millisecond
+  # noise on fast endpoints; the floor alone flags slow endpoints that never
+  # actually changed. min_samples keeps low-traffic subjects quiet.
+  # config.regression_thresholds = {
+  #   ratio:                1.5,   # 50% worse than baseline
+  #   min_delta_ms:         50.0,  # ...and at least 50ms worse
+  #   min_delta_rate:       1.0,   # ...or 1 percentage point, for error rates
+  #   min_samples:          100,   # minimum observations on each side
+  #   min_baseline_periods: 3      # minimum days of history before comparing
+  # }
+
+
+  # ====================================================================================================
+  #                                               ADVANCED
+  # ====================================================================================================
+
+  # Use a custom logger (default: Rails.logger)
+  # config.logger = Logger.new("log/rails_pulse.log")
+
+
+  # How many requests the background writer may hold before it starts dropping
+  # the newest ones instead of slowing the app down (default: 1000). Drops are
+  # counted and logged at most once a minute.
+  # config.async_queue_size = 1000
+
+
+  # Show a dashboard banner when summary data is stale (default: true)
+  # config.warn_on_stale_summaries = true
+
+
+  # When this gem version is newer than the Rails Pulse tables it is connected
+  # to (deployed before `db:migrate`, or a rolling restart), pause tracking after
+  # one logged warning and answer every dashboard page with a 503 that lists the
+  # upgrade commands, instead of erroring on each request (default: true).
+  # config.schema_check_enabled = true
+
+
+  # Set to false to skip dashboard middleware and asset serving entirely.
+  # Useful for standalone/API-only deployments that use a separate dashboard app.
+  # config.mount_dashboard = true
 end
