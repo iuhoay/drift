@@ -15,4 +15,10 @@ if [[ "$CURRENT_BRANCH" == "main" && "${KAMAL_DESTINATION:-production}" == "prod
   # has something to point at.
   git push origin "$KAMAL_VERSION:refs/tags/$KAMAL_SERVICE_VERSION" || true
   gh release create "$KAMAL_SERVICE_VERSION" --generate-notes || true
+
+  # Mark the deploy on Rails Pulse charts. Records inside the app container via
+  # the gem's rake task; inner single quotes are the remote-bash quoting layer
+  # (same transport rule as bin/kamal query). || true: a failed marker must not
+  # fail a live deploy.
+  bin/kamal app exec --reuse "bin/rails 'rails_pulse:record_deployment[$KAMAL_SERVICE_VERSION]'" || true
 fi
