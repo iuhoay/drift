@@ -2,7 +2,10 @@
 
 <div class="max-w-3xl mx-auto px-6 py-8">
   <header class="flex items-baseline justify-between mb-6 font-sans">
-    <h1 class="text-xl font-medium tracking-tight">Feeds</h1>
+    <div>
+      <h1 class="text-xl font-medium tracking-tight">Feeds</h1>
+      <p class="mt-1 text-xs text-stone-400">Watch a feed to get email when it publishes something new.</p>
+    </div>
     <%= link_to "Add feed", new_subscription_path,
           class: "px-3 py-1.5 text-sm rounded bg-stone-900 text-white hover:bg-stone-700" %>
   </header>
