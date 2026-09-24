@@ -119,7 +119,7 @@ GEM
       railties
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
-    annotaterb (4.24.0)
+    annotaterb (4.25.0)
       activerecord (>= 6.0.0)
       activesupport (>= 6.0.0)
     anonymous_loader (0.1.3)
@@ -130,7 +130,7 @@ GEM
     base64 (0.3.0)
     bcrypt (3.1.22)
     bcrypt_pbkdf (1.1.2)
-    bigdecimal (4.1.2)
+    bigdecimal (4.1.3)
     bindex (0.8.1)
     bootsnap (1.26.0)
       msgpack (~> 1.5)
@@ -334,7 +334,7 @@ GEM
       actionpack (>= 7.0.0)
       activesupport (>= 7.0.0)
       rack
-    psych (5.4.0)
+    psych (5.5.0)
       date
       stringio
     public_suffix (7.0.5)
@@ -354,7 +354,7 @@ GEM
       rack (>= 1.3)
     rackup (2.3.1)
       rack (>= 3)
-    ractor-dispatch (0.2.0)
+    ractor-dispatch (0.3.0)
     rails-dom-testing (2.3.0)
       activesupport (>= 5.0.0)
       minitest
@@ -564,14 +564,14 @@ CHECKSUMS
   activestorage (8.2.0.alpha)
   activesupport (8.2.0.alpha)
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
-  annotaterb (4.24.0) sha256=3953d3a3fb86ef06639a8d5ea29001e4af1e51cabd147973b1b23524b8fbced6
+  annotaterb (4.25.0) sha256=1c7a4c43d6afe3eb460731289ea8c831e9d864ce2f57897b5e1c749c1dd4ed89
   anonymous_loader (0.1.3) sha256=084a18e2439144d955447dc11dfc982f41fcd1583ad32d4d55151325dc44cb55
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   auth-sanitizer (0.2.3) sha256=db10aac92cfbe4c64ab637eebcbe1d67395d1694798041362173370f59933e3c
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
   bcrypt (3.1.22) sha256=1f0072e88c2d705d94aff7f2c5cb02eb3f1ec4b8368671e19112527489f29032
   bcrypt_pbkdf (1.1.2) sha256=c2414c23ce66869b3eb9f643d6a3374d8322dfb5078125c82792304c10b94cf6
-  bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
+  bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
   bindex (0.8.1) sha256=7b1ecc9dc539ed8bccfc8cb4d2732046227b09d6f37582ff12e50a5047ceb17e
   bootsnap (1.26.0) sha256=ca96237015e6cd74a02963d5821cf00ac5ea134653b323e8cd6d702a7718bf1b
   brakeman (8.0.6) sha256=759cc69341115e6c2dcd47b6fd8649a0b9bd540e3585ac8a0a94e31c66fee386
@@ -661,7 +661,7 @@ CHECKSUMS
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
   propshaft (1.3.2) sha256=1d56a3e56a92c21bfc29caf07406b5386b00d4c47ddf357cf989a5a234b1389e
-  psych (5.4.0) sha256=14f72d69a611af663d7d70e4a7b67d9eb1f3ae9f8d916b478961d5a0075ba5b7
+  psych (5.5.0) sha256=4b245bbbd0f3238df8ccee766ebc1a6b062b10e4ee1d3284eb588739ba156a0a
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   puma (8.0.2) sha256=c8ed871dfbbe66448ea9ffd46692342d9804d4071522b52b5331b7b6e7b686fb
   raabro (1.5.0) sha256=3f998a7bc84f9c84df3ab580634d2e0a5bda4f0841168d56035f529c9877440a
@@ -671,7 +671,7 @@ CHECKSUMS
   rack-session (2.1.2) sha256=595434f8c0c3473ae7d7ac56ecda6cc6dfd9d37c0b2b5255330aa1576967ffe8
   rack-test (2.2.0) sha256=005a36692c306ac0b4a9350355ee080fd09ddef1148a5f8b2ac636c720f5c463
   rackup (2.3.1) sha256=6c79c26753778e90983761d677a48937ee3192b3ffef6bc963c0950f94688868
-  ractor-dispatch (0.2.0) sha256=5fe3eb85c202ac33910b0ada80a15f7a2e9504a057cf91d90ce80a73608492b2
+  ractor-dispatch (0.3.0) sha256=cd2d46743303e00fe500df168b4dde85080160fd9f04539cada4b4dd5e588f68
   rails (8.2.0.alpha)
   rails-dom-testing (2.3.0) sha256=8acc7953a7b911ca44588bf08737bc16719f431a1cc3091a292bca7317925c1d
   rails-html-sanitizer (1.7.1) sha256=e797a7c9b01e567307e317c576b49ab4168017e63eea4dba9ce3cb587e2f22c2
