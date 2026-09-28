@@ -1,13 +1,13 @@
 <% content_for :title, @entry.title %>
 
 <article class="max-w-3xl mx-auto px-5 sm:px-8 py-8">
-  <div class="flex items-center justify-between border-b border-stone-300 pb-3 text-sm">
+  <div class="flex flex-wrap items-center justify-between gap-2 border-b border-stone-300 pb-3 text-sm">
     <%= link_to :back, class: "text-stone-500 hover:text-amber-700" do %>
       <span class="select-none">&larr;</span> back
     <% end %>
 
     <%# mark-read posts on render, keeping #show a safe GET (Turbo prefetch won't mark read). %>
-    <div id="<%= dom_id(@entry, :actions) %>" class="flex items-center gap-2"
+    <div id="<%= dom_id(@entry, :actions) %>" class="flex flex-wrap items-center justify-end gap-2"
          data-controller="mark-read"
          data-mark-read-url-value="<%= entry_read_path(@entry) %>">
       <%= render "entries/actions", entry: @entry, user_entry: @user_entry %>

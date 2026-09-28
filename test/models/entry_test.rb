@@ -136,6 +136,29 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal "BV1wPJH6UEVL", Entry.new(url: "https://www.bilibili.com/video/BV1wPJH6UEVL/?spm_id_from=x").bilibili_bvid
   end
 
+  test "agent_prompt points at the source URL and drift show" do
+    entry = entries(:example_first)
+
+    prompt = entry.agent_prompt
+
+    assert_includes prompt, "Title: First Example Post"
+    assert_includes prompt, "Feed: Example Feed"
+    assert_includes prompt, "Source: https://example.com/posts/1"
+    assert_includes prompt, "drift show #{entry.id}"
+    assert_includes prompt, "Otherwise fetch the source URL."
+  end
+
+  test "agent_prompt does not include a non-http url" do
+    entry = entries(:example_first)
+    entry.url = "javascript:alert(1)"
+
+    prompt = entry.agent_prompt
+
+    assert_not_includes prompt, "javascript:"
+    assert_not_includes prompt, "Source:"
+    assert_includes prompt, "Run `drift show #{entry.id}` and read that body."
+  end
+
   test "bilibili_bvid returns nil for non-Bilibili urls" do
     assert_nil Entry.new(url: "https://space.bilibili.com/26846937").bilibili_bvid
     assert_nil Entry.new(url: nil).bilibili_bvid

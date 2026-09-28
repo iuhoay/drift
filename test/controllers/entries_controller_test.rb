@@ -96,4 +96,15 @@ class EntriesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".entry-content[data-controller=syntax-highlight] pre > code.language-ruby",
       text: "def answer = 42"
   end
+
+  test "show offers a prompt that points an agent at the source URL" do
+    get entry_path(@entry)
+
+    assert_response :success
+    assert_select "##{dom_id(@entry, :actions)} button", text: "[copy prompt]"
+    assert_select "##{dom_id(@entry, :actions)} textarea[data-clipboard-target=source]",
+      text: /Source: #{Regexp.escape(@entry.url)}/
+    assert_select "##{dom_id(@entry, :actions)} textarea[data-clipboard-target=source]",
+      text: /drift show #{@entry.id}/
+  end
 end
