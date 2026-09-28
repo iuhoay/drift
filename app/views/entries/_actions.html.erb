@@ -14,3 +14,8 @@
 <% else %>
   <%= button_to entry_read_path(entry), form: { class: "inline" }, class: "term-btn" do %>[read]<% end %>
 <% end %>
+
+<span data-controller="clipboard" class="inline-flex">
+  <textarea hidden readonly tabindex="-1" data-clipboard-target="source"><%= entry.agent_prompt %></textarea>
+  <button type="button" class="term-btn" data-clipboard-target="button" data-action="clipboard#copy">[copy prompt]</button>
+</span>

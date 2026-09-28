@@ -71,6 +71,26 @@ class Entry < ApplicationRecord
     url if url.to_s.match?(%r{\Ahttps?://\S+\z}i)
   end
 
+  # Clipboard text for an agent that should read this article. The source URL
+  # is the path that works without the drift CLI; the entry page itself is
+  # login-gated, so it is not included.
+  def agent_prompt
+    lines = [
+      "Read this article. Do not answer from the title alone.",
+      "",
+      "Title: #{title.presence || "(untitled)"}"
+    ]
+    lines << "Feed: #{feed.display_title}" if feed
+    lines << "Source: #{safe_url}" if safe_url
+    lines << ""
+    lines << if safe_url
+      "If the drift CLI is installed, run `drift show #{id}` and read that body. Otherwise fetch the source URL."
+    else
+      "Run `drift show #{id}` and read that body."
+    end
+    lines.join("\n")
+  end
+
   def youtube_video_id
     url.to_s.match(YOUTUBE_URL)&.captures&.first
   end
