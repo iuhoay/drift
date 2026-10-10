@@ -5,6 +5,7 @@
 #  id           :bigint           not null, primary key
 #  category     :string
 #  custom_title :string
+#  watched      :boolean          default(FALSE), not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  feed_id      :bigint           not null
@@ -22,7 +23,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Subscription < ApplicationRecord
-  include Subscribing
+  include Subscribing, Watchable
 
   belongs_to :user
   belongs_to :feed

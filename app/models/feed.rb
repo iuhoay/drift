@@ -25,6 +25,8 @@
 #  index_feeds_on_next_fetch_at  (next_fetch_at)
 #
 class Feed < ApplicationRecord
+  include Watchable
+
   # Sent on every outbound HTTP request we make on a feed's behalf (discovery
   # and refresh). The per-environment value lives in config/feed.yml: only
   # production identifies as the bare live service, so non-production traffic is

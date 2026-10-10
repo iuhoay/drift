@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_08_22_232022) do
+ActiveRecord::Schema[8.2].define(version: 2026_08_23_125745) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -124,6 +124,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_08_22_232022) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "category"
+    t.boolean "watched", default: false, null: false
     t.index ["feed_id"], name: "index_subscriptions_on_feed_id"
     t.index ["user_id", "feed_id"], name: "index_subscriptions_on_user_id_and_feed_id", unique: true
     t.index ["user_id"], name: "index_subscriptions_on_user_id"
