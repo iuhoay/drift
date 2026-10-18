@@ -92,6 +92,7 @@ Rails.application.routes.draw do
       # QUERY is a collection verb on index (canonical → /api/entries, not /index).
       # A GET-only resources#index never matches QUERY (no HEAD-style fallback).
       query :index, on: :collection
+      resource :read, only: [ :create, :destroy ], module: :entries
     end
     resources :subscriptions, only: [ :index, :update ]
     namespace :cli do
