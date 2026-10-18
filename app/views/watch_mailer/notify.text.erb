@@ -1,0 +1,16 @@
+<%= @subscription.display_title %> published:
+
+<% @entries.each do |entry| -%>
+<%= entry.title %>
+<%= entry.safe_url.presence || entry_url(entry) %>
+
+<% end -%>
+<% if @remainder.positive? -%>
+and <%= @remainder %> more
+
+<% end -%>
+Read in Drift:
+<%= entries_url(feed_id: @subscription.feed_id, scope: "unread") %>
+
+Stop watching from Feeds:
+<%= subscriptions_url %>

@@ -20,6 +20,7 @@ class Feed::Refresher
   def initialize(feed, http: nil)
     @feed = feed
     @http = http
+    @new_entry_ids = []
   end
 
   def call
@@ -34,8 +35,7 @@ class Feed::Refresher
   end
 
   def ingest(body)
-    apply!(Feedjira.parse(body), nil)
-    record_success(nil)
+    commit_entries(Feedjira.parse(body), nil)
     @feed
   rescue Feedjira::NoParserAvailable => e
     record_failure("Push parse error: #{e.message}")
@@ -54,8 +54,7 @@ class Feed::Refresher
     when 304
       record_success(response)
     when 200..299
-      apply!(Feedjira.parse(response.body), response)
-      record_success(response)
+      commit_entries(Feedjira.parse(response.body), response)
     else
       record_failure("HTTP #{response.status}", response: response)
     end
@@ -65,8 +64,7 @@ class Feed::Refresher
   # returns a parsed-feed-shaped object. There's no HTTP response to carry an
   # ETag, so apply!/record_success run with a nil response.
   def refresh_from_source
-    apply!(Feed::Bilibili.fetch(@feed, http), nil)
-    record_success(nil)
+    commit_entries(Feed::Bilibili.fetch(@feed, http), nil)
   rescue Feed::Bilibili::Error => e
     record_failure(e.message)
   end
@@ -99,6 +97,13 @@ class Feed::Refresher
     entry.content = sanitize(raw.content.presence || raw.summary.presence)
     entry.published_at = raw.published || raw.updated || entry.published_at || Time.current
     entry.save!
+    @new_entry_ids << entry.id if entry.previously_new_record?
+  end
+
+  def commit_entries(parsed, response)
+    apply!(parsed, response)
+    @feed.notify_watchers_later(@new_entry_ids)
+    record_success(response)
   end
 
   def sanitize(html)

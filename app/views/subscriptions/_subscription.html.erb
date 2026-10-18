@@ -18,6 +18,8 @@
     <%= render "subscriptions/category_field", f: f, options: @category_options || [], variant: :inline %>
   <% end %>
 
+  <%= render "subscriptions/watch_button", subscription: subscription %>
+
   <%= button_to "Unsubscribe", subscription_path(subscription),
         method: :delete,
         form: { data: { turbo_confirm: "Unsubscribe from #{subscription.display_title}?" } },
