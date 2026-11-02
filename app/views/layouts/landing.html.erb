@@ -4,9 +4,10 @@
     <title><%= content_for(:title) || "Drift — a calm RSS reader" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="application-name" content="Drift">
+    <%= yield :head %>
     <%= render "shared/seo_meta",
           title: content_for(:title) || "Drift — a calm RSS reader",
-          description: "Drift is a fast, distraction-free RSS reader. Follow the sites, blogs, and channels you care about and read them in one calm place — no ads, no tracking, no algorithm." %>
+          description: "Drift is an RSS reader. Follow the sites you care about and read them in one inbox, in the order they were published. No ads, no tracking, no AI summaries." %>
     <% case cookies[:theme] %>
     <% when "light" %>
       <meta name="theme-color" content="#f5f5f4">
@@ -39,7 +40,7 @@
         applicationCategory: "BrowserApplication",
         operatingSystem: "Web",
         url: request.base_url + "/",
-        description: "A fast, distraction-free RSS reader. Follow the sites, blogs, and channels you care about and read them in one calm place — no ads, no tracking, no algorithm.",
+        description: "An RSS reader. Follow the sites you care about and read them in one inbox, in the order they were published. No ads, no tracking, no AI summaries.",
         offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         license: "https://www.gnu.org/licenses/agpl-3.0.html"
       }.to_json %>
@@ -47,28 +48,29 @@
   </head>
 
   <body class="term term-screen min-h-full bg-stone-50 text-stone-900 antialiased">
+    <a class="skip-link" href="#content">Skip to content</a>
     <header class="term-topbar sticky top-0 z-40 flex min-h-9 items-center justify-between border-b border-stone-300 px-4 pt-[env(safe-area-inset-top)] text-xs">
-      <%= link_to root_path, class: "brand-logo text-stone-900", aria: { label: "Drift RSS reader" } do %>
+      <%= link_to root_path, class: "brand-logo text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700", aria: { label: "Drift RSS reader", current: "page" } do %>
         <span class="brand-logo__rail" aria-hidden="true"></span>
         <span class="brand-logo__name">drift</span>
         <span class="brand-logo__tagline" aria-hidden="true">&#8212; rss reader</span>
       <% end %>
       <nav class="flex items-center text-stone-400">
-        <%= link_to "sign in", new_session_path, class: "hover:text-amber-700" %>
+        <%= link_to "sign in", new_session_path, class: "hover:text-amber-700 focus-visible:text-amber-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700" %>
       </nav>
     </header>
 
-    <main>
+    <main id="content" tabindex="-1" class="focus:outline-none">
       <%= yield %>
     </main>
 
-    <footer class="border-t border-stone-200 px-5 py-8 text-sm text-stone-500">
-      <div class="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-5 gap-y-3">
-        <nav class="flex flex-wrap gap-x-5 gap-y-2">
-          <%= link_to "About", about_path, class: "underline underline-offset-2 hover:text-stone-900" %>
-          <%= link_to "Terms", terms_path, class: "underline underline-offset-2 hover:text-stone-900" %>
-          <%= link_to "Privacy", privacy_path, class: "underline underline-offset-2 hover:text-stone-900" %>
-          <%= link_to "Source", "https://github.com/iuhoay/drift", class: "underline underline-offset-2 hover:text-stone-900" %>
+    <footer class="border-t border-stone-200 px-4 py-8 text-sm text-stone-500">
+      <div class="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <nav class="flex flex-wrap gap-x-4 gap-y-2">
+          <%= link_to "About", about_path, class: "underline underline-offset-2 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700" %>
+          <%= link_to "Terms", terms_path, class: "underline underline-offset-2 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700" %>
+          <%= link_to "Privacy", privacy_path, class: "underline underline-offset-2 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700" %>
+          <%= link_to "Source", "https://github.com/iuhoay/drift", class: "underline underline-offset-2 hover:text-stone-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700" %>
         </nav>
         <span class="select-none text-stone-400">tty/01</span>
       </div>

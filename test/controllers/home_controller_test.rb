@@ -5,12 +5,13 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
 
-    assert_select "h1", "A calm place to read the web."
-    assert_select "a[href=?]", new_registration_path
+    assert_select "h1", text: /The web you follow/
+    assert_select "a[href=?]", new_registration_path, text: "Create your inbox", count: 2
     assert_select "a[href=?]", new_session_path
     assert_select "dt", text: /agent/
     assert_select "p", text: /drift inbox/
     assert_select "a[href=?]", "https://github.com/iuhoay/drift-cli", text: "skills/drift-cli"
+    assert_no_match(%r{~/\.pi|~/\.agents|curl }, response.body)
   end
 
   test "landing page links to the legal pages" do
@@ -38,5 +39,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "meta[property='og:title']"
     assert_select "meta[property='og:image']"
     assert_select "script[type='application/ld+json']", /WebApplication/
+    assert_select "script[type='application/ld+json']", /FAQPage/
   end
 end

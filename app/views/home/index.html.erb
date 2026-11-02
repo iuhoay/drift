@@ -1,70 +1,207 @@
-<% content_for :title, "Drift — a calm, distraction-free RSS reader" %>
+<% content_for :title, "Drift — the web you follow, in one inbox" %>
 
 <%#
-  Marketing landing page, shown at the root URL to signed-out visitors only
-  (HomeController redirects signed-in readers to their inbox). Rendered in the
-  `landing` layout, which carries the brand topbar and footer (legal + Source
-  links). Styling stays in the existing terminal vocabulary: mono type, stone
-  screen, amber phosphor. Deliberately kept to a single screen — RSS is simple,
-  so the page is too.
+  Signed-out front door. Terminal screen, not a second visual system: mono,
+  stone, amber, square. One primary action (create an account). Sign in stays
+  in the topbar. The inbox pane is an illustration, not a live feed.
 %>
 
 <%
-  cta_primary = "inline-flex items-center border border-stone-900 bg-stone-900 px-4 py-2.5 text-sm text-stone-50 transition-colors hover:border-stone-700 hover:bg-stone-700"
+  cta = "landing-cta inline-flex items-center border border-stone-900 bg-stone-900 px-3 py-2 text-base font-semibold text-stone-50 transition-[color,background-color,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-stone-700 hover:bg-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 active:translate-y-px"
 
-  features = [
-    { cmd: "subscribe", body: "Paste a URL and Drift finds the feed for you." },
-    { cmd: "read",      body: "Every feed in one timeline, in the order it was published." },
-    { cmd: "search",    body: "Full-text search across everything you follow." },
-    { cmd: "agent",     body: "The same inbox, from a CLI. Your agent reads the articles — we don't write a digest." }
+  proof = "Free and open source. No ads, no tracking, no AI summaries."
+
+  benefits = [
+    { cmd: "Published order", body: "The list is the order the posts went out. Nothing ranks them." },
+    { cmd: "One place to catch up", body: "Sites, blogs, and channels you follow, waiting until you open them." },
+    { cmd: "The article, not a paraphrase", body: "No summary written for you. If a feed cuts the body short, load the full text on the article page." },
+    { cmd: "Search the pile", body: "Full text across everything you follow." },
+    { cmd: "Same list for an agent", body: "A CLI reads the inbox. Drift does not write a digest." }
+  ]
+
+  steps = [
+    { n: "1", title: "Paste a URL", body: "A feed address or a site address. Drift finds the feed." },
+    { n: "2", title: "Read it when you want", body: "New posts land in one inbox, in published order. Star what you want to come back to." },
+    { n: "3", title: "Hand it to an agent, if you want", body: "drift inbox and drift show return the article, not a digest we wrote." }
+  ]
+
+  rows = [
+    { feed: "field notes", time: "2h", mark: "●", mark_class: "text-amber-700", title: "A changelog with the quiet parts left in", unread: true, cursor: true },
+    { feed: "paper route", time: "5h", mark: "●", mark_class: "text-amber-700", title: "Why the order is the whole point", unread: true, cursor: false },
+    { feed: "signal desk", time: "1d", mark: "·", mark_class: "text-stone-300", title: "The piece you already finished", unread: false, cursor: false },
+    { feed: "slow web", time: "2d", mark: "★", mark_class: "text-amber-700", title: "A note marked to come back to", unread: false, cursor: false }
+  ]
+
+  faqs = [
+    { q: "What do I get?", a: "An inbox of the RSS and Atom feeds you subscribe to, in published order. You can read, star, and search them. Light and dark themes. You can install the app to your home screen." },
+    { q: "How do I add a feed?", a: "Paste a feed URL or a site address. Drift looks for the feed." },
+    { q: "Do you summarize what I read?", a: "No. You read the source. If a feed cuts the body short, you can load the full text on the article page. The CLI returns the article, not a digest we wrote." },
+    { q: "Do you run ads or track me?", a: "No advertising, and no analytics trackers." },
+    { q: "What does it cost?", a: "Nothing. Drift is free, and the source is open under the GNU Affero General Public License v3.0. You can run your own copy." },
+    { q: "Can I delete my account?", a: "Yes. From your account page you can delete the account, your subscriptions, and your read history. A feed other people also follow stays, because it is not only yours." }
+  ]
+
+  tagline = [
+    [ "The", "sites", "you", "chose," ],
+    [ "in", "published", "order." ]
   ]
 %>
 
-<section class="mx-auto w-full max-w-2xl px-5 pt-16 pb-24 sm:pt-24">
-  <p class="text-sm">
-    <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="term-caret select-none" aria-hidden="true"></span>
-  </p>
+<% content_for :head do %>
+  <%= tag.script type: "application/ld+json" do %>
+    <%== {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map { |faq|
+        {
+          "@type": "Question",
+          "name": faq[:q],
+          "acceptedAnswer": { "@type": "Answer", "text": faq[:a] }
+        }
+      }
+    }.to_json %>
+  <% end %>
+<% end %>
 
-  <h1 class="mt-6 text-3xl font-semibold tracking-tight sm:text-4xl">
-    A calm place to read the web.
-  </h1>
+<section class="mx-auto grid w-full max-w-5xl items-start gap-12 px-4 pt-16 lg:grid-cols-2 lg:gap-16">
+  <div class="min-w-0 max-w-2xl">
+    <p class="text-sm">
+      <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="term-caret select-none" aria-hidden="true"></span>
+    </p>
 
-  <p class="mt-5 max-w-xl leading-relaxed text-stone-600">
-    Drift is a fast, distraction-free RSS reader. Subscribe to the sites and
-    blogs you follow, and read them in one quiet place — in the order they were
-    published, with nothing in between. The same list is a feed for your agent,
-    if you want that.
-  </p>
+    <h1 class="mt-6 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
+      The web you follow,<br>
+      in one inbox.
+    </h1>
 
-  <div class="mt-8">
-    <%= link_to "[ get started ]", new_registration_path, class: cta_primary %>
+    <p class="mt-6 max-w-2xl text-base text-pretty leading-relaxed text-stone-600">
+      Paste a site address. Drift finds the feed and keeps new posts in the
+      order they were published, with nothing in between. The same list can
+      feed your agent, as the article.
+    </p>
+
+    <div class="mt-8">
+      <%= link_to "Create your inbox", new_registration_path, class: cta %>
+    </div>
+
+    <p class="mt-4 text-sm text-stone-500"><%= proof %></p>
   </div>
 
-  <p class="mt-4 text-xs text-stone-500">
-    Free and open source. No ads, no tracking, no AI summaries.
-  </p>
-
-  <dl class="mt-12 space-y-3 border-t border-stone-200 pt-8 text-sm">
-    <% features.each do |feature| %>
-      <div class="sm:flex sm:gap-3">
-        <dt class="font-medium tracking-tight text-stone-900 sm:w-28 sm:shrink-0">
-          <span class="select-none text-amber-700" aria-hidden="true">&gt;</span>
-          <%= feature[:cmd] %>
-        </dt>
-        <dd class="leading-relaxed text-stone-600"><%= feature[:body] %></dd>
+  <figure class="min-w-0 border border-stone-300 bg-stone-100" role="img" aria-label="Sample unread inbox. Four illustrated rows, not a live feed.">
+    <div aria-hidden="true">
+      <div class="flex items-baseline gap-2 border-b border-stone-300 px-4 py-3 text-sm">
+        <span class="text-amber-700">drift</span><span class="text-stone-400">:</span><span class="text-stone-500">~/</span><span class="font-medium text-stone-900">unread</span>
       </div>
-    <% end %>
-  </dl>
 
-  <div class="mt-12 space-y-1 border-t border-stone-200 pt-8 text-sm">
-    <p><span class="text-amber-700">$</span> drift inbox</p>
-    <p class="text-stone-400"># unread, as JSON</p>
-    <p class="pt-2"><span class="text-amber-700">$</span> drift show 699</p>
-    <p class="text-stone-400"># the article, not a summary we invented</p>
-    <p class="pt-2 text-stone-400">
-      # rDrift skill →
-      <%= link_to "skills/drift-cli", "https://github.com/iuhoay/drift-cli",
-            class: "underline underline-offset-2 hover:text-stone-700" %>
-    </p>
+      <ul class="divide-y divide-stone-200">
+        <% rows.each do |row| %>
+          <li class="border-l-2 px-4 py-3 <%= row[:cursor] ? "border-amber-700 bg-amber-700/[0.07]" : "border-transparent" %>">
+            <div class="flex items-baseline gap-3 text-[0.7rem] uppercase tracking-[0.18em] text-stone-500">
+              <span class="min-w-0 flex-1 truncate">[<%= row[:feed] %>]</span>
+              <span class="shrink-0 normal-case tracking-normal tabular-nums text-stone-300"><%= row[:time] %></span>
+            </div>
+            <p class="mt-1 flex items-baseline gap-2 text-sm leading-snug <%= row[:unread] ? "font-medium text-stone-900" : "text-stone-500" %>">
+              <span class="w-2 shrink-0 select-none text-center <%= row[:mark_class] %>"><%= row[:mark] %></span>
+              <span class="min-w-0 truncate"><%= row[:title] %></span>
+            </p>
+          </li>
+        <% end %>
+      </ul>
+
+      <div class="flex items-center justify-between border-t border-stone-300 px-4 py-3 text-xs text-stone-500">
+        <span>4 entries</span>
+        <span>sample, not a live feed</span>
+      </div>
+    </div>
+  </figure>
+</section>
+
+<section class="mx-auto w-full max-w-5xl px-4 pt-20" aria-labelledby="what-you-get">
+  <div class="max-w-2xl">
+    <h2 id="what-you-get" class="text-xl font-semibold tracking-tight">
+      <span class="select-none text-amber-700" aria-hidden="true">&gt;</span>
+      What you get
+    </h2>
+    <dl class="mt-8 space-y-6 text-sm">
+      <% benefits.each do |benefit| %>
+        <div>
+          <dt class="font-medium text-stone-900"><%= benefit[:cmd] %></dt>
+          <dd class="mt-1 text-pretty leading-relaxed text-stone-600"><%= benefit[:body] %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+</section>
+
+<section class="mx-auto w-full max-w-5xl px-4 pt-20" aria-labelledby="tagline">
+  <h2 id="tagline" data-controller="landing-tagline" class="landing-tagline max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+    <% tagline.each do |line| %>
+      <span class="block">
+        <% line.each do |token| %>
+          <%= tag.span token, class: "landing-word", data: { landing_tagline_target: "word" } %>
+        <% end %>
+      </span>
+    <% end %>
+  </h2>
+</section>
+
+<section class="mx-auto w-full max-w-5xl px-4 pt-20" aria-labelledby="how-it-works">
+  <div class="max-w-2xl">
+    <h2 id="how-it-works" class="text-xl font-semibold tracking-tight">
+      <span class="select-none text-amber-700" aria-hidden="true">&gt;</span>
+      How it works
+    </h2>
+    <ol class="mt-8 space-y-6">
+      <% steps.each do |step| %>
+        <li class="flex gap-4">
+          <span class="w-4 shrink-0 text-sm font-semibold text-amber-700" aria-hidden="true"><%= step[:n] %></span>
+          <div class="min-w-0">
+            <p class="text-base font-medium text-stone-900"><%= step[:title] %></p>
+            <p class="mt-1 text-sm text-pretty leading-relaxed text-stone-600"><%= step[:body] %></p>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+
+    <div class="mt-8 border border-stone-300 bg-stone-100 px-4 py-4 text-sm">
+      <p><span class="text-amber-700">$</span> drift inbox</p>
+      <p class="text-stone-400"># unread, as JSON</p>
+      <p class="pt-4"><span class="text-amber-700">$</span> drift show 699</p>
+      <p class="text-stone-400"># the article, not a summary we invented</p>
+      <p class="pt-4 text-stone-400">
+        # rDrift skill →
+        <%= link_to "skills/drift-cli", "https://github.com/iuhoay/drift-cli",
+              class: "underline underline-offset-2 hover:text-stone-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700" %>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto w-full max-w-5xl px-4 pt-20" aria-labelledby="questions">
+  <div class="max-w-2xl">
+    <h2 id="questions" class="text-xl font-semibold tracking-tight">
+      <span class="select-none text-amber-700" aria-hidden="true">&gt;</span>
+      Questions
+    </h2>
+    <dl class="mt-8 space-y-6">
+      <% faqs.each do |faq| %>
+        <div>
+          <dt class="text-base font-medium text-stone-900"><%= faq[:q] %></dt>
+          <dd class="mt-1 text-sm text-pretty leading-relaxed text-stone-600"><%= faq[:a] %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+</section>
+
+<section class="mx-auto w-full max-w-5xl px-4 pt-20 pb-20" aria-labelledby="open-inbox">
+  <div class="max-w-2xl">
+    <h2 id="open-inbox" class="text-xl font-semibold tracking-tight text-balance">
+      The inbox is empty until you add a feed.
+    </h2>
+    <div class="mt-8">
+      <%= link_to "Create your inbox", new_registration_path, class: cta %>
+    </div>
+    <p class="mt-4 text-sm text-stone-500"><%= proof %></p>
   </div>
 </section>
