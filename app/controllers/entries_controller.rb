@@ -6,6 +6,7 @@ class EntriesController < ApplicationController
   def index
     @scope = params[:scope].presence_in(%w[all unread starred]) || "unread"
     @feed = Current.user.feeds.find_by(id: params[:feed_id]) if params[:feed_id]
+    @subscription = Current.user.subscriptions.find_by(feed: @feed) if @feed
     @category = params[:category].to_s.strip.presence
     @category_options = Current.user.subscriptions.filter_map(&:category).uniq.sort_by(&:downcase)
     @query = params[:q].to_s.strip

@@ -79,6 +79,69 @@ class Feed::RefresherTest < ActiveSupport::TestCase
     assert_in_delta 300, feed.next_fetch_at - Time.current, 5
   end
 
+  test "first successful fetch does not notify watchers" do
+    feed = feeds(:failing)
+    users(:one).subscriptions.create!(feed: feed, watched: true)
+
+    assert_no_enqueued_jobs only: WatchNotifyJob do
+      Feed::Refresher.new(feed, http: stub_http(200, {}, FEED_BODY)).call
+    end
+  end
+
+  test "a later fetch notifies watchers of newly created entries" do
+    feed = feeds(:example)
+    feed.update!(last_success_at: 1.hour.ago)
+    subscriptions(:one_example).update!(watched: true)
+
+    assert_enqueued_jobs 1, only: WatchNotifyJob do
+      Feed::Refresher.new(feed, http: stub_http(200, {}, FEED_BODY)).call
+    end
+
+    job = enqueued_jobs.find { |enqueued| enqueued[:job] == WatchNotifyJob }
+    assert_equal feed.id, job[:args][0]
+    assert_includes job[:args][1], feed.entries.find_by!(guid: "urn:entry:1").id
+  end
+
+  test "updating an existing guid does not notify" do
+    feed = feeds(:example)
+    feed.update!(last_success_at: 1.hour.ago)
+    subscriptions(:one_example).update!(watched: true)
+    Feed::Refresher.new(feed, http: stub_http(200, {}, FEED_BODY)).call
+
+    assert_no_enqueued_jobs only: WatchNotifyJob do
+      Feed::Refresher.new(feed, http: stub_http(200, {}, FEED_BODY)).call
+    end
+  end
+
+  test "new entries without watchers do not enqueue a notify" do
+    feed = feeds(:example)
+    feed.update!(last_success_at: 1.hour.ago)
+
+    assert_no_enqueued_jobs only: WatchNotifyJob do
+      Feed::Refresher.new(feed, http: stub_http(200, {}, FEED_BODY)).call
+    end
+  end
+
+  test "a 304 does not notify" do
+    feed = feeds(:example)
+    feed.update!(last_success_at: 1.hour.ago)
+    subscriptions(:one_example).update!(watched: true)
+
+    assert_no_enqueued_jobs only: WatchNotifyJob do
+      Feed::Refresher.new(feed, http: stub_http(304)).call
+    end
+  end
+
+  test "ingest notifies watchers after the feed has succeeded once" do
+    feed = feeds(:youtube)
+    feed.update!(last_success_at: 1.hour.ago)
+    users(:one).subscriptions.create!(feed: feed, watched: true)
+
+    assert_enqueued_jobs 1, only: WatchNotifyJob do
+      Feed::Refresher.ingest(feed, YOUTUBE_PUSH_BODY)
+    end
+  end
+
   test "a success revives a dead feed and clears its error" do
     feed = feeds(:failing)
     feed.update!(fetch_failure_count: Feed::DEAD_AFTER_FAILURES, dead_at: 2.days.ago)

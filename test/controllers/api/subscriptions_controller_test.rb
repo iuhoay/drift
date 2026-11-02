@@ -35,6 +35,7 @@ class Api::SubscriptionsControllerTest < ActionDispatch::IntegrationTest
 
     example = subscriptions.find { |subscription| subscription["feed_id"] == feeds(:example).id }
     assert_nil example["category"]
+    assert_equal false, example["watched"]
   end
 
   test "another user's token does not see this user's only-one feeds" do
