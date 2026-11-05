@@ -32,7 +32,7 @@ gem "omniauth-rails_csrf_protection", "~> 2.0"
 
 # Feed parsing and HTTP
 gem "feedjira", "~> 4.0"
-gem "faraday", "~> 2.14"
+gem "faraday", "~> 2.15"
 gem "faraday-follow_redirects", "~> 0.3"
 
 # HTML sanitization for entry content
